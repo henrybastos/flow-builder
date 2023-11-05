@@ -1,0 +1,45 @@
+{
+    "env": {
+       "response_slot": "lethamyr",
+       "video_url": "https://www.youtube.com/watch?v=vZDbybxRLRk",
+       "website_urls": [
+          {
+             "response_slot": "squishy",
+             "video_url": "https://www.youtube.com/watch?v=RFWGwNq_8_4"
+          },
+          {
+             "response_slot": "sunless",
+             "video_url": "https://www.youtube.com/watch?v=qohBbkwGkZc"
+          },
+          {
+             "response_slot": "retals",
+             "video_url": "https://www.youtube.com/watch?v=B77k6zqytzg"
+          }
+       ]
+    },
+    "flows": {
+       "main_flow": [
+          {
+             "command": "run_flow",
+             "flow": "scrape_video_title"
+          },
+          {
+             "command": "run_flow_for_each",
+             "flow": "scrape_video_title",
+             "env_var": "%website_urls%"
+          }
+       ],
+       "scrape_video_title": [
+          {
+             "command": "goto",
+             "target": "%video_url%"
+          },
+          {
+             "command": "scrape_attr",
+             "target": "//*/h1[contains(@class, 'ytd-watch-metadata')]",
+             "attr": "innerText",
+             "response_slot": "%response_slot%"
+          }
+       ]
+    }
+ }

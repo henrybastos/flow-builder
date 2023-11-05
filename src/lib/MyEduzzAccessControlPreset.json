@@ -1,0 +1,128 @@
+{
+    "main_flow": [
+       {
+          "command": "goto",
+          "target": "https://accounts.eduzz.com/53124931-1a7a-424b-aca7-a2eb91fd5b20/login?isPartnerCreate=true&isPartnerLogin=true&logo=https%3A%2F%2Forbita.eduzz.com%2Fimg%2Flogo-myeduzz-login.png&redirectTo=https%3A%2F%2Forbita.eduzz.com%2F"
+       },
+       {
+          "command": "type",
+          "target": "//*/input[@id='email-login']",
+          "value": "contatocamartins@hotmail.com"
+       },
+       {
+          "command": "type",
+          "target": "//*/input[@id='password-login']",
+          "value": "Eduzz.Ca2004"
+       },
+       {
+          "command": "click",
+          "target": "//*/button[@type='submit']"
+       },
+       {
+          "command": "click",
+          "target": "//*/span[text()='Controle de Acesso']"
+       },
+       {
+          "command": "click",
+          "target": "//*/button//*[text()='Adicionar Usuário']"
+       },
+       {
+          "command": "type",
+          "target": "//*/input[@name='name']",
+          "value": "Suporte Técnico - Kebook"
+       },
+       {
+          "command": "type",
+          "target": "//*/input[@name='email']",
+          "value": "suporte@kebook.com.br"
+       },
+       {
+          "command": "user_click",
+          "target": "//*/div[text()='Selecione o grupo']"
+       },
+       {
+          "command": "click",
+          "target": "//*/li[text()='Suporte Técnico']"
+       },
+       {
+          "command": "click",
+          "target": "//*/button//*[text()='Adicionar']"
+       },
+       {
+          "command": "goto",
+          "target": "https://accounts.eduzz.com/53124931-1a7a-424b-aca7-a2eb91fd5b20/login?isPartnerCreate=true&isPartnerLogin=true&logo=https%3A%2F%2Forbita.eduzz.com%2Fimg%2Flogo-myeduzz-login.png&redirectTo=https%3A%2F%2Forbita.eduzz.com%2F"
+       },
+       {
+          "command": "type",
+          "target": "//*/input[@id='email-login']",
+          "value": "contatocamartins@hotmail.com"
+       },
+       {
+          "command": "type",
+          "target": "//*/input[@id='password-login']",
+          "value": "Eduzz.Ca2004"
+       },
+       {
+          "command": "click",
+          "target": "//*/button[@type='submit']"
+       }
+    ],
+    "add_user": [
+       {
+          "command": "click",
+          "target": "//*/button//*[text()='Adicionar Usuário']"
+       },
+       {
+          "command": "type",
+          "target": "//*/input[@name='name']",
+          "value": "Suporte Técnico - Kebook"
+       },
+       {
+          "command": "type",
+          "target": "//*/input[@name='email']",
+          "value": "suporte@kebook.com.br"
+       },
+       {
+          "command": "user_click",
+          "target": "//*/div[text()='Selecione o grupo']"
+       },
+       {
+          "command": "click",
+          "target": "//*/li[text()='Suporte Técnico']"
+       },
+       {
+          "command": "click",
+          "target": "//*/button//*[text()='Adicionar']"
+       }
+    ],
+    "caroline_flow": [
+        {
+           "command": "type",
+           "target": "//*/input[@id='email-login']",
+           "value": "contatocamartins@hotmail.com"
+        },
+        {
+           "command": "type",
+           "target": "//*/input[@id='password-login']",
+           "value": "Eduzz.Ca2004"
+        },
+        {
+           "command": "click",
+           "target": "//*/span[text()='Caroline Jessica Pereira Martins']"
+        },
+        {
+           "command": "type",
+           "target": "//*/input[@id='email-login']",
+           "value": "contatocamartins@hotmail.com"
+        },
+        {
+           "command": "type",
+           "target": "//*/input[@id='password-login']",
+           "value": "Eduzz.Ca2004"
+        },
+        {
+           "command": "click",
+           "target": "//*/span[text()='Caroline Jessica Pereira Martins']"
+        }
+     ]
+ }

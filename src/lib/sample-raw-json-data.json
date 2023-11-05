@@ -1,0 +1,20 @@
+{
+    "payload": {
+       "expert_data": {
+             "emails_url": "https://emails.kebook.live/",
+             "brand_name": "testbrand.com",
+             "list_label": "TEMP_TEST"
+       },
+       "template_data": {
+             "expert": "Alefy Sousa",
+             "product_name": "Escola de Açougueiros",
+             "color": "#d50a0a",
+             "logo_expert": "https://kronus.kebook.com.br/assets/8e41d80c-95a5-4741-b4b3-8c642364eba7",
+             "link_checkout": "https://sun.eduzz.com/2117410",
+             "link_selling": "https://alefysousa.kebook.com.br/cursos/escola-de-acougueiros/",
+             "link_facebook": "https://www.facebook.com/Alefysousaa/",
+             "link_instagram": "https://www.instagram.com/carnes_e_cortes_nobres/",
+             "link_youtube": "https://www.youtube.com/@alefysousacortes/feature"
+       }
+    }
+ }
