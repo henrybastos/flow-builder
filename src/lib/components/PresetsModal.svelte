@@ -1,6 +1,5 @@
 <script>
    import Modal from "./Modal.svelte";
-   export let presetList
    export let presetsModal;
    export let newPresetName;
 
@@ -11,6 +10,33 @@
 
    export let clearPresetsHandler;
    export let loadPresetFileHandler;
+
+   function savePreset () {
+        localStorage.setItem('presets', JSON.stringify({...presets, [newPresetName]: { payload } }));
+        console.log('Preset saved!');
+    }
+
+    function clearPresets () {
+        localStorage.removeItem('presets');
+        console.log('Presets cleared!');
+    }
+
+    function removePreset (_preset_name) {
+        delete presets[_preset_name];
+        localStorage.setItem('presets', JSON.stringify(presets));
+    }
+
+    function loadPreset (_preset_name) {
+        console.log(_preset_name, presets[_preset_name].payload);
+        payloadModalTextearea = JSON.stringify(presets[_preset_name].payload, null, 3);
+        loadPayload();
+        presetsModal.close();
+    }
+
+    export function open () {
+        // exportFlowsToJson();
+        presetsModal.open();
+    }
 </script>
 
 <Modal bind:this={presetsModal} title="Presets">

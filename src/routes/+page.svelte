@@ -76,29 +76,7 @@
             presets = JSON.parse(localStorage.getItem('presets'));
             console.log(JSON.stringify(presets, null, 3));
         }
-    })
-
-    function savePreset () {
-        localStorage.setItem('presets', JSON.stringify({...presets, [newPresetName]: { payload } }));
-        console.log('Preset saved!');
-    }
-
-    function clearPresets () {
-        localStorage.removeItem('presets');
-        console.log('Presets cleared!');
-    }
-
-    function removePreset (_preset_name) {
-        delete presets[_preset_name];
-        localStorage.setItem('presets', JSON.stringify(presets));
-    }
-
-    function loadPreset (_preset_name) {
-        console.log(_preset_name, presets[_preset_name].payload);
-        payloadModalTextearea = JSON.stringify(presets[_preset_name].payload, null, 3);
-        loadPayload();
-        presetsModal.close();
-    }
+    });
 
     function addFlow () {
         flows[convertToSnakeCase(newFlowName)] = [];
@@ -163,11 +141,6 @@
             }
             payload.flows[flow_name] = flowBuffer;
         });
-    }
-
-    function openPresetsModal () {
-        exportFlowsToJson();
-        presetsModal.open();
     }
 
     function openPayloadModal () {
@@ -327,7 +300,7 @@
     </header>
 
     <div class="btn-bar">
-        <button on:click={openPresetsModal} class="btn-md w-full col-span-full">
+        <button on:click={() => presetsModal.open()} class="btn-md w-full col-span-full">
             <i class="ti ti-bookmarks text-blue-500"></i>
             Presets
         </button>
@@ -433,7 +406,9 @@
         </div>
     </Modal>
 
-    <PresetsModal />
+    <PresetsModal
+        bind:presetsModal={presetsModal}
+    />
 
     <ToastsWrapper bind:this={toastWrapper} />
 </main>

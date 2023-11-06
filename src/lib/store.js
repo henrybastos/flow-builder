@@ -11,6 +11,18 @@ console.log(`⣠⠀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⡄�
 // "response_slot": "jivo_id"
 // }
 
+function createUser () {
+    const { subscribe, set, update } = writable({name: 'Roberto'});
+
+    return {
+        subscribe,
+        setName: (name) => update(user => ({...user, name: name})),
+        reset: () => set({})
+    }
+}
+
+export const USER = createUser();
+
 export const FLOW_BUILDER_INPUT_FIELD_TEMPLATES = {
     flow: {
         type: 'dropdown',
@@ -230,4 +242,4 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = writable({
             picker_target: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.picker_target,
         }
     }
-})
+}) 
