@@ -1,29 +1,27 @@
 <script>
    import Modal from "./Modal.svelte";
+   import { FLOW_PRESETS } from "$lib/PresetsStore";
+   import { PAYLOAD } from "$lib/store";
    export let presetsModal;
    export let newPresetName;
 
-   export let loadPresetHandler;
-   export let editPresetHandler;
-   export let savePresetHandler;
-   export let deletePresetHandler;
-
-   export let clearPresetsHandler;
-   export let loadPresetFileHandler;
-
    function savePreset () {
-        localStorage.setItem('presets', JSON.stringify({...presets, [newPresetName]: { payload } }));
+        FLOW_PRESETS.savePreset({ [newPresetName]: { $PAYLOAD } });
+
+        PAYLOAD.addFlow('flow_01');
+        PAYLOAD.addCommand('flow_01', { command: 'goto', link: 'my_link_dot_com' });
+
+        console.log($PAYLOAD);
         console.log('Preset saved!');
+        newPresetName = '';
     }
 
     function clearPresets () {
-        localStorage.removeItem('presets');
-        console.log('Presets cleared!');
+        FLOW_PRESETS.clearPresets();
     }
 
     function removePreset (_preset_name) {
-        delete presets[_preset_name];
-        localStorage.setItem('presets', JSON.stringify(presets));
+        FLOW_PRESETS.removePreset(_preset_name);
     }
 
     function loadPreset (_preset_name) {
@@ -31,6 +29,10 @@
         payloadModalTextearea = JSON.stringify(presets[_preset_name].payload, null, 3);
         loadPayload();
         presetsModal.close();
+    }
+
+    function editPreset () {
+        console.log('Edit preset!');
     }
 
     export function open () {
@@ -41,34 +43,35 @@
 
 <Modal bind:this={presetsModal} title="Presets">
    <div class="btn-bar mb-3">
-       {#each Object.keys(presetList) as preset_name}
-           <div class="grid grid-cols-6 col-span-full">
-               <button class="btn-md w-full col-span-4" on:click={() => loadPresetHandler(preset_name)}>
+       {#each Object.keys($FLOW_PRESETS) as preset_name}
+           <div class="flex flex-row col-span-full">
+               <button class="btn-md grow" on:click={() => loadPreset(preset_name)}>
                    <i class="ti ti-bookmark-filled text-blue-500"></i>
                    { preset_name }
                </button>
-               <button class="btn-md col-span-1" on:click={() => editPresetHandler(preset_name)}>
+               <!-- <button class="btn-md" on:click={() => editPreset(preset_name)}>
                    <i class="ti ti-ballpen"></i>
-               </button>
-               <button class="btn-md btn-danger col-span-1" on:click={() => deletePresetHandler(preset_name)}>
+               </button> -->
+               <button class="btn-md btn-danger" on:click={() => removePreset(preset_name)}>
                    <i class="ti ti-trash-x"></i>
                </button>
            </div>
        {/each}
    </div>
+   
    <div class="btn-bar">
-       <button on:click={clearPresetsHandler} class="btn-md btn-danger w-full">
+       <button on:click={clearPresets} class="btn-md btn-danger w-full">
            <i class="ti ti-book-download"></i>
            Clear presets
        </button>
 
-       <button on:click={loadPresetFileHandler} class="btn-md w-full">
+       <button on:click={loadPreset} class="btn-md w-full">
            <i class="ti ti-book-download text-blue-500"></i>
            Load Presets
        </button>
 
        <input class="input-md peer/preset-name" bind:value={newPresetName} type="text" placeholder="Preset name">
-       <button on:click={savePresetHandler} class="btn-md w-full">
+       <button on:click={savePreset} class="btn-md w-full">
            <i class="ti ti-book-upload text-blue-500"></i>
            Save Preset
        </button>

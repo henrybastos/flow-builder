@@ -16,6 +16,7 @@
     import OperationBuilder from "$lib/components/OperationBuilder.svelte";
     import Fieldset from "$lib/components/Fieldset.svelte";
     import ToastsWrapper from "$lib/components/ToastsWrapper.svelte";
+    import { FLOW_PRESETS } from '$lib/PresetsStore';
 
     import { snakeCaseToPascalCase, convertToSnakeCase } from "$lib/utils";
     import { onMount } from "svelte";
@@ -72,10 +73,18 @@
             toastWrapper.appendToast('No payload found in local storage.', 'error');
         }
 
-        if (localStorage.getItem('presets')) {
-            presets = JSON.parse(localStorage.getItem('presets'));
-            console.log(JSON.stringify(presets, null, 3));
+        if (localStorage?.getItem('presets')) {
+            try {
+                presets = JSON.parse(localStorage.getItem('presets'));
+            } catch (err) {
+                console.error(err);
+                console.error(`[ERR] Invalid presets strucuture.`);
+            }
         }
+
+        // FLOW_PRESETS.savePreset({ preset_01: { command: 'test' }});
+
+        // console.log($FLOW_PRESETS);
     });
 
     function addFlow () {

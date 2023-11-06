@@ -11,17 +11,40 @@ console.log(`⣠⠀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⡄�
 // "response_slot": "jivo_id"
 // }
 
-function createUser () {
-    const { subscribe, set, update } = writable({name: 'Roberto'});
+function createPayload () {
+    const initStruct = {
+        env: {},
+        main_flow: {}
+    };
+    const { subscribe, update, set } = writable(structuredClone(initStruct));
 
     return {
         subscribe,
-        setName: (name) => update(user => ({...user, name: name})),
-        reset: () => set({})
+        addFlow: (_flow_name) => update((_payload) => {
+            return {
+                ..._payload, 
+                [_flow_name]: []
+            }
+        }),
+        addCommand: (_flow_name, _command) => {
+            update((_payload) => {
+                return {
+                    ..._payload,
+                    [_flow_name]: [
+                        ..._payload[_flow_name],
+                        _command
+                    ]
+                }
+            })
+        },
+        resetPayload: () => {
+            set(structuredClone(initStruct));
+            localStorage.removeItem('presets');
+        }
     }
 }
 
-export const USER = createUser();
+export const PAYLOAD = createPayload();
 
 export const FLOW_BUILDER_INPUT_FIELD_TEMPLATES = {
     flow: {
