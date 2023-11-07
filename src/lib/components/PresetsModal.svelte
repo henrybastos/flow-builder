@@ -1,17 +1,21 @@
 <script>
    import Modal from "./Modal.svelte";
    import { FLOW_PRESETS } from "$lib/PresetsStore";
-   import { PAYLOAD } from "$lib/store";
+   import PAYLOAD from "$lib/PayloadStore";
    export let presetsModal;
-   export let newPresetName;
+   let newPresetName;
 
    function savePreset () {
-        FLOW_PRESETS.savePreset({ [newPresetName]: { $PAYLOAD } });
-
+        PAYLOAD.setStrictFlows(true);
         PAYLOAD.addFlow('flow_01');
-        PAYLOAD.addCommand('flow_01', { command: 'goto', link: 'my_link_dot_com' });
+        PAYLOAD.addCommand('flow_01', { command: 'Bark!' });
+        PAYLOAD.addCommand('main_flow', { command: 'Miaw!' });
+        FLOW_PRESETS.savePreset({ [newPresetName]: { ...$PAYLOAD } });
 
-        console.log($PAYLOAD);
+        // PAYLOAD.addFlow('flow_01');
+        // PAYLOAD.addCommand('flow_01', { command: 'goto', link: 'my_link_dot_com' });
+        // console.log($PAYLOAD);
+
         console.log('Preset saved!');
         newPresetName = '';
     }
@@ -25,9 +29,8 @@
     }
 
     function loadPreset (_preset_name) {
-        console.log(_preset_name, presets[_preset_name].payload);
-        payloadModalTextearea = JSON.stringify(presets[_preset_name].payload, null, 3);
-        loadPayload();
+        PAYLOAD.loadPreset($FLOW_PRESETS[_preset_name]);
+        console.log($PAYLOAD);
         presetsModal.close();
     }
 

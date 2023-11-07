@@ -1,46 +1,51 @@
 <script>
     import Dropdown from "./Dropdown.svelte";
+    import { getContext } from "svelte";
+    import { FLOW_BUILDER_INPUT_FIELD_TEMPLATES } from "$lib/store";
+    import PAYLOAD from "$lib/PayloadStore";
+    import { snakeCaseToPascalCase, checkForEnvPlaceholder } from "$lib/utils";
 
     let isOptionnCollapsed = true;
+    let flowName = getContext('flow_name');
 
-    export let operationStructure;
-    export let moveOperationUp, moveOperationDown, removeOperation;
-    export let flowsDropdownOptions = [];
-    import { FLOW_BUILDER_INPUT_FIELD_TEMPLATES } from "$lib/store";
-    import { snakeCaseToPascalCase, checkForEnvPlaceholder } from "$lib/utils";
+    export let operation;
+    export let flowsDropdownOptions = [
+        { label: 'flow_01', value: 'Flow 01' },
+        { label: 'flow_02', value: 'Flow 02' }
+    ];
 
     const OPERATION_CONFIG_OPTIONS = [
         {
             name: 'remove',
             danger: true,
             icon: 'ti-trash',
-            action: removeOperation
+            action: () => PAYLOAD.removeOperation(flowName, operation.id)
         },
         {
             name: 'move_up',
             icon: 'ti-circle-chevron-up',
-            action: moveOperationUp
+            action: () => PAYLOAD.moveOperation(flowName, operation, 'up')
         },
         {
             name: 'move_down',
             icon: 'ti-circle-chevron-down',
-            action: moveOperationDown
+            action: () => PAYLOAD.moveOperation(flowName, operation, 'down')
         }
     ];
 
     function handleDropdownOptionSelection ({ detail }, _field) {
-        if (operationStructure.command === 'repeat_flow') {
+        if (operation.command === 'repeat_flow') {
             _field.value = detail.value;
             _field.dropdown_label = detail.label;
 
             switch (detail.value) {
                 case 'by_group':
-                    operationStructure.input_fields.group_name = FLOW_BUILDER_INPUT_FIELD_TEMPLATES.group_name; 
-                    delete operationStructure.input_fields.flow;
+                    operation.input_fields.group_name = FLOW_BUILDER_INPUT_FIELD_TEMPLATES.group_name; 
+                    delete operation.input_fields.flow;
                     break;
                 case 'by_flow':
-                    operationStructure.input_fields.flow = FLOW_BUILDER_INPUT_FIELD_TEMPLATES.flow; 
-                    delete operationStructure.input_fields.group_name;
+                    operation.input_fields.flow = FLOW_BUILDER_INPUT_FIELD_TEMPLATES.flow; 
+                    delete operation.input_fields.group_name;
                     break;
             }
         }
@@ -52,11 +57,11 @@
     }
 </script>
 
-<div class="mb-4 p-4 border-2 border-neutral-800 rounded-lg" id={ operationStructure.id }>
+<div class="mb-4 p-4 border-2 border-neutral-800 rounded-lg" id={ operation.id }>
     <div class="flex flex-row justify-between">
         <h5 class="mb-4 text-left">
-            <i class={`ti ${ operationStructure.icon || 'ti-topology-ring-2' } text-blue-500 mr-1 text-2xl`}></i>
-            { operationStructure.label }
+            <i class={`ti ${ operation.icon || 'ti-topology-ring-2' } text-blue-500 mr-1 text-2xl`}></i>
+            { operation.label }
         </h5>
         <div class="flex flex-row flex-nowrap">
             <i on:click={() => isOptionnCollapsed = !isOptionnCollapsed} class="ti ti-settings text-2xl text-neutral-600 hover:text-neutral-200 cursor-pointer"></i>
@@ -69,8 +74,8 @@
         </div>
     </div>
     <div class="grid grid-cols-[min-content_auto] gap-y-3">
-        {#if operationStructure?.input_fields}
-            {#each Object.entries(operationStructure.input_fields) as [field_name, field]}
+        {#if operation?.input_fields}
+            {#each Object.entries(operation.input_fields) as [field_name, field], i (operation.id)}
                 {#if field.type !== 'btn'}
                     <label class="col-start-1 col-end-2 whitespace-nowrap pr-4 my-auto" for={ field_name }>{ field.label }</label>
                 {/if}
@@ -84,18 +89,6 @@
                         placeholder={ field.placeholder }
                     >
                 {:else if field.type === 'dropdown'}
-                    <Dropdown
-                        bind:selectedOption={ field.value }
-                        selectedOptionLabel={ 
-                            snakeCaseToPascalCase(field.value, true)
-                        }
-                        options={ 
-                            isFlowsDropdown(field_name) ? 
-                            flowsDropdownOptions : 
-                            field.options 
-                        } 
-                        on:select_option={(evt) => handleDropdownOptionSelection(evt, field)}
-                    />
                 {:else if field.type === 'btn'}
                     <button class="btn-sm col-span-full w-full">{ field.label }</button>
                 {/if}

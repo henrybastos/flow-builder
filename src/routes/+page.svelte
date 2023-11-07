@@ -11,12 +11,16 @@
 <script>
     import '../app.css';
     import { FLOW_BUILDER_OPERATION_TEMPLATES } from "$lib/store";
+    import PAYLOAD from "$lib/PayloadStore";
+    import { FLOW_PRESETS } from '$lib/PresetsStore';
+
     import Modal from "$lib/components/Modal.svelte";
     import PresetsModal from '$lib/components/PresetsModal.svelte';
     import OperationBuilder from "$lib/components/OperationBuilder.svelte";
     import Fieldset from "$lib/components/Fieldset.svelte";
     import ToastsWrapper from "$lib/components/ToastsWrapper.svelte";
-    import { FLOW_PRESETS } from '$lib/PresetsStore';
+    import LetTest from '$lib/components/LetTest.svelte';
+    import Flow from '$lib/components/Flow.svelte';
 
     import { snakeCaseToPascalCase, convertToSnakeCase } from "$lib/utils";
     import { onMount } from "svelte";
@@ -285,6 +289,11 @@
         toastWrapper.appendToast('Payload deleted!', 'danger');
         pageSettingsModal.close();
     }
+
+    let id_arr = [
+        'id_001',
+        'id_002'
+    ]
 </script>
 
 
@@ -308,6 +317,12 @@
         <p class="text-center text-neutral-500">Powered by Tailwind, SvelteKit and Puppeteer</p>
     </header>
 
+    {#each id_arr as item_id}
+        <LetTest let:sayId id={item_id}>
+            <button class="btn-md" on:click={sayId}>Bark 🐶</button>
+        </LetTest>
+    {/each}
+
     <div class="btn-bar">
         <button on:click={() => presetsModal.open()} class="btn-md w-full col-span-full">
             <i class="ti ti-bookmarks text-blue-500"></i>
@@ -325,7 +340,11 @@
         </button>
     </div>
 
-    {#each Object.keys(flows) as flow_name, index (flow_name)}
+    <!-- START  //  OPERATION SECTION   //  START -->
+
+    <Flow flowName="main_flow" />
+
+    <!-- {#each Object.keys(flows) as flow_name, index (flow_name)}
         <Fieldset 
             legend={ snakeCaseToPascalCase(flow_name, true) } 
             isDynamic={flow_name !== 'main_flow' ? true : false} 
@@ -362,7 +381,9 @@
                 </button>
             {/each}
         </div>
-    </Modal>
+    </Modal> -->
+
+    <!-- END    //  OPERATION SECTION   //      END -->
 
     <Modal bind:this={addFlowModal} title="Add flow">
         <div class="btn-bar">
@@ -373,7 +394,7 @@
     </Modal>
 
     <Modal bind:this={payloadModal} title="Payload" on:close={() => runFlowMessage.message = ''}>
-        <textarea class="code" bind:value={payloadModalTextearea} name="" id="" cols="30" rows="20"></textarea>
+        <textarea class="code" value={JSON.stringify($PAYLOAD, null, 3)} name="" id="" cols="30" rows="20"></textarea>
         
         {#if runFlowMessage.message !== ''}
             <span class={`${ runFlowMessage.type === 'error' ? 'text-red-600' : 'text-green-600' } mt-4`}>

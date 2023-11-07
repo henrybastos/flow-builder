@@ -11,41 +11,6 @@ console.log(`⣠⠀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⡄�
 // "response_slot": "jivo_id"
 // }
 
-function createPayload () {
-    const initStruct = {
-        env: {},
-        main_flow: {}
-    };
-    const { subscribe, update, set } = writable(structuredClone(initStruct));
-
-    return {
-        subscribe,
-        addFlow: (_flow_name) => update((_payload) => {
-            return {
-                ..._payload, 
-                [_flow_name]: []
-            }
-        }),
-        addCommand: (_flow_name, _command) => {
-            update((_payload) => {
-                return {
-                    ..._payload,
-                    [_flow_name]: [
-                        ..._payload[_flow_name],
-                        _command
-                    ]
-                }
-            })
-        },
-        resetPayload: () => {
-            set(structuredClone(initStruct));
-            localStorage.removeItem('presets');
-        }
-    }
-}
-
-export const PAYLOAD = createPayload();
-
 export const FLOW_BUILDER_INPUT_FIELD_TEMPLATES = {
     flow: {
         type: 'dropdown',
