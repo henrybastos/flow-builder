@@ -65,11 +65,7 @@
                         placeholder={ field.placeholder }
                     >
                 {:else if field.type === 'dropdown'}
-                    <button class="inline-flex justify-center items-center py-2 col-span-full w-full">
-                        <i class={`ti ${ operation.icon || 'ti-topology-ring-2' } text-blue-500 mr-2 text-2xl`}></i>
-                        { operation.label }
-                        <CollapsableOptions options={OPERATION_CONFIG_OPTIONS} />
-                    </button>
+                    <span class="bg-neutral-900 border-2 border-neutral-800 rounded-lg py-2 text-center text-neutral-400">Dropdown</span>
                 {:else if field.type === 'btn'}
                     <button class="btn-sm col-span-full w-full">{ field.label }</button>
                 {/if}

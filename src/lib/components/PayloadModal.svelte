@@ -1,33 +1,18 @@
 <script>
+    import { FLOW_BUILDER_OPERATION_TEMPLATES } from "$lib/store";
     import Modal from "./Modal.svelte";
     import PAYLOAD from "$lib/PayloadStore";
+
     let payloadModal;
+    let isFLowAPILoading;
+    let payloadModalTextearea;
+    let runFlowMessage = {
+        type: 'error',
+        message: ''
+    };
 
-    function openPayloadModal () {
-        exportFlowsToJson();
-        // payloadModalTextearea = JSON.stringify(payload, null, 3);
-        payloadModal.open();
-    }
-
-    async function exportFlowsToJson () {
-        // Object.entries(flows).forEach(([flow_name, flow_body]) => {
-        //     let flowBuffer = [];
-
-        //     for (let block of flow_body) {
-        //         let commandBody = {};
-        //         commandBody.command = block.command;
-
-        //         if (block?.input_fields) {
-        //             Object.entries(block.input_fields).forEach(([field_name, field]) => {
-        //                 commandBody[field_name] = field.value;
-        //             })
-        //         }
-
-        //         flowBuffer.push(commandBody);
-        //     }
-        //     payload.flows[flow_name] = flowBuffer;
-        // });
-
+    function transformToJSON () {
+        let payloadBuffer = structuredClone($PAYLOAD);
         Object.entries($PAYLOAD.flows).forEach(([flow_name, flow_body]) => {
             let flowBuffer = [];
 
@@ -44,21 +29,108 @@
                 flowBuffer.push(operationBody);
             }
 
-            PAYLOAD.loadFlow(flow_name, flowBuffer);
-            console.log($PAYLOAD);
+            payloadBuffer.flows[flow_name] = flowBuffer;
+
+            console.log('Transform to JSON');
         });
+        payloadModalTextearea = JSON.stringify(payloadBuffer, null, 3);
+    }
+
+    async function sendFlowPayload (_payload) {
+        isFLowAPILoading = true;
+
+        if (Object.keys($PAYLOAD.flows.main_flow).length > 0) {
+            let response = await fetch('http://localhost:5173/api/run-flow', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify( $PAYLOAD )
+            });
+
+            response = await response.json();
+
+            if (response.error) {
+                runFlowMessage.type = 'error';
+                runFlowMessage.message = response.error.message;
+            } else {
+                console.log(response);
+                runFlowMessage.type = 'success';
+                runFlowMessage.message = response.status.message;
+            }
+        } else {
+            runFlowMessage.type = 'error';
+            runFlowMessage.message = 'Empty Main Flow. Nothing to run.';
+        }
+        isFLowAPILoading = false;
+    }
+
+    function loadPayload () {
+        const payloadJSON = JSON.parse(payloadModalTextearea);
+
+        PAYLOAD.resetPayload();
+        PAYLOAD.setEnv(payloadJSON.env);
+
+        console.log(payloadJSON);
+
+        Object.entries(payloadJSON.flows).forEach(([ _flow_name, _flow_body ]) => {
+            PAYLOAD.addFlow(_flow_name);
+            Object.values(_flow_body).forEach((operation) => {
+                if ( $FLOW_BUILDER_OPERATION_TEMPLATES[operation.command] ) {
+                    const operationBody = structuredClone( $FLOW_BUILDER_OPERATION_TEMPLATES[operation.command] );
+                    
+                    if (operationBody?.input_fields) {
+                        // if (_operation_body?.input_fields) {
+                        //     Object.values(_operation_body.input_fields).forEach(input => {
+                        //         if (input.type === 'dropdown') {
+                        //             input.options = Object.keys(flows);
+                        //         }
+                        //     })
+                        // }
+
+                        Object.entries(operationBody.input_fields).forEach(([key, value]) => {
+                            value.value = operation[key];
+                        })
+                    }
+
+                    PAYLOAD.addCommand(_flow_name, operationBody);
+                }
+            })
+        });
+
+        console.log($PAYLOAD);
+        payloadModal.close();
+    }
+
+    function addFlowOperationBody (_operation_body, _flow_name) {
+            
+        // if (flows[_flow_name]) {
+        //     flows[_flow_name] = [...flows[_flow_name], _operation_body];
+        // } else {
+        //     flows[_flow_name] = [_operation_body];
+        // }
+
+        // addOperationsModal.close();
+    }
+
+    function onPayloadModalOpenHandler () {
+        transformToJSON();
+    }
+
+    function onPayloadModalCloseHandler () {
+        runFlowMessage.message = '';
     }
 </script>
 
-<button on:click={openPayloadModal} class="btn-md btn-full mb-4">
+<button on:click={() => payloadModal.open()} class="btn-md btn-full mb-4">
     <i class="ti ti-script text-blue-500"></i>
     Process JSON
 </button>
 
-<Modal bind:this={payloadModal} title="Payload" on:close={() => runFlowMessage.message = ''}>
-    <textarea class="code" value={JSON.stringify($PAYLOAD, null, 3)} name="" id="" cols="30" rows="20"></textarea>
+<Modal on:open={onPayloadModalOpenHandler} on:close={onPayloadModalCloseHandler} bind:this={payloadModal} title="Payload">
+    <textarea class="code" bind:value={payloadModalTextearea} name="" id="" cols="30" rows="20"></textarea>
     
-    <!-- {#if runFlowMessage.message !== ''}
+    {#if runFlowMessage.message !== ''}
         <span class={`${ runFlowMessage.type === 'error' ? 'text-red-600' : 'text-green-600' } mt-4`}>
                 <i class="ti ti-exclamation-circle text-lg mr-2 align-middle"></i>
                 { runFlowMessage.message }
@@ -81,5 +153,5 @@
             <i class="ti ti-file-upload text-blue-500"></i>
             Load payload
         </button>
-    </div> -->
+    </div>
 </Modal>

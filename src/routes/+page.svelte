@@ -39,11 +39,6 @@
     let newPresetName;
     let flowOperationOwner = flows.main_flow;
     let payloadModalTextearea;
-    let isFLowAPILoading;
-    let runFlowMessage = {
-        type: 'error',
-        message: ''
-    };
 
     let presets = {};
 
@@ -91,155 +86,6 @@
 
         // console.log($FLOW_PRESETS);
     });
-
-    function addFlow () {
-        flows[convertToSnakeCase(newFlowName)] = [];
-        newFlowName = '';
-        addFlowModal.close();
-    }
-
-    function openAddOperationModal (_flow) {
-        flowOperationOwner = _flow;
-        addOperationsModal.open();
-    }
-
-    function addFlowOperation (_operation_command) {
-        let newOperationBody = structuredClone($FLOW_BUILDER_OPERATION_TEMPLATES[_operation_command]);
-        newOperationBody.id = Math.random().toString().slice(2);
-
-        if (newOperationBody?.input_fields) {
-            Object.entries(newOperationBody.input_fields).forEach(([input_name, input]) => {
-                if (input.type === 'dropdown' && input_name === 'flow') {
-                    input.options = Object.keys(flows);
-                }
-            })
-        }
-        
-        flows[flowOperationOwner] = [...flows[flowOperationOwner], newOperationBody];
-        addOperationsModal.close();
-    }
-
-    function addFlowOperationBody (_operation_body, _flow_name) {
-        if (_operation_body?.input_fields) {
-            Object.values(_operation_body.input_fields).forEach(input => {
-                if (input.type === 'dropdown') {
-                    input.options = Object.keys(flows);
-                }
-            })
-        }
-            
-            if (flows[_flow_name]) {
-                flows[_flow_name] = [...flows[_flow_name], _operation_body];
-            } else {
-                flows[_flow_name] = [_operation_body];
-            }
-
-            addOperationsModal.close();
-    }
-    
-    async function sendFlowPayload (_payload) {
-        isFLowAPILoading = true;
-
-        if (_payload.flows.main_flow.length > 0) {
-            let response = await fetch('http://localhost:5173/api/run-flow', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify( _payload )
-            });
-
-            response = await response.json();
-            if (response.error) {
-                runFlowMessage.type = 'error';
-                runFlowMessage.message = response.error.message;
-            } else {
-                console.log(response);
-                runFlowMessage.type = 'success';
-                runFlowMessage.message = response.status.message;
-            }
-        } else {
-            runFlowMessage.type = 'error';
-            runFlowMessage.message = 'Empty Main Flow. Nothing to run.';
-        }
-        isFLowAPILoading = false;
-    }
-
-    function moveOperation (_flow_key, _op, _direction) {
-        const currentFlow = flows[_flow_key];
-        const [currentOperationIndex] = getOperationIndex(currentFlow, _op.id);
-        
-        
-        if (_direction === 'down') {
-            if (currentOperationIndex < currentFlow.length) {
-                // Ads operation after it's own index
-                currentFlow.splice(currentOperationIndex + 2, 0, _op);
-                // Removes it's own old copy
-                currentFlow.splice(currentOperationIndex, 1);
-            }
-        } else if (_direction === 'up') {
-            if (currentOperationIndex !== 0) {
-                // Ads operation before it's own index
-                currentFlow.splice(currentOperationIndex - 1, 0, _op);
-                // Removes it's own old copy
-                currentFlow.splice(currentOperationIndex + 1, 1);
-            }
-        }
-
-        // Updates the DOM
-        flows[_flow_key] = flows[_flow_key];
-    }
-
-    function getOperationIndex (_flow, _op_id) {
-        return Object.keys(_flow).map((op, index) => {
-            if (_flow[op].id === _op_id) {
-                return index;
-            };
-        }).filter(v => v !== undefined);
-    }
-
-    function loadPayload () {
-        const payloadJSON = JSON.parse(payloadModalTextearea);
-
-        payload = {
-            env: {},
-            flows: {}
-        }
-
-        flows = [];
-
-        payload.env = payloadJSON.env;
-
-        Object.entries(payloadJSON.flows).forEach(([ flow_name, flow_body ]) => {
-            Object.values(flow_body).forEach((operation) => {
-                if ( $FLOW_BUILDER_OPERATION_TEMPLATES[operation.command] ) {
-                    const operationBody = structuredClone( $FLOW_BUILDER_OPERATION_TEMPLATES[operation.command] );
-                    
-                    if (operationBody?.input_fields) {
-                        Object.entries(operationBody.input_fields).forEach(([key, value]) => {
-                            value.value = operation[key];
-                        })
-                    }
-        
-                    operationBody.id = Math.random().toString().slice(2);
-                    addFlowOperationBody(operationBody, flow_name);
-                }
-            })
-        });
-
-        payloadModal.close();
-    }
-
-    function removeOperation (_flow_name, _id) {
-        Object.entries(flows[_flow_name]).forEach(([ index, operation ]) => {
-            if (_id === operation.id) {
-                flows[_flow_name].splice(index, 1);
-            }
-        });
-
-        // Updates the DOM
-        flows[_flow_name] = flows[_flow_name];
-    }
 
     function removeFlow (_flow_name) {
         if (_flow_name !== 'main_flow') {
@@ -311,11 +157,8 @@
         <AddFlowModal />
     </div>
 
-    <!-- START  //  OPERATION SECTION   //  START -->
     {#each Object.keys($PAYLOAD.flows) as flow_name}
-        {#if flow_name !== 'env'}   
-            <Flow flowName={flow_name} />
-        {/if}
+        <Flow flowName={flow_name} />
     {/each}
 
     <PayloadModal />

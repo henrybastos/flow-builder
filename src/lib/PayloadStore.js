@@ -1,4 +1,4 @@
-import { writable, get } from "svelte/store";
+import { writable } from "svelte/store";
 
 function createPayload () {
     const initStruct = {
@@ -17,6 +17,12 @@ function createPayload () {
     return {
         subscribe,
         setStrictFlows: (_state) => {strict_flows = _state},
+        setEnv: (_env) => update(_payload => {
+            return {
+                ..._payload,
+                env: _env
+            }
+        }),
         loadFlow: (_flow_name, _new_flow) => update(_payload => {
             return {
                 ..._payload,
@@ -42,6 +48,7 @@ function createPayload () {
                     console.error(`[STRICT_FLOWS] Undefined flow: ${_flow_name}`);
                 } else {
                     _command.id = Math.random().toString().slice(2);
+
                     return {
                         ..._payload,
                         flows: {
@@ -86,7 +93,9 @@ function createPayload () {
         },
         resetPayload: () => {
             set(structuredClone(initStruct));
-            localStorage.removeItem('presets');
+        },
+        resetFlows: () => {
+            update(_payload => ({..._payload, flows: { main_flow: {} }}));
         }
     }
 }
