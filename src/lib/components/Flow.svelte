@@ -20,31 +20,6 @@
         addOperationsModal.close();
     }
 
-    function moveOperation (_flow, _op, _direction) {
-        const currentFlow = _flow;
-        const currentOperationIndex = Object.keys(_flow).indexOf(_op.id);
-        // const [currentOperationIndex] = getOperationIndex(currentFlow, _op.id);
-        
-        if (_direction === 'down') {
-            if (currentOperationIndex < currentFlow.length) {
-                // Ads operation after it's own index
-                currentFlow.splice(currentOperationIndex + 2, 0, _op);
-                // Removes it's own old copy
-                currentFlow.splice(currentOperationIndex, 1);
-            }
-        } else if (_direction === 'up') {
-            if (currentOperationIndex !== 0) {
-                // Ads operation before it's own index
-                currentFlow.splice(currentOperationIndex - 1, 0, _op);
-                // Removes it's own old copy
-                currentFlow.splice(currentOperationIndex + 1, 1);
-            }
-        }
-
-        // Updates the DOM
-        _flow = _flow;
-    }
-
     const FIELDSET_OPTIONS = [ 
         { 
             icon: 'ti-trash',
@@ -64,9 +39,8 @@
     isDynamic={flowName !== 'main_flow' ? true : false} 
     options={FIELDSET_OPTIONS}
 >
-    {#each Object.values($PAYLOAD[flowName]) as operation, index (operation.id)}
-        <OperationBuilder {operation} flowsDropdownOptions={ [{ label: 'flow_01', value: 'Flow 01' }] }
-        />
+    {#each Object.values($PAYLOAD.flows[flowName]) as operation, index (operation.id)}
+        <OperationBuilder {operation} flowsDropdownOptions={ [{ label: 'flow_01', value: 'Flow 01' }] } />
     {/each}
 
     <button on:click={() => addOperationsModal.open()} class="btn-md w-full">
@@ -78,7 +52,7 @@
 <Modal bind:this={addOperationsModal} title="Add operation">
     <div class="grid grid-cols-2 gap-x-4 gap-y-2 h-fit">
         {#each Object.values($FLOW_BUILDER_OPERATION_TEMPLATES) as operationTemplate}
-            <button class="btn btn-md w-full" on:click={() => addOp('main_flow', structuredClone(operationTemplate))}>
+            <button class="btn btn-md w-full" on:click={() => addOp(flowName, structuredClone(operationTemplate))}>
                 <i class={`ti ${ operationTemplate.icon || 'ti-topology-ring-2' } text-blue-500 mr-1 text-2xl`}></i>
                 { operationTemplate.label }
             </button>

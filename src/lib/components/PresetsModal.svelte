@@ -29,7 +29,7 @@
     }
 
     function loadPreset (_preset_name) {
-        PAYLOAD.loadPreset($FLOW_PRESETS[_preset_name]);
+        PAYLOAD.loadPayload($FLOW_PRESETS[_preset_name]);
         console.log($PAYLOAD);
         presetsModal.close();
     }

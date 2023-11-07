@@ -1,232 +1,240 @@
 {
-    "env": {
-       "jivo_email": "programacao@kebook.com.br",
-       "jivo_password": "4qMU2^XyvEj72^X",
-       "jivo_url": "https://camartins.kebook.com.br/cursos/escola-para-blogueiras-iniciantes",
-       "jivo_color": "#d723ea",
-       "jivo_theme": "light"
-    },
-    "flows": {
-       "main_flow": [
-          {
-             "command": "goto",
-             "target": "https://app.jivosite.com/settings/channels"
-          },
-          {
-             "command": "type",
-             "target": "//*/input[@type='email']",
-             "value": "%jivo_email%"
-          },
-          {
-             "command": "type",
-             "target": "//*/input[@type='password']",
-             "value": "%jivo_password%"
-          },
-          {
-             "command": "click",
-             "target": "//*/button[text()='Entrar']"
-          },
-          {
-             "command": "type",
-             "target": "//*/input[contains(@placeholder,'Busque')]",
-             "value": "%jivo_url%"
-          },
-          {
-             "command": "check_element",
-             "target": "//*[text()='%jivo_url%']",
-             "success_flow": "select_brand_flow",
-             "error_flow": "create_brand_flow"
-          }
-       ],
-       "select_brand_flow": [
-          {
-             "command": "click",
-             "target": "//*/div[contains(text(), '%jivo_url%')]"
-          },
-          {
-             "command": "run_flow",
-             "flow": "instalation_flow"
-          },
-          {
-             "command": "set_payload_slot",
-             "response_slot": "operation_status",
-             "value": "Jivo already existed. Instalation code extracted."
-          }
-       ],
-       "create_brand_flow": [
-          {
-             "command": "reload"
-          },
-          {
-             "command": "click",
-             "target": "//*/h3[text()='Chat online']"
-          },
-          {
-             "command": "click",
-             "target": "//*/button[text()='Adicionar site']"
-          },
-          {
-             "command": "type",
-             "target": "//*/input[@name='channelNameInput']",
-             "value": "%jivo_url%"
-          },
-          {
-             "command": "click",
-             "target": "//*/button/span[text()='Portuguese']"
-          },
-          {
-             "command": "click",
-             "target": "//*/li[@title='Brazilian Portuguese']"
-          },
-          {
-             "command": "click",
-             "target": "//*/button[text()='Adicionar site']"
-          },
-          {
-             "command": "run_flow",
-             "flow": "config_brand_flow"
-          },
-          {
-             "command": "set_payload_slot",
-             "response_slot": "operation_status",
-             "value": "New jivo created!"
-          }
-       ],
-       "config_brand_flow": [
-          {
-             "command": "run_flow",
-             "flow": "preferences_flow"
-          },
-          {
-             "command": "run_flow",
-             "flow": "instalation_flow"
-          },
-          {
-             "command": "run_flow",
-             "flow": "service_quality_flow"
-          },
-          {
-             "command": "run_flow",
-             "flow": "pre_chat_flow"
-          },
-          {
-             "command": "run_flow",
-             "flow": "automatic_activities_flow"
-          },
-          {
-             "command": "run_flow",
-             "flow": "contact_form_flow"
-          },
-          {
-             "command": "run_flow",
-             "flow": "design_flow"
-          }
-       ],
-       "preferences_flow": [
-          {
-             "command": "click",
-             "target": "//*/div[text()='Preferências']"
-          },
-          {
-             "command": "click",
-             "target": "//*/h2[text()='Esconder o logotipo do JivoChat']/parent::div//input"
-          }
-       ],
-       "instalation_flow": [
-          {
-             "command": "click",
-             "target": "//*/div[text()='Instalação']"
-          },
-          {
-             "command": "scrape_attr",
-             "target": "//*/textarea",
-             "attr": "value",
-             "response_slot": "jivo_id"
-          }
-       ],
-       "service_quality_flow": [
-          {
-             "command": "click",
-             "target": "//*/div[text()='Avaliação de qualidade do serviço']"
-          },
-          {
-             "command": "click",
-             "target": "//*/h2[text()='Habilitar serviço de avaliação de qualidade']/parent::div//input"
-          }
-       ],
-       "pre_chat_flow": [
-          {
-             "command": "click",
-             "target": "//*/div[text()='Botões pré-chat']"
-          },
-          {
-             "command": "click",
-             "target": "//*/h2[text()='Habilitar botões pré-chat']/parent::div//input"
-          }
-       ],
-       "automatic_activities_flow": [
-          {
-             "command": "click",
-             "target": "//*/div[text()='Atividades automáticas']"
-          },
-          {
-             "command": "click",
-             "target": "//*/h2[text()='A frase de espera']/parent::div//input"
-          }
-       ],
-       "contact_form_flow": [
-          {
-             "command": "click",
-             "target": "//*/div[text()='Formulário de contato']"
-          },
-          {
-             "command": "click",
-             "target": "//*/button/span[text()='Durante a conversa']"
-          },
-          {
-             "command": "click",
-             "target": "//*/li[@title='Desativar']"
-          }
-       ],
-       "design_flow": [
-          {
-             "command": "click",
-             "target": "//*/div[text()='Design']"
-          },
-          {
-             "command": "click",
-             "target": "(//*[contains(text(),'Canto inferior direito')])[1]"
-          },
-          {
-             "command": "click",
-             "target": "(//*[contains(text(),'Inferior esquerdo')])[1]"
-          },
-          {
-             "command": "click",
-             "target": "//*/p[text()='Cor do texto']/parent::*//div[contains(@class, 'switch')]"
-          },
-          {
-             "command": "click",
-             "target": "//*/div[@id='%jivo_theme%' and @data-qa-id='dropdown-option']"
-          },
-          {
-             "command": "click",
-             "target": "//*/div[contains(text(),'Color')]"
-          },
-          {
-             "command": "chrome_picker_set_color",
-             "color": "%jivo_color%",
-             "trigger_target": "(//*/div[contains(@class, 'colorPickerBtn')])[1]",
-             "picker_target": "(//*[contains(@class,'chrome-picker')])[1]//input"
-          },
-          {
-             "command": "click",
-             "target": "//*[contains(@style,'background-color: rgb(68, 86, 105);')]"
-          },
-          {
-             "command": "click",
-             "target": "//*[contains(text(),'Salvar configurações')]"
-          }
-       ]
-    }
- }
+   "env": {
+      "jivo_email": "kebook.programacao.2@gmail.com",
+      "jivo_password": "Kbk@1234",
+      "jivo_url": "https://camartins.kebook.com.br/cursos/escola-para-blogueiras-iniciantes",
+      "jivo_color": "#d723ea",
+      "jivo_theme": "light"
+   },
+   "flows": {
+      "main_flow": [
+         {
+            "command": "goto",
+            "target": "https://app.jivosite.com/settings/channels"
+         },
+         {
+            "command": "type",
+            "target": "//*/input[@type='email']",
+            "value": "%jivo_email%"
+         },
+         {
+            "command": "type",
+            "target": "//*/input[@type='password']",
+            "value": "%jivo_password%"
+         },
+         {
+            "command": "click",
+            "target": "//*/button[text()='Entrar']"
+         },
+         {
+            "command": "type",
+            "target": "//*/input[contains(@placeholder,'Busque')]",
+            "value": "%jivo_url%"
+         },
+         {
+            "command": "check_element",
+            "target": "//*[text()='%jivo_url%']",
+            "success_flow": "select_brand_flow",
+            "error_flow": "create_brand_flow"
+         }
+      ],
+      "select_brand_flow": [
+         {
+            "command": "click",
+            "target": "//*/div[contains(text(), '%jivo_url%')]"
+         },
+         {
+            "command": "run_flow",
+            "flow": "instalation_flow"
+         },
+         {
+            "command": "set_payload_slot",
+            "response_slot": "operation_status",
+            "value": "Jivo already existed. Instalation code extracted."
+         }
+      ],
+      "create_brand_flow": [
+         {
+            "command": "reload"
+         },
+         {
+            "command": "click",
+            "target": "//*/h3[text()='Chat online']"
+         },
+         {
+            "command": "click",
+            "target": "//*/button[text()='Adicionar site']"
+         },
+         {
+            "command": "type",
+            "target": "//*/input[@name='channelNameInput']",
+            "value": "%jivo_url%"
+         },
+         {
+            "command": "click",
+            "target": "//*/button/span[text()='Portuguese']"
+         },
+         {
+            "command": "click",
+            "target": "//*/li[@title='Brazilian Portuguese']"
+         },
+         {
+            "command": "click",
+            "target": "//*/button[text()='Adicionar site']"
+         },
+         {
+            "command": "run_flow",
+            "flow": "config_brand_flow"
+         },
+         {
+            "command": "set_payload_slot",
+            "response_slot": "operation_status",
+            "value": "New jivo created!"
+         }
+      ],
+      "config_brand_flow": [
+         {
+            "command": "run_flow",
+            "flow": "preferences_flow"
+         },
+         {
+            "command": "run_flow",
+            "flow": "instalation_flow"
+         },
+         {
+            "command": "run_flow",
+            "flow": "service_quality_flow"
+         },
+         {
+            "command": "run_flow",
+            "flow": "pre_chat_flow"
+         },
+         {
+            "command": "run_flow",
+            "flow": "automatic_activities_flow"
+         },
+         {
+            "command": "run_flow",
+            "flow": "contact_form_flow"
+         },
+         {
+            "command": "run_flow",
+            "flow": "design_flow"
+         }
+      ],
+      "preferences_flow": [
+         {
+            "command": "click",
+            "target": "//*/div[text()='Preferências']"
+         },
+         {
+            "command": "click",
+            "target": "//*/h2[text()='Esconder o logotipo do JivoChat']/parent::div//input"
+         }
+      ],
+      "instalation_flow": [
+         {
+            "command": "click",
+            "target": "//*/div[text()='Instalação']"
+         },
+         {
+            "command": "scrape_attr",
+            "target": "//*/textarea",
+            "attr": "value",
+            "response_slot": "jivo_id"
+         }
+      ],
+      "service_quality_flow": [
+         {
+            "command": "click",
+            "target": "//*/div[text()='Avaliação de qualidade do serviço']"
+         },
+         {
+            "command": "click",
+            "target": "//*/h2[text()='Habilitar serviço de avaliação de qualidade']/parent::div//input"
+         }
+      ],
+      "pre_chat_flow": [
+         {
+            "command": "click",
+            "target": "//*/div[text()='Botões pré-chat']"
+         },
+         {
+            "command": "click",
+            "target": "//*/h2[text()='Habilitar botões pré-chat']/parent::div//input"
+         }
+      ],
+      "automatic_activities_flow": [
+         {
+            "command": "click",
+            "target": "//*/div[text()='Atividades automáticas']"
+         },
+         {
+            "command": "click",
+            "target": "//*/h2[text()='A frase de espera']/parent::div//input"
+         }
+      ],
+      "contact_form_flow": [
+         {
+            "command": "click",
+            "target": "//*/div[text()='Formulário de contato']"
+         },
+         {
+            "command": "click",
+            "target": "//*/button/span[text()='Durante a conversa']"
+         },
+         {
+            "command": "click",
+            "target": "//*/li[@title='Desativar']"
+         }
+      ],
+      "design_flow": [
+         {
+            "command": "click",
+            "target": "//*/div[text()='Design']"
+         },
+         {
+            "command": "click",
+            "target": "(//*[contains(text(),'Canto inferior direito')])[1]"
+         },
+         {
+            "command": "click",
+            "target": "(//*[contains(text(),'Inferior esquerdo')])[1]"
+         },
+         {
+            "command": "click",
+            "target": "//*/p[text()='Cor do texto']/parent::*//div[contains(@class, 'switch')]"
+         },
+         {
+            "command": "click",
+            "target": "//*/div[@id='%jivo_theme%' and @data-qa-id='dropdown-option']"
+         },
+         {
+            "command": "click",
+            "target": "//*/div[contains(text(),'Color')]"
+         },
+         {
+            "command": "chrome_picker_set_color",
+            "color": "%jivo_color%",
+            "trigger_target": "(//*/div[contains(@class, 'colorPickerBtn')])[1]",
+            "picker_target": "(//*[contains(@class,'chrome-picker')])[1]//input"
+         },
+         {
+            "command": "click",
+            "target": "//*[contains(@style,'background-color: rgb(68, 86, 105);')]"
+         },
+         {
+            "command": "click",
+            "target": "//*[contains(text(),'Salvar configurações')]"
+         },
+         {
+            "command": "click",
+            "target": "//*/span[text()='Versão móvel']"
+         },
+         {
+            "command": "click",
+            "target": "(//*/div[contains(@class, 'radio__hNKDN radioBtn__MlgIx')])[1]"
+         }
+      ]
+   }
+}

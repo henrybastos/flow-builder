@@ -12,10 +12,11 @@
     import '../app.css';
     import { FLOW_BUILDER_OPERATION_TEMPLATES } from "$lib/store";
     import PAYLOAD from "$lib/PayloadStore";
-    import { FLOW_PRESETS } from '$lib/PresetsStore';
 
     import Modal from "$lib/components/Modal.svelte";
     import PresetsModal from '$lib/components/PresetsModal.svelte';
+    import PayloadModal from '$lib/components/PayloadModal.svelte';
+    import AddFlowModal from '$lib/components/AddFlowModal.svelte';
     import OperationBuilder from "$lib/components/OperationBuilder.svelte";
     import Fieldset from "$lib/components/Fieldset.svelte";
     import ToastsWrapper from "$lib/components/ToastsWrapper.svelte";
@@ -134,32 +135,6 @@
             }
 
             addOperationsModal.close();
-    }
-
-    async function exportFlowsToJson () {
-        Object.entries(flows).forEach(([flow_name, flow_body]) => {
-            let flowBuffer = [];
-
-            for (let block of flow_body) {
-                let commandBody = {};
-                commandBody.command = block.command;
-
-                if (block?.input_fields) {
-                    Object.entries(block.input_fields).forEach(([field_name, field]) => {
-                        commandBody[field_name] = field.value;
-                    })
-                }
-
-                flowBuffer.push(commandBody);
-            }
-            payload.flows[flow_name] = flowBuffer;
-        });
-    }
-
-    function openPayloadModal () {
-        exportFlowsToJson();
-        payloadModalTextearea = JSON.stringify(payload, null, 3);
-        payloadModal.open();
     }
     
     async function sendFlowPayload (_payload) {
@@ -317,11 +292,11 @@
         <p class="text-center text-neutral-500">Powered by Tailwind, SvelteKit and Puppeteer</p>
     </header>
 
-    {#each id_arr as item_id}
+    <!-- {#each id_arr as item_id}
         <LetTest let:sayId id={item_id}>
             <button class="btn-md" on:click={sayId}>Bark 🐶</button>
         </LetTest>
-    {/each}
+    {/each} -->
 
     <div class="btn-bar">
         <button on:click={() => presetsModal.open()} class="btn-md w-full col-span-full">
@@ -333,94 +308,17 @@
             <i class="ti ti-adjustments-horizontal text-blue-500"></i>
             Page Settings
         </button>
-    
-        <button on:click={() => addFlowModal.open()} class="btn-md w-full col-span-full">
-            <i class="ti ti-s-turn-right text-blue-500"></i>
-            Add flow
-        </button>
+        <AddFlowModal />
     </div>
 
     <!-- START  //  OPERATION SECTION   //  START -->
-
-    <Flow flowName="main_flow" />
-
-    <!-- {#each Object.keys(flows) as flow_name, index (flow_name)}
-        <Fieldset 
-            legend={ snakeCaseToPascalCase(flow_name, true) } 
-            isDynamic={flow_name !== 'main_flow' ? true : false} 
-            options={fieldsetOptions}
-        >
-            {#each flows[flow_name] as operation, index (operation.id)}
-                <OperationBuilder 
-                    flowsDropdownOptions={ flowsDropdownOptions }
-                    moveOperationUp={() => moveOperation(flow_name, operation, 'up')} 
-                    moveOperationDown={() => moveOperation(flow_name, operation, 'down')} 
-                    operationStructure={ operation } 
-                    removeOperation={() => removeOperation(flow_name, operation.id)}
-                />
-            {/each}
-
-            <button on:click={() => openAddOperationModal( flow_name )} class="btn-md w-full">
-                <i class="ti ti-category-plus text-blue-500"></i>
-                Add operation
-            </button>
-        </Fieldset>
+    {#each Object.keys($PAYLOAD.flows) as flow_name}
+        {#if flow_name !== 'env'}   
+            <Flow flowName={flow_name} />
+        {/if}
     {/each}
 
-    <button on:click={openPayloadModal} class="btn-md btn-full mb-4">
-        <i class="ti ti-script text-blue-500"></i>
-        Process JSON
-    </button>
-
-    <Modal bind:this={addOperationsModal} title="Add operation">
-        <div class="grid grid-cols-2 gap-x-4 gap-y-2 h-fit">
-            {#each Object.keys($FLOW_BUILDER_OPERATION_TEMPLATES) as operationTemplate}
-                <button class="btn btn-md w-full" on:click={() => addFlowOperation( operationTemplate )}>
-                    <i class={`ti ${ $FLOW_BUILDER_OPERATION_TEMPLATES[operationTemplate].icon || 'ti-topology-ring-2' } text-blue-500 mr-1 text-2xl`}></i>
-                    { $FLOW_BUILDER_OPERATION_TEMPLATES[operationTemplate].label }
-                </button>
-            {/each}
-        </div>
-    </Modal> -->
-
-    <!-- END    //  OPERATION SECTION   //      END -->
-
-    <Modal bind:this={addFlowModal} title="Add flow">
-        <div class="btn-bar">
-            <input class="input input-md col-span-full" type="text" bind:value={newFlowName}>
-            <button class="btn btn-md w-full border-neutral-700" on:click={addFlow}>Add</button>
-            <button class="btn btn-md w-full border-neutral-700" on:click={() => addFlowModal.close()}>Cancel</button>
-        </div>
-    </Modal>
-
-    <Modal bind:this={payloadModal} title="Payload" on:close={() => runFlowMessage.message = ''}>
-        <textarea class="code" value={JSON.stringify($PAYLOAD, null, 3)} name="" id="" cols="30" rows="20"></textarea>
-        
-        {#if runFlowMessage.message !== ''}
-            <span class={`${ runFlowMessage.type === 'error' ? 'text-red-600' : 'text-green-600' } mt-4`}>
-                    <i class="ti ti-exclamation-circle text-lg mr-2 align-middle"></i>
-                    { runFlowMessage.message }
-            </span>
-        {/if}
-
-        <div class="btn-bar">
-            <button disabled={isFLowAPILoading} on:click={async () => await sendFlowPayload(payload)} class="btn-md w-full mt-4">
-                {#if isFLowAPILoading}
-                    <span class="w-full inline-flex justify-center">
-                        <i class="ti ti-loader-2 text-neutral-400 animate-spin-icon"></i>
-                    </span>
-                {:else }
-                    <i class="ti ti-arrows-split-2 text-blue-500"></i>
-                    Run flow
-                {/if}
-            </button>
-    
-            <button on:click={loadPayload} class="btn-md w-full mt-4">
-                <i class="ti ti-file-upload text-blue-500"></i>
-                Load payload
-            </button>
-        </div>
-    </Modal>
+    <PayloadModal />
 
     <Modal bind:this={pageSettingsModal} title="Page Settings">
         <div class="btn-bar">
@@ -436,9 +334,7 @@
         </div>
     </Modal>
 
-    <PresetsModal
-        bind:presetsModal={presetsModal}
-    />
+    <PresetsModal bind:presetsModal={presetsModal}/>
 
     <ToastsWrapper bind:this={toastWrapper} />
 </main>
