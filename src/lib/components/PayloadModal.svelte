@@ -38,14 +38,15 @@
 
     async function sendFlowPayload (_payload) {
         isFLowAPILoading = true;
+        console.log(_payload);
 
-        if (Object.keys($PAYLOAD.flows.main_flow).length > 0) {
+        if (Object.keys(_payload.flows.main_flow).length > 0) {
             let response = await fetch('http://localhost:5173/api/run-flow', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify( $PAYLOAD )
+                body: JSON.stringify( _payload )
             });
 
             response = await response.json();
@@ -138,7 +139,7 @@
     {/if}
 
     <div class="btn-bar">
-        <button disabled={isFLowAPILoading} on:click={async () => await sendFlowPayload(payload)} class="btn-md w-full mt-4">
+        <button disabled={isFLowAPILoading} on:click={async () => await sendFlowPayload(JSON.parse(payloadModalTextearea))} class="btn-md w-full mt-4">
             {#if isFLowAPILoading}
                 <span class="w-full inline-flex justify-center">
                     <i class="ti ti-loader-2 text-neutral-400 animate-spin-icon"></i>

@@ -235,7 +235,7 @@ export async function POST ({ request }) {
     try {   
         // responsePayload.base_url = payload.base_url;
         await runFlow(payload.flows.main_flow, payload.env);
-        await browser.close();
+        // await browser.close();
         responsePayload.status = {
             message: 'All operations done.',
             code: 200
