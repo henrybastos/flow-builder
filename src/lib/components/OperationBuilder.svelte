@@ -2,17 +2,12 @@
     import Dropdown from "./Dropdown.svelte";
     import CollapsableOptions from "./CollapsableOptions.svelte";
     import { getContext } from "svelte";
-    import { FLOW_BUILDER_INPUT_FIELD_TEMPLATES } from "$lib/store";
     import { PAYLOAD } from "$lib/PayloadStore";
-    import { snakeCaseToPascalCase, checkForEnvPlaceholder } from "$lib/utils";
+    import { checkForEnvPlaceholder } from "$lib/utils";
 
     let flowName = getContext('flow_name');
 
     export let operation;
-    export let flowsDropdownOptions = [
-        { label: 'flow_01', value: 'Flow 01' },
-        { label: 'flow_02', value: 'Flow 02' }
-    ];
 
     const OPERATION_CONFIG_OPTIONS = [
         {

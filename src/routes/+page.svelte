@@ -26,32 +26,13 @@
         main_flow: []
     };
 
-    let addOperationsModal, addFlowModal, payloadModal, pageSettingsModal, presetsModal;
+    let pageSettingsModal;
     let toastWrapper;
     let payload = { 
         env: {},
         flows: {}
     };
     let appendToast;
-
-    let fieldsetOptions = [ 
-        { 
-            icon: 'ti-trash',
-            action: () => removeFlow(flow_name),
-        },
-        { 
-            icon: 'ti-layout-bottombar-expand',
-            action: (_fieldset) => console.log(_fieldset),
-        } 
-    ];
-
-    // Updates the dropdowns' options dyanmically, as new flows are created
-    $: flowsDropdownOptions = Object.keys(flows).map(flow => {
-        return {
-            label: flow.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
-            value: flow
-        }
-    })
 
     onMount(() => {
         if (localStorage.getItem('payload')) {
@@ -95,21 +76,15 @@
         pageSettingsModal.close();
     }
 
-    let id_arr = [
-        'id_001',
-        'id_002'
-    ]
+    // let id_arr = [
+    //     'id_001',
+    //     'id_002'
+    // ]
 </script>
 
 
-<!-- 
-██████   █████   ██████  ███████     ██   ██ ████████ ███    ███ ██      
-██   ██ ██   ██ ██       ██          ██   ██    ██    ████  ████ ██      
-██████  ███████ ██   ███ █████       ███████    ██    ██ ████ ██ ██      
-██      ██   ██ ██    ██ ██          ██   ██    ██    ██  ██  ██ ██      
-██      ██   ██  ██████  ███████     ██   ██    ██    ██      ██ ███████ 
--->
-                                                                         
+<!-- ============================== -->
+
 
 <svelte:head>
     <title>KMT • Flow Builder</title>
