@@ -5,6 +5,7 @@
     
     export let legend;
     export let className = '';
+    export let fieldsetCollapsedPlaceholder = '...';
     
     export let isDynamic = false;
     export let extraOptions;
@@ -27,7 +28,7 @@
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <fieldset class={className}>
     {#if isFieldsetCollapsed}
-        <span class="font-bold text-xl text-center text-neutral-500">...</span>
+        <span on:click={toggleFieldsetSize} class="font-medium text-lg text-center text-neutral-500 hover:text-neutral-400 cursor-pointer">{ fieldsetCollapsedPlaceholder }</span>
     {/if}
     <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
     <legend class={`${ isDynamic ? 'cursor-pointer hover:ml-1 transition-all' : '' }`} on:click={() => isOptionnCollapsed = !isOptionnCollapsed}>

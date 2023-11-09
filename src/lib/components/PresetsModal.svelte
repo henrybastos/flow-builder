@@ -73,9 +73,9 @@
            Clear presets
        </button>
 
-       <button on:click={loadPreset} class="btn-md w-full">
+       <button on:click={loadPreset} class="btn-md btn-disabled w-full">
            <i class="ti ti-book-download text-blue-500"></i>
-           Load Presets
+           Load Preset
        </button>
 
        <input class="input-md peer/preset-name" bind:value={newPresetName} type="text" placeholder="Preset name">

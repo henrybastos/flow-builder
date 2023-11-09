@@ -196,4 +196,9 @@
    .danger {
       @apply bg-red-500;
    }
+
+   .btn-disabled,
+   .btn-disabled i {
+      @apply text-neutral-500 pointer-events-none;
+   }
 }

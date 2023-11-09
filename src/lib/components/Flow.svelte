@@ -10,6 +10,7 @@
     import { setContext } from "svelte";
 
     let addOperationsModal;
+    let openDangerModal;
 
     export let flowName;
     
@@ -34,6 +35,7 @@
     isDynamic={flowName !== 'main_flow' ? true : false}
     extraOptions={{removeFieldset}}
     isFieldsetCollapsed={flowName !== 'main_flow' ? true : false}
+    fieldsetCollapsedPlaceholder={`${ Object.values($PAYLOAD.flows[flowName]).length } operations...`}
 >
     {#each Object.values($PAYLOAD.flows[flowName]) as operation, index (operation.id)}
         <OperationBuilder {operation} flowsDropdownOptions={ [{ label: 'flow_01', value: 'Flow 01' }] } />
@@ -45,7 +47,7 @@
     </button>
 </Fieldset>
 
-<Modal bind:this={addOperationsModal} title="Add operation">
+<Modal bind:this={addOperationsModal} title="Add operation" bind:openDangerModal>
     <div class="grid grid-cols-2 gap-x-4 gap-y-2 h-fit">
         {#each Object.values($FLOW_BUILDER_OPERATION_TEMPLATES) as operationTemplate}
             <button class="btn btn-md w-full" on:click={() => addOp(flowName, structuredClone(operationTemplate))}>
