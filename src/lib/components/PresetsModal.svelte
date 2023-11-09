@@ -56,7 +56,7 @@
                <!-- <button class="btn-md" on:click={() => editPreset(preset_name)}>
                    <i class="ti ti-ballpen"></i>
                </button> -->
-               <button class="btn-md btn-danger" on:click={() => removePreset(preset_name)}>
+               <button class="btn-md btn-danger ml-3" on:click={() => removePreset(preset_name)}>
                    <i class="ti ti-trash-x"></i>
                </button>
            </div>
