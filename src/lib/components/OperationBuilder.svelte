@@ -3,7 +3,7 @@
     import CollapsableOptions from "./CollapsableOptions.svelte";
     import { getContext } from "svelte";
     import { FLOW_BUILDER_INPUT_FIELD_TEMPLATES } from "$lib/store";
-    import PAYLOAD from "$lib/PayloadStore";
+    import { PAYLOAD } from "$lib/PayloadStore";
     import { snakeCaseToPascalCase, checkForEnvPlaceholder } from "$lib/utils";
 
     let flowName = getContext('flow_name');

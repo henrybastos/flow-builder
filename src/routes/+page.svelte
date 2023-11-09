@@ -10,37 +10,29 @@
 
 <script>
     import '../app.css';
-    import { FLOW_BUILDER_OPERATION_TEMPLATES } from "$lib/store";
-    import PAYLOAD from "$lib/PayloadStore";
+    import { PAYLOAD } from "$lib/PayloadStore";
 
+    // import LetTest from '$lib/components/LetTest.svelte';
     import Modal from "$lib/components/Modal.svelte";
     import PresetsModal from '$lib/components/PresetsModal.svelte';
     import PayloadModal from '$lib/components/PayloadModal.svelte';
     import AddFlowModal from '$lib/components/AddFlowModal.svelte';
-    import OperationBuilder from "$lib/components/OperationBuilder.svelte";
-    import Fieldset from "$lib/components/Fieldset.svelte";
     import ToastsWrapper from "$lib/components/ToastsWrapper.svelte";
-    import LetTest from '$lib/components/LetTest.svelte';
     import Flow from '$lib/components/Flow.svelte';
-
-    import { snakeCaseToPascalCase, convertToSnakeCase } from "$lib/utils";
-    import { onMount } from "svelte";
+    import { onMount } from 'svelte';
+    import { FLOW_PRESETS } from '$lib/PresetsStore';
 
     let flows = { 
         main_flow: []
     };
+
     let addOperationsModal, addFlowModal, payloadModal, pageSettingsModal, presetsModal;
     let toastWrapper;
     let payload = { 
         env: {},
         flows: {}
     };
-    let newFlowName = '';
-    let newPresetName;
-    let flowOperationOwner = flows.main_flow;
-    let payloadModalTextearea;
-
-    let presets = {};
+    let appendToast;
 
     let fieldsetOptions = [ 
         { 
@@ -51,7 +43,7 @@
             icon: 'ti-layout-bottombar-expand',
             action: (_fieldset) => console.log(_fieldset),
         } 
-    ]
+    ];
 
     // Updates the dropdowns' options dyanmically, as new flows are created
     $: flowsDropdownOptions = Object.keys(flows).map(flow => {
@@ -63,7 +55,7 @@
 
     onMount(() => {
         if (localStorage.getItem('payload')) {
-            payload = JSON.parse(localStorage.getItem('payload'));
+            PAYLOAD.loadPayload(JSON.parse(localStorage.getItem('payload')));
 
             Object.entries(payload.flows).forEach(([flow_name, flow_body]) => {
                 flows[flow_name] = flow_body;
@@ -75,7 +67,7 @@
 
         if (localStorage?.getItem('presets')) {
             try {
-                presets = JSON.parse(localStorage.getItem('presets'));
+                FLOW_PRESETS.loadPresets(JSON.parse(localStorage.getItem('presets')));
             } catch (err) {
                 console.error(err);
                 console.error(`[ERR] Invalid presets strucuture.`);
@@ -86,14 +78,6 @@
 
         // console.log($FLOW_PRESETS);
     });
-
-    function removeFlow (_flow_name) {
-        if (_flow_name !== 'main_flow') {
-            delete flows[_flow_name];
-        }
-
-        flows = flows;
-    }
 
     function savePayloadToLocalStorage () {
         Object.entries(flows).forEach(([flow_name, flow_body]) => {
@@ -145,10 +129,7 @@
     {/each} -->
 
     <div class="btn-bar">
-        <button on:click={() => presetsModal.open()} class="btn-md w-full col-span-full">
-            <i class="ti ti-bookmarks text-blue-500"></i>
-            Presets
-        </button>
+        <PresetsModal {appendToast}/>
 
         <button on:click={() => pageSettingsModal.open()} class="btn-md btn-full col-span-full">
             <i class="ti ti-adjustments-horizontal text-blue-500"></i>
@@ -176,8 +157,6 @@
             </button>
         </div>
     </Modal>
-
-    <PresetsModal bind:presetsModal={presetsModal}/>
-
-    <ToastsWrapper bind:this={toastWrapper} />
+    
+    <ToastsWrapper bind:appendToast={appendToast} bind:this={toastWrapper}/>
 </main>

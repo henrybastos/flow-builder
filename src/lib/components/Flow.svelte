@@ -2,7 +2,7 @@
     import Fieldset from "./Fieldset.svelte";
     import OperationBuilder from "./OperationBuilder.svelte";
     import Modal from "./Modal.svelte";
-    import PAYLOAD from "$lib/PayloadStore";
+    import { PAYLOAD } from "$lib/PayloadStore";
     import { FLOW_BUILDER_OPERATION_TEMPLATES } from "$lib/store";
 
     import { snakeCaseToPascalCase } from "$lib/utils";
@@ -12,7 +12,6 @@
     let addOperationsModal;
 
     export let flowName;
-
     
     function addOp (_flow_name, _operation) {
         PAYLOAD.addCommand(_flow_name, _operation);
@@ -21,24 +20,18 @@
         addOperationsModal.close();
     }
 
-    const FIELDSET_OPTIONS = [ 
-        { 
-            icon: 'ti-trash',
-            action: () => removeFlow(flow_name),
-        },
-        { 
-            icon: 'ti-layout-bottombar-expand',
-            action: (_fieldset) => console.log(_fieldset),
-        } 
-    ]
+    const removeFieldset = {
+        icon: 'ti-trash',
+        action: () => PAYLOAD.removeFlow(flowName)
+    }
 
     setContext('flow_name', flowName);
 </script>
 
 <Fieldset 
     legend={ snakeCaseToPascalCase(flowName, true) } 
-    isDynamic={flowName !== 'main_flow' ? true : false} 
-    options={FIELDSET_OPTIONS}
+    isDynamic={flowName !== 'main_flow' ? true : false}
+    extraOptions={{removeFieldset}}
 >
     {#each Object.values($PAYLOAD.flows[flowName]) as operation, index (operation.id)}
         <OperationBuilder {operation} flowsDropdownOptions={ [{ label: 'flow_01', value: 'Flow 01' }] } />

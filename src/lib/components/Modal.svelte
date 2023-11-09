@@ -1,5 +1,7 @@
 <script>
     import { createEventDispatcher } from "svelte";
+    import Toast from "./Toast.svelte";
+
     const dispatch = createEventDispatcher();
     let modal;
     export let title;
@@ -21,4 +23,9 @@
         <i class="ti ti-x align-middle absolute text-neutral-500 hover:text-neutral-300 cursor-pointer top-[50%] -translate-y-[50%] text-2xl right-6" on:click={close}></i>
     </div>
     <slot />
+    
+    <!-- MODAL TOASTS -->
+    <!-- <div class="fixed inset-0 top-3 bg-transparent z-50 flex flex-col justify-start items-end box-border overflow-hidden pointer-events-none">
+        <Toast message="aa" />
+    </div> -->
 </dialog>

@@ -91,6 +91,12 @@ function createPayload () {
                 return _payload;
             })
         },
+        removeFlow: (_flow_name) => {
+            update(_payload => {
+                delete _payload.flows[_flow_name];
+                return _payload;
+            })
+        },
         resetPayload: () => {
             set(structuredClone(initStruct));
         },
@@ -100,4 +106,4 @@ function createPayload () {
     }
 }
 
-export default createPayload();
+export const PAYLOAD = createPayload();

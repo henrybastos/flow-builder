@@ -1,6 +1,6 @@
 <script>
     import Modal from "./Modal.svelte";
-    import PAYLOAD from "$lib/PayloadStore";
+    import { PAYLOAD } from "$lib/PayloadStore";
     import { convertToSnakeCase } from "$lib/utils";
 
     let addFlowModal;

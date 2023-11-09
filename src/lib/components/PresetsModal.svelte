@@ -1,20 +1,14 @@
 <script>
    import Modal from "./Modal.svelte";
    import { FLOW_PRESETS } from "$lib/PresetsStore";
-   import PAYLOAD from "$lib/PayloadStore";
-   export let presetsModal;
+   import { PAYLOAD } from "$lib/PayloadStore";
+
+   let presetsModal;
    let newPresetName;
+   export let appendToast;
 
    function savePreset () {
-        PAYLOAD.setStrictFlows(true);
-        PAYLOAD.addFlow('flow_01');
-        PAYLOAD.addCommand('flow_01', { command: 'Bark!' });
-        PAYLOAD.addCommand('main_flow', { command: 'Miaw!' });
         FLOW_PRESETS.savePreset({ [newPresetName]: { ...$PAYLOAD } });
-
-        // PAYLOAD.addFlow('flow_01');
-        // PAYLOAD.addCommand('flow_01', { command: 'goto', link: 'my_link_dot_com' });
-        // console.log($PAYLOAD);
 
         console.log('Preset saved!');
         newPresetName = '';
@@ -22,6 +16,8 @@
 
     function clearPresets () {
         FLOW_PRESETS.clearPresets();
+        presetsModal.close();
+        appendToast('Presets cleared', 'success');
     }
 
     function removePreset (_preset_name) {
@@ -43,6 +39,11 @@
         presetsModal.open();
     }
 </script>
+
+<button on:click={() => presetsModal.open()} class="btn-md w-full col-span-full">
+    <i class="ti ti-bookmarks text-blue-500"></i>
+    Presets
+</button>
 
 <Modal bind:this={presetsModal} title="Presets">
    <div class="btn-bar mb-3">

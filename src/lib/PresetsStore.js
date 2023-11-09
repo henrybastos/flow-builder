@@ -5,6 +5,7 @@ function createPresetsStore () {
 
    return {
       subscribe,
+      loadPresets: (_presets) => set(_presets),
       savePreset: (_preset_flow) => {
          if (typeof _preset_flow === 'object') {
             update((_presets) => {

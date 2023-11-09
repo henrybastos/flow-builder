@@ -1,7 +1,7 @@
 <script>
     import { FLOW_BUILDER_OPERATION_TEMPLATES } from "$lib/store";
     import Modal from "./Modal.svelte";
-    import PAYLOAD from "$lib/PayloadStore";
+    import { PAYLOAD } from "$lib/PayloadStore";
 
     let payloadModal;
     let isFLowAPILoading;
@@ -38,7 +38,6 @@
 
     async function sendFlowPayload (_payload) {
         isFLowAPILoading = true;
-        console.log(_payload);
 
         if (Object.keys(_payload.flows.main_flow).length > 0) {
             let response = await fetch('http://localhost:5173/api/run-flow', {
@@ -52,16 +51,20 @@
             response = await response.json();
 
             if (response.error) {
-                runFlowMessage.type = 'error';
-                runFlowMessage.message = response.error.message;
+                console.error(response.error);
+                console.error('Response error');
+                // runFlowMessage.type = 'error';
+                // runFlowMessage.message = response.error.message;
             } else {
                 console.log(response);
-                runFlowMessage.type = 'success';
-                runFlowMessage.message = response.status.message;
+                console.log('Response success');
+                // runFlowMessage.type = 'success';
+                // runFlowMessage.message = response.status.message;
             }
         } else {
-            runFlowMessage.type = 'error';
-            runFlowMessage.message = 'Empty Main Flow. Nothing to run.';
+            console.error('Empty Main Flow. Nothing to run.');
+            // runFlowMessage.type = 'error';
+            // runFlowMessage.message = 'Empty Main Flow. Nothing to run.';
         }
         isFLowAPILoading = false;
     }
