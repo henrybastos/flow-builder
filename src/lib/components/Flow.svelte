@@ -22,6 +22,7 @@
 
     const removeFieldset = {
         icon: 'ti-trash',
+        danger: true,
         action: () => PAYLOAD.removeFlow(flowName)
     }
 
@@ -32,6 +33,7 @@
     legend={ snakeCaseToPascalCase(flowName, true) } 
     isDynamic={flowName !== 'main_flow' ? true : false}
     extraOptions={{removeFieldset}}
+    isFieldsetCollapsed={flowName !== 'main_flow' ? true : false}
 >
     {#each Object.values($PAYLOAD.flows[flowName]) as operation, index (operation.id)}
         <OperationBuilder {operation} flowsDropdownOptions={ [{ label: 'flow_01', value: 'Flow 01' }] } />

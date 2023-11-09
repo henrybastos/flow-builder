@@ -11,10 +11,12 @@
     let options = {
         ...extraOptions,
         toggleFieldset: {
-            icon: 'ti-layout-bottombar-expand',
+            icon: 'ti-arrows-vertical',
             action: toggleFieldsetSize
         }
     };
+
+    $: options.toggleFieldset.icon = isFieldsetCollapsed ? 'ti-arrows-diagonal' : 'ti-arrows-diagonal-minimize-2';
 
     export function toggleFieldsetSize () {
         isFieldsetCollapsed = !isFieldsetCollapsed;
@@ -24,6 +26,9 @@
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <fieldset class={className}>
+    {#if isFieldsetCollapsed}
+        <span class="font-bold text-xl text-center text-neutral-500">...</span>
+    {/if}
     <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
     <legend class={`${ isDynamic ? 'cursor-pointer hover:ml-1 transition-all' : '' }`} on:click={() => isOptionnCollapsed = !isOptionnCollapsed}>
         { legend }
@@ -33,7 +38,7 @@
                     <!-- svelte-ignore a11y-no-static-element-interactions -->
                     <i 
                         on:click={() => option.action(isOptionnCollapsed) }
-                        class={`ti ${ option.icon } ml-2 hover:text-red-600 cursor-pointer`}
+                        class={`ti ${ option.icon } ${ option.danger ? 'hover:text-red-600' : 'hover:text-neutral-50' } text-neutral-400 ml-2 cursor-pointer`}
                     />
                 {/each}
             </div>
