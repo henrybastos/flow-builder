@@ -45,7 +45,11 @@
     Presets
 </button>
 
-<Modal bind:this={presetsModal} title="Presets">
+<Modal 
+    bind:this={presetsModal} 
+    title="Presets" 
+    let:openDangerModal 
+>
    <div class="btn-bar mb-3">
        {#each Object.keys($FLOW_PRESETS) as preset_name}
            <div class="flex flex-row col-span-full">
@@ -56,7 +60,7 @@
                <!-- <button class="btn-md" on:click={() => editPreset(preset_name)}>
                    <i class="ti ti-ballpen"></i>
                </button> -->
-               <button class="btn-md btn-danger ml-3" on:click={() => removePreset(preset_name)}>
+               <button class="btn-md btn-danger ml-3" on:click={() => openDangerModal(() => removePreset(preset_name), { danger_modal_title: `Remove preset ${ preset_name }?` })}>
                    <i class="ti ti-trash-x"></i>
                </button>
            </div>

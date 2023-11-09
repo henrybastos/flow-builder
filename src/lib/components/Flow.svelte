@@ -23,7 +23,7 @@
     const removeFieldset = {
         icon: 'ti-trash',
         danger: true,
-        action: () => PAYLOAD.removeFlow(flowName)
+        action: () => openDangerModal(() => PAYLOAD.removeFlow(flowName), { danger_modal_title: `Remove flow ${ flowName }?` })
     }
 
     setContext('flow_name', flowName);
