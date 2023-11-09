@@ -65,7 +65,13 @@
                         placeholder={ field.placeholder }
                     >
                 {:else if field.type === 'dropdown'}
-                    <span class="bg-neutral-900 border-2 border-neutral-800 rounded-lg py-2 text-center text-neutral-400">Dropdown</span>
+                    <!-- <span class="bg-neutral-900 border-2 border-neutral-800 rounded-lg py-2 text-center text-neutral-400">Dropdown</span> -->
+                    <Dropdown 
+                        options={Object.keys($PAYLOAD.flows).map(_flow => ({ value: _flow, label: _flow }))}
+                        selectedOption='aa'
+                        selectedOptionLabel='Aa'
+                        capitalizeOptionLabel={true}
+                    />
                 {:else if field.type === 'btn'}
                     <button class="btn-sm col-span-full w-full">{ field.label }</button>
                 {/if}

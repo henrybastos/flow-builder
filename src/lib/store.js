@@ -164,7 +164,7 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = writable({
     run_flow: {
         command: 'run_flow',
         label: 'Run Flow',
-        icon: 'ti-zoom-scan',
+        icon: 'ti-arrow-bear-right-2',
         input_fields: {
             flow: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.flow
         }

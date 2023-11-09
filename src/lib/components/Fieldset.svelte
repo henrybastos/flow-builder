@@ -45,7 +45,7 @@
             </div>
         {/if}
     </legend>
-    <div class={`overflow-hidden ${ isFieldsetCollapsed ? 'max-h-0' : 'max-h-[4000rem]' }`}>
+    <div class={`${ isFieldsetCollapsed ? 'max-h-0 overflow-hidden' : 'max-h-[4000rem] overflow-visible' }`}>
         <slot />
     </div>
  </fieldset>
