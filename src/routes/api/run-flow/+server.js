@@ -31,10 +31,10 @@ const ENV_VARIABLES_ALLOWLIST = [
 
 export async function POST ({ request }) {
     const payload = await request.json();
-
     const [page, browser] = await _startEngine();
-
     let responsePayload = {};
+
+    console.log('Calling local endpoint: [::1]:5173/api/run-flow');
 
     async function _startEngine () {
         const browser = await puppeteer.launch({

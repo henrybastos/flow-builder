@@ -1,13 +1,3 @@
-<!-- 
-██████   █████   ██████  ███████     ███████  ██████ ██████  ██ ██████  ████████ 
-██   ██ ██   ██ ██       ██          ██      ██      ██   ██ ██ ██   ██    ██    
-██████  ███████ ██   ███ █████       ███████ ██      ██████  ██ ██████     ██    
-██      ██   ██ ██    ██ ██               ██ ██      ██   ██ ██ ██         ██    
-██      ██   ██  ██████  ███████     ███████  ██████ ██   ██ ██ ██         ██     
--->
-
-
-
 <script>
     import '../app.css';
     import { PAYLOAD } from "$lib/PayloadStore";
@@ -22,59 +12,24 @@
     import { onMount } from 'svelte';
     import { FLOW_PRESETS } from '$lib/PresetsStore';
 
-    let flows = { 
-        main_flow: []
-    };
-
     let pageSettingsModal;
     let toastWrapper;
-    let payload = { 
-        env: {},
-        flows: {}
-    };
     let appendToast;
 
     onMount(() => {
-        if (localStorage.getItem('payload')) {
-            PAYLOAD.loadPayload(JSON.parse(localStorage.getItem('payload')));
-
-            Object.entries(payload.flows).forEach(([flow_name, flow_body]) => {
-                flows[flow_name] = flow_body;
-            })
-            toastWrapper.appendToast('Payload loaded from local storage!', 'success');
-        } else {
-            toastWrapper.appendToast('No payload found in local storage.', 'error');
-        }
-
         if (localStorage?.getItem('presets')) {
             try {
                 FLOW_PRESETS.loadPresets(JSON.parse(localStorage.getItem('presets')));
+                appendToast('Presets loaded successfully!', 'success');
             } catch (err) {
                 console.error(err);
                 console.error(`[ERR] Invalid presets strucuture.`);
+                appendToast('[ERR] Invalid presets strucuture.', 'error');
             }
+        } else {
+            appendToast('No presets found :(', 'error');
         }
-
-        // FLOW_PRESETS.savePreset({ preset_01: { command: 'test' }});
-
-        // console.log($FLOW_PRESETS);
     });
-
-    function savePayloadToLocalStorage () {
-        Object.entries(flows).forEach(([flow_name, flow_body]) => {
-            payload.flows[flow_name] = flow_body;
-        })
-        // payload.main_flow = flows.main_flow;
-        localStorage.setItem('payload', JSON.stringify(payload));
-        pageSettingsModal.close();
-        toastWrapper.appendToast('Payload saved!', 'success');
-    }
-
-    function clearPayloadLocalStorage () {
-        localStorage.removeItem('payload');
-        toastWrapper.appendToast('Payload deleted!', 'danger');
-        pageSettingsModal.close();
-    }
 
     // let id_arr = [
     //     'id_001',
@@ -121,12 +76,12 @@
 
     <Modal bind:this={pageSettingsModal} title="Page Settings">
         <div class="btn-bar">
-            <button on:click={clearPayloadLocalStorage} class="btn-sm btn-danger w-full">
+            <button on:click={FLOW_PRESETS.clearPresets()} class="btn-sm btn-danger w-full">
                 <i class="ti ti-database-x"></i>
                 Clear Local Storage
             </button>
 
-            <button on:click={savePayloadToLocalStorage} class="btn-sm btn-full">
+            <button on:click={() => console.log('Save to local storage?')} class="btn-sm btn-full">
                 <i class="ti ti-device-floppy text-blue-500"></i>
                 Save to Local Storage
             </button>
@@ -135,3 +90,22 @@
     
     <ToastsWrapper bind:appendToast={appendToast} bind:this={toastWrapper}/>
 </main>
+
+<!-- 
+⣿⣿⣿⣿⣿⢯⡫⡣⣏⣎⢮⢮⢣⣫⢹⠯⣿⣿⣽⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ 
+⣿⣿⣿⣿⣿⣷⢽⢝⢮⢪⢪⢪⢪⢪⣲⢫⣘⢿⣜⡿⣿⢿⣿⣿⣿⣿⣿⣿⣿⣿ 
+⣿⣿⣿⣿⣿⣿⢳⢱⢵⢱⡱⡵⣱⡛⡎⡽⡸⣕⣗⢯⣟⣯⢯⣟⣿⣿⣿⣿⣿⣿ 
+⣿⣿⣿⣿⣿⣿⢱⢭⢮⢓⠭⢪⢒⣹⣺⣺⣻⣽⢾⡿⣽⣶⣽⣹⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⣿⡳⡝⡎⠊⠐⣔⢯⡺⣺⣪⢗⡯⣯⣟⣯⣷⢿⣿⣻⣻⣿⣿⣿⣿
+⣿⣿⣿⣿⡿⣻⣺⢽⢽⡂⡜⣎⢧⢫⢮⢪⡳⣝⣞⣞⣗⣯⣿⣻⣟⣯⣿⣿⣿⣿
+⣿⣿⣿⣯⡺⡵⡳⡽⡕⠕⡝⡜⡜⡜⡜⡜⡜⡜⣜⢞⡮⡷⣯⢿⣽⢿⣯⣿⣿⣿
+⣿⣿⡯⣪⢮⣫⣫⢺⢸⠄⡇⡗⡍⡎⡎⡎⡪⡪⡪⡳⣝⢽⢽⢽⢾⣟⣯⣟⣿⣿
+⣿⣟⢪⡺⡜⣖⢵⢹⡐⠅⠑⢕⢕⠕⡕⢜⠌⡆⢕⢕⢕⢯⡫⣯⡻⣞⣯⣿⢹⣿
+⣿⡗⡕⡵⡹⡜⡎⡇⡎⢌⠄⠣⡑⡕⡱⡑⢕⠸⡐⡱⡑⡗⣝⢮⣫⢗⠟⡊⢺⣿
+⣿⡏⢎⢎⢎⢎⢎⢎⠪⡂⡂⠄⠈⠢⡱⡘⢌⢊⢂⠪⡘⠜⠜⡑⢅⠂⡅⡪⢹⣿
+⣿⣿⡥⢑⢅⠣⡑⠅⠑⠄⠄⠂⠠⠐⠐⠈⠄⠁⠂⠁⡀⠄⠡⠨⠄⠑⡠⠨⢸⣿
+⣿⣿⡿⠃⠠⠄⡀⢂⠁⠂⠁⠈⢀⠨⠄⠠⠁⠠⠈⠠⠄⠂⢁⠠⢐⠁⢄⠡⣾⣿
+⣿⣿⣇⡁⠈⠄⠄⠂⠠⠁⠄⠁⠠⠐⠄⠁⠄⠄⠄⡀⠄⠠⢐⠨⡢⡹⡪⣻⣿⣿
+⣿⣿⣿⠨⠐⠄⠄⠄⠄⠄⠄⠄⠄⠄⡀⡁⠄⠂⠁⠄⢀⠡⠠⡑⡜⡜⡵⣽⣿⣿
+⣿⣿⣇⡁⠈⠄⠄⠂⠠⠁⠄⠁⠠⠐⠄⠁⠄⠄⠄⡀⠄⠠⢐⠨⡢⡹⡪⣻⣿⣿
+-->

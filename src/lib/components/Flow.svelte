@@ -30,11 +30,12 @@
     setContext('flow_name', flowName);
 </script>
 
+<!-- isFieldsetCollapsed is set to true (collapsed) only if the flow is not the Main Flow and the flow is not empty. -->
 <Fieldset 
     legend={ snakeCaseToPascalCase(flowName, true) } 
     isDynamic={flowName !== 'main_flow' ? true : false}
     extraOptions={{removeFieldset}}
-    isFieldsetCollapsed={flowName !== 'main_flow' ? true : false}
+    isFieldsetCollapsed={(flowName !== 'main_flow' && Object.values($PAYLOAD.flows[flowName]).length > 0) ? true : false}
     fieldsetCollapsedPlaceholder={`${ Object.values($PAYLOAD.flows[flowName]).length } operations...`}
 >
     {#each Object.values($PAYLOAD.flows[flowName]) as operation, index (operation.id)}

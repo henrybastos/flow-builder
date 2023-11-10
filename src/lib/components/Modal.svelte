@@ -11,7 +11,7 @@
     export let dangerModalTitlePlaceholder = 'Danger';
     export let dangerConfirmPlaceholder = 'Confirm';
     export let dangerCancelPlaceholder = 'Cancel';
-    export let dangerConfirmCallbackAction;
+    export let dangerConfirmCallbackAction = null;
 
     export function dangerConfirmAction () {
         dispatch(dangerConfirmEventMessage);
@@ -65,7 +65,8 @@
         <h3 class="text-2xl mb-6 mt-3 ml-1">{ title }</h3>
         <i on:click={close} class="ti ti-x align-middle absolute text-neutral-500 hover:text-neutral-300 cursor-pointer top-[50%] -translate-y-[50%] text-2xl right-6"></i>
     </div>
-    <slot {openDangerModal} />
+
+    <slot  {openDangerModal} />
     
     <!-- MODAL TOASTS -->
     <!-- <div class="fixed inset-0 top-3 bg-transparent z-50 flex flex-col justify-start items-end box-border overflow-hidden pointer-events-none">

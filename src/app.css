@@ -153,6 +153,13 @@
    .label-md {
       @apply label text-base p-2;
    }
+
+   .tab_btn {
+      @apply border-0 rounded-none border-b-2 border-transparent px-4 py-3 outline-none text-neutral-400 hover:border-blue-400 capitalize;
+   }
+   .active_tab_btn { 
+      @apply border-blue-400 text-neutral-100; 
+   }
 }
 
 @layer utilities {

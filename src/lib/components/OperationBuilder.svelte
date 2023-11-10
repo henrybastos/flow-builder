@@ -63,8 +63,8 @@
                     <!-- <span class="bg-neutral-900 border-2 border-neutral-800 rounded-lg py-2 text-center text-neutral-400">Dropdown</span> -->
                     <Dropdown 
                         options={Object.keys($PAYLOAD.flows).map(_flow => ({ value: _flow, label: _flow }))}
-                        selectedOption='aa'
-                        selectedOptionLabel='Aa'
+                        bind:selectedOption={ field.value }
+                        selectedOptionLabel={ field.value }
                         capitalizeOptionLabel={true}
                     />
                 {:else if field.type === 'btn'}

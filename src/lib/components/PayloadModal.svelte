@@ -1,7 +1,11 @@
 <script>
     import { FLOW_BUILDER_OPERATION_TEMPLATES } from "$lib/store";
-    import Modal from "./Modal.svelte";
     import { PAYLOAD } from "$lib/PayloadStore";
+    import Modal from "./Modal.svelte";
+    import TabsBar from "./TabsBar.svelte";
+
+    const controller = new AbortController();
+    const signal = controller.signal;
 
     let payloadModal;
     let isFLowAPILoading;
@@ -10,6 +14,7 @@
         type: 'error',
         message: ''
     };
+    let tabs = ['payload', 'console'];
 
     function transformToJSON () {
         let payloadBuffer = structuredClone($PAYLOAD);
@@ -37,29 +42,43 @@
     }
 
     async function sendFlowPayload (_payload) {
+        let response;
         isFLowAPILoading = true;
 
         if (Object.keys(_payload.flows.main_flow).length > 0) {
-            let response = await fetch('http://localhost:5173/api/run-flow', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify( _payload )
-            });
+            const FLOW_RUNNER_ENDPOINT = 'http://localhost:5173/api/run-flow' ?? 'https://kmt-main-repository-mrm27z6irq-rj.a.run.app/run-flow';
+            console.log(`Calling endpoint: ${ FLOW_RUNNER_ENDPOINT }`);
 
-            response = await response.json();
+            const runFlowRequest = new Request(FLOW_RUNNER_ENDPOINT, {
+                    method: 'POST',
+                    signal,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify( _payload )
+                });
 
-            if (response.error) {
-                console.error(response.error);
-                console.error('Response error');
-                // runFlowMessage.type = 'error';
-                // runFlowMessage.message = response.error.message;
-            } else {
-                console.log(response);
-                console.log('Response success');
-                // runFlowMessage.type = 'success';
-                // runFlowMessage.message = response.status.message;
+            runFlowRequest.signal.onabort = () => console.log('[SYS] Aborted');
+
+            try {
+                let response = await fetch(runFlowRequest);
+            } catch (err) {
+                console.error(body.error);
+                console.error('body error');
+
+                // if (body?.error) {
+                //     runFlowMessage.type = 'error';
+                //     runFlowMessage.message = response.error.message;
+                // } else {
+                //     console.log(response);
+                //     console.log('Response success');
+                //     runFlowMessage.type = 'success';
+                //     runFlowMessage.message = response.status.message;
+                // }
+            } finally {
+                console.log('Parsing response to JSON...');
+                response = await response.json();
+                console.log('Done');
             }
         } else {
             console.error('Empty Main Flow. Nothing to run.');
@@ -132,30 +151,39 @@
 </button>
 
 <Modal on:open={onPayloadModalOpenHandler} on:close={onPayloadModalCloseHandler} bind:this={payloadModal} title="Payload">
-    <textarea class="code" bind:value={payloadModalTextearea} name="" id="" cols="30" rows="20"></textarea>
-    
-    {#if runFlowMessage.message !== ''}
-        <span class={`${ runFlowMessage.type === 'error' ? 'text-red-600' : 'text-green-600' } mt-4`}>
-                <i class="ti ti-exclamation-circle text-lg mr-2 align-middle"></i>
-                { runFlowMessage.message }
-        </span>
-    {/if}
-
-    <div class="btn-bar">
-        <button disabled={isFLowAPILoading} on:click={async () => await sendFlowPayload(JSON.parse(payloadModalTextearea))} class="btn-md w-full mt-4">
-            {#if isFLowAPILoading}
-                <span class="w-full inline-flex justify-center">
-                    <i class="ti ti-loader-2 text-neutral-400 animate-spin-icon"></i>
+    <TabsBar let:activeTab modalTabs={tabs}>
+        {#if activeTab === 'payload'}
+            <textarea class="code" bind:value={payloadModalTextearea} name="" id="" cols="30" rows="20"></textarea>
+            
+            {#if runFlowMessage.message !== ''}
+                <span class={`${ runFlowMessage.type === 'error' ? 'text-red-600' : 'text-green-600' } mt-4`}>
+                        <i class="ti ti-exclamation-circle text-lg mr-2 align-middle"></i>
+                        { runFlowMessage.message }
                 </span>
-            {:else }
-                <i class="ti ti-arrows-split-2 text-blue-500"></i>
-                Run flow
             {/if}
-        </button>
+        
+            <div class="btn-bar">
+                <button disabled={isFLowAPILoading} on:click={async () => await sendFlowPayload(JSON.parse(payloadModalTextearea))} class="btn-md w-full mt-4">
+                    {#if isFLowAPILoading}
+                        <span class="w-full inline-flex justify-center">
+                            <i class="ti ti-loader-2 text-neutral-400 animate-spin-icon"></i>
+                        </span>
+                    {:else }
+                        <i class="ti ti-arrows-split-2 text-blue-500"></i>
+                        Run flow
+                    {/if}
+                </button>
+        
+                <button on:click={loadPayload} class="btn-md w-full mt-4">
+                    <i class="ti ti-file-upload text-blue-500"></i>
+                    Load payload
+                </button>
 
-        <button on:click={loadPayload} class="btn-md w-full mt-4">
-            <i class="ti ti-file-upload text-blue-500"></i>
-            Load payload
-        </button>
-    </div>
+                <button on:click={() => controller.abort()} class="btn-md w-full mt-4">
+                    <i class="ti ti-file-upload text-blue-500"></i>
+                    Abort
+                </button>
+            </div>
+        {/if}
+    </TabsBar>
 </Modal>
