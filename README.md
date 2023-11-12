@@ -20,8 +20,8 @@ There's the `env` object and the `flows` object, composing the `payload`;
 
 ```json
 {
-   "env": {...},
-   "flows": {...}
+   "env": {},
+   "flows": {}
 }
 ```
 
