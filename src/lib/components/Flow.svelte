@@ -7,13 +7,13 @@
 
     import { snakeCaseToPascalCase } from "$lib/utils";
     import { getOperationIndex } from "$lib/operationsSystem";
-    import { setContext } from "svelte";
+    import { onMount, setContext } from "svelte";
 
     let addOperationsModal;
     let openDangerModal;
 
     export let flowName;
-    
+
     function addOp (_flow_name, _operation) {
         PAYLOAD.addCommand(_flow_name, _operation);
         console.log($PAYLOAD);
@@ -35,7 +35,6 @@
     legend={ snakeCaseToPascalCase(flowName, true) } 
     isDynamic={flowName !== 'main_flow' ? true : false}
     extraOptions={{removeFieldset}}
-    isFieldsetCollapsed={(flowName !== 'main_flow' && Object.values($PAYLOAD.flows[flowName]).length > 0) ? true : false}
     fieldsetCollapsedPlaceholder={`${ Object.values($PAYLOAD.flows[flowName]).length } operations...`}
 >
     {#each Object.values($PAYLOAD.flows[flowName]) as operation, index (operation.id)}
