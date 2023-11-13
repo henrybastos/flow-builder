@@ -13,10 +13,12 @@
     import { FLOW_PRESETS } from '$lib/PresetsStore';
 
     let pageSettingsModal;
-    let toastWrapper;
     let appendToast;
 
     onMount(() => {
+        if (localStorage?.getItem('temp_preset')) {
+            PAYLOAD.loadPayload(JSON.parse(localStorage.getItem('temp_preset')));
+        }
         if (localStorage?.getItem('presets')) {
             try {
                 FLOW_PRESETS.loadPresets(JSON.parse(localStorage.getItem('presets')));
@@ -30,6 +32,50 @@
             appendToast('No presets found :(', 'error');
         }
     });
+
+    async function fetchAndAttach () {
+        console.log('AAAA');
+        const decoder = new TextDecoder();
+
+        fetch('http://localhost:5001/stream', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Basic k3b00k#vip@dev'
+            },
+        }).then((res) => {
+            const reader = res.body.getReader();
+
+            console.log('Fetching...');
+
+            reader.read().then(function readStream ({ done, value }) {
+                if (done) {
+                    console.log('[done]');
+                    return;
+                }
+
+                console.log(decoder.decode(value));
+                return reader.read().then(readStream);
+            });
+        });
+        console.log('BBBB');
+    }
+
+    function saveTempPresetToLocalStorage () {
+        try {
+            localStorage?.setItem('temp_preset', JSON.stringify($PAYLOAD));
+            appendToast('Temp Preset saved!', 'success');
+        } catch (err) {
+            appendToast('Failed to save Temp Preset', 'error');
+            console.error(err);
+        }
+    }
+
+    function clearTempPresetToLocalStorage () {
+        if (localStorage?.getItem('temp_preset')) {
+            localStorage.removeItem('temp_preset');
+        }
+    }
 
     // let id_arr = [
     //     'id_001',
@@ -51,6 +97,8 @@
         <h2 class="m-0">Flow Builder</h2>
         <p class="text-center text-neutral-500">Powered by Tailwind, SvelteKit and Puppeteer</p>
     </header>
+
+    <!-- <button class="btn-md" on:click={fetchAndAttach}>Fetch And Attach</button> -->
 
     <!-- {#each id_arr as item_id}
         <LetTest let:sayId id={item_id}>
@@ -76,19 +124,19 @@
 
     <Modal bind:this={pageSettingsModal} title="Page Settings">
         <div class="btn-bar">
-            <button on:click={FLOW_PRESETS.clearPresets()} class="btn-sm btn-danger w-full">
+            <button on:click={clearTempPresetToLocalStorage} class="btn-sm btn-danger w-full">
                 <i class="ti ti-database-x"></i>
                 Clear Local Storage
             </button>
 
-            <button on:click={() => console.log('Save to local storage?')} class="btn-sm btn-full">
+            <button on:click={saveTempPresetToLocalStorage} class="btn-sm btn-full">
                 <i class="ti ti-device-floppy text-blue-500"></i>
                 Save to Local Storage
             </button>
         </div>
     </Modal>
     
-    <ToastsWrapper bind:appendToast={appendToast} bind:this={toastWrapper}/>
+    <ToastsWrapper bind:appendToast={appendToast}/>
 </main>
 
 <!-- 

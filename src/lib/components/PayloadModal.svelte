@@ -50,13 +50,13 @@
             console.log(`Calling endpoint: ${ FLOW_RUNNER_ENDPOINT }`);
 
             const runFlowRequest = new Request(FLOW_RUNNER_ENDPOINT, {
-                    method: 'POST',
-                    signal,
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify( _payload )
-                });
+                method: 'POST',
+                signal,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify( _payload )
+            });
 
             runFlowRequest.signal.onabort = () => console.log('[SYS] Aborted');
 
@@ -125,17 +125,6 @@
         payloadModal.close();
     }
 
-    function addFlowOperationBody (_operation_body, _flow_name) {
-            
-        // if (flows[_flow_name]) {
-        //     flows[_flow_name] = [...flows[_flow_name], _operation_body];
-        // } else {
-        //     flows[_flow_name] = [_operation_body];
-        // }
-
-        // addOperationsModal.close();
-    }
-
     function onPayloadModalOpenHandler () {
         transformToJSON();
     }
@@ -179,10 +168,10 @@
                     Load payload
                 </button>
 
-                <button on:click={() => controller.abort()} class="btn-md w-full mt-4">
+                <!-- <button on:click={() => controller.abort()} class="btn-md w-full mt-4">
                     <i class="ti ti-file-upload text-blue-500"></i>
                     Abort
-                </button>
+                </button> -->
             </div>
         {/if}
     </TabsBar>

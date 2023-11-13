@@ -1,5 +1,5 @@
 <script>
-    let isOptionnCollapsed = true;
+    export let isOptionnCollapsed = false;
 
     export let isFieldsetCollapsed = false;
     
