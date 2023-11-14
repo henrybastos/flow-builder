@@ -8,6 +8,7 @@
     let flowName = getContext('flow_name');
 
     export let operation;
+    let disabled = false;
 
     const OPERATION_CONFIG_OPTIONS = [
         {
@@ -25,13 +26,21 @@
             name: 'move_down',
             icon: 'ti-circle-chevron-down',
             action: () => PAYLOAD.moveOperation(flowName, operation, 'down')
+        },
+        {
+            name: 'toggle_active',
+            type: 'toggle',
+            state: false,
+            icon: {
+                on: 'ti-toggle-right',
+                off: 'ti-toggle-left'
+            },
+            action: {
+                on: () => console.log('On!'),
+                off: () => console.log('Off...'),
+            }
         }
     ];
-
-    function isFlowsDropdown (field_name) {
-        const knownDropdownFieldNames = ['flow', 'error_flow', 'success_flow'];
-        return knownDropdownFieldNames.includes(field_name);
-    }
 </script>
 
 <div class="mb-4 p-4 border-2 border-neutral-800 rounded-lg" id={ operation.id }>
@@ -76,3 +85,9 @@
         {/if}
     </div>
 </div>
+
+<style>
+    .disabled {
+        @apply text-neutral-600;
+    }
+</style>

@@ -92,6 +92,14 @@ export const FLOW_BUILDER_INPUT_FIELD_TEMPLATES = {
     }
 };
 
+/**
+ * @typedef {Object} Operation
+ * @property {string} command
+ * @property {string} label
+ * @property {string} icon
+ * @property {'btn'} type
+ */
+
 export const FLOW_BUILDER_OPERATION_TEMPLATES = writable({
     goto: {
         command: 'goto',
@@ -188,6 +196,7 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = writable({
         }
     },
     repeat_flow: {
+        disabled: true,
         command: 'repeat_flow',
         label: 'WIP Repeat Flow',
         icon: 'ti-repeat',
@@ -210,6 +219,7 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = writable({
         }
     },
     repeater: {
+        disabled: true,
         command: 'repeater',
         label: 'WIP Repeater',
         icon: 'ti-zoom-scan',
@@ -228,6 +238,20 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = writable({
             color: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.color,
             trigger_target: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.trigger_target,
             picker_target: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.picker_target,
+        }
+    },
+    wait_for_selector: {
+        command: 'wait_for_selector',
+        label: 'Wait For Selector',
+        icon: 'ti-clock-search',
+        input_fields: {
+            target: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.target,
+            timeout: {
+                type: 'text',
+                label: 'Timeout time | secs',
+                placeholder: '15000',
+                value: ''
+            }
         }
     }
 }) 

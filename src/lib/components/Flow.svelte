@@ -6,11 +6,11 @@
     import { FLOW_BUILDER_OPERATION_TEMPLATES } from "$lib/store";
 
     import { snakeCaseToPascalCase } from "$lib/utils";
-    import { getOperationIndex } from "$lib/operationsSystem";
-    import { onMount, setContext } from "svelte";
+    import { setContext } from "svelte";
 
     let addOperationsModal;
     let openDangerModal;
+    let operationsLimit = 5;
 
     export let flowName;
 
@@ -27,11 +27,14 @@
         action: () => openDangerModal(() => PAYLOAD.removeFlow(flowName), { danger_modal_title: `Remove flow ${ flowName }?` })
     }
 
+    $: hasFieldsetReachedOperationsLimit = Object.values($PAYLOAD.flows[flowName]).length > operationsLimit;
+
     setContext('flow_name', flowName);
 </script>
 
 <!-- isFieldsetCollapsed is set to true (collapsed) only if the flow is not the Main Flow and the flow is not empty. -->
 <Fieldset 
+    isFieldsetCollapsed={ hasFieldsetReachedOperationsLimit }
     legend={ snakeCaseToPascalCase(flowName, true) } 
     isDynamic={flowName !== 'main_flow' ? true : false}
     extraOptions={{removeFieldset}}
@@ -50,10 +53,12 @@
 <Modal bind:this={addOperationsModal} title="Add operation" bind:openDangerModal>
     <div class="grid grid-cols-2 gap-x-4 gap-y-2 h-fit">
         {#each Object.values($FLOW_BUILDER_OPERATION_TEMPLATES) as operationTemplate}
-            <button class="btn btn-md w-full" on:click={() => addOp(flowName, structuredClone(operationTemplate))}>
-                <i class={`ti ${ operationTemplate.icon || 'ti-topology-ring-2' } text-blue-500 mr-1 text-2xl`}></i>
-                { operationTemplate.label }
-            </button>
+            {#if !operationTemplate.disabled}                
+                <button class="btn btn-md w-full" on:click={() => addOp(flowName, structuredClone(operationTemplate))}>
+                    <i class={`ti ${ operationTemplate.icon || 'ti-topology-ring-2' } text-blue-500 mr-1 text-2xl`}></i>
+                    { operationTemplate.label }
+                </button>
+            {/if}
         {/each}
     </div>
 </Modal>

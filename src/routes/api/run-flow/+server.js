@@ -58,14 +58,15 @@ export async function POST ({ request }) {
         return _field_value;
     }
 
+    async function _waitForSelector (_target, _timeout = 15000) {
+        await page.waitForSelector(`xpath/${ _target }`, {
+            timeout: _timeout
+        });
+    }
+
     async function _getElement (_target) {
-        if (payload?.wait_timeout) {
-            await page.waitForSelector(`xpath/${ _target }`, {
-                timeout: payload.wait_timeout
-            });
-        } else {
-            await page.waitForSelector(`xpath/${ _target }`);
-        }
+        await _waitForSelector(_target, payload?.wait_timeout);
+
         return await page.$$(`xpath/${ _target }`);
     }
 
@@ -134,6 +135,9 @@ export async function POST ({ request }) {
             await runFlow(payload.flows[flow], _env);
         }
     }
+
+
+    
 
     async function evalOperation (_operation, _env) {
         if (logCommands) {
@@ -216,6 +220,9 @@ export async function POST ({ request }) {
                 break;
             case 'set_payload_slot':
                 responsePayload[_operation.response_slot] = _operation.value;
+                break;
+            case 'wait_for_selector':
+                await _waitForSelector(_operation.target, _operation.timeout);
                 break;
             case 'close_browser':
                 await browser.close();

@@ -62,6 +62,9 @@
 
             try {
                 let response = await fetch(runFlowRequest);
+                console.log('Parsing response to JSON...');
+                response = await response.json();
+                console.log('Done');
             } catch (err) {
                 console.error(body.error);
                 console.error('body error');
@@ -75,10 +78,6 @@
                 //     runFlowMessage.type = 'success';
                 //     runFlowMessage.message = response.status.message;
                 // }
-            } finally {
-                console.log('Parsing response to JSON...');
-                response = await response.json();
-                console.log('Done');
             }
         } else {
             console.error('Empty Main Flow. Nothing to run.');

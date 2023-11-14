@@ -17,7 +17,7 @@ devDependencies:
     specifier: ^1.20.4
     version: 1.25.1(svelte@4.2.1)(vite@4.4.9)
   autoprefixer:
-    specifier: ^10.4.16
+    specifier: ^10.4.14
     version: 10.4.16(postcss@8.4.30)
   dotenv:
     specifier: ^16.3.1
@@ -29,16 +29,19 @@ devDependencies:
     specifier: ^2.30.0
     version: 2.33.2(eslint@8.50.0)(svelte@4.2.1)
   postcss:
-    specifier: ^8.4.30
+    specifier: ^8.4.24
     version: 8.4.30
+  postcss-load-config:
+    specifier: ^4.0.1
+    version: 4.0.1(postcss@8.4.30)
   svelte:
     specifier: ^4.0.5
     version: 4.2.1
   svelte-check:
     specifier: ^3.4.3
-    version: 3.5.2(postcss@8.4.30)(svelte@4.2.1)
+    version: 3.5.2(postcss-load-config@4.0.1)(postcss@8.4.30)(svelte@4.2.1)
   tailwindcss:
-    specifier: ^3.3.3
+    specifier: ^3.3.2
     version: 3.3.3
   typescript:
     specifier: ^5.0.0
@@ -2239,7 +2242,7 @@ packages:
     engines: {node: '>= 0.4'}
     dev: true
 
-  /svelte-check@3.5.2(postcss@8.4.30)(svelte@4.2.1):
+  /svelte-check@3.5.2(postcss-load-config@4.0.1)(postcss@8.4.30)(svelte@4.2.1):
     resolution: {integrity: sha512-5a/YWbiH4c+AqAUP+0VneiV5bP8YOk9JL3jwvN+k2PEPLgpu85bjQc5eE67+eIZBBwUEJzmO3I92OqKcqbp3fw==}
     hasBin: true
     peerDependencies:
@@ -2252,7 +2255,7 @@ packages:
       picocolors: 1.0.0
       sade: 1.8.1
       svelte: 4.2.1
-      svelte-preprocess: 5.0.4(postcss@8.4.30)(svelte@4.2.1)(typescript@5.2.2)
+      svelte-preprocess: 5.0.4(postcss-load-config@4.0.1)(postcss@8.4.30)(svelte@4.2.1)(typescript@5.2.2)
       typescript: 5.2.2
     transitivePeerDependencies:
       - '@babel/core'
@@ -2292,7 +2295,7 @@ packages:
       svelte: 4.2.1
     dev: true
 
-  /svelte-preprocess@5.0.4(postcss@8.4.30)(svelte@4.2.1)(typescript@5.2.2):
+  /svelte-preprocess@5.0.4(postcss-load-config@4.0.1)(postcss@8.4.30)(svelte@4.2.1)(typescript@5.2.2):
     resolution: {integrity: sha512-ABia2QegosxOGsVlsSBJvoWeXy1wUKSfF7SWJdTjLAbx/Y3SrVevvvbFNQqrSJw89+lNSsM58SipmZJ5SRi5iw==}
     engines: {node: '>= 14.10.0'}
     requiresBuild: true
@@ -2334,6 +2337,7 @@ packages:
       detect-indent: 6.1.0
       magic-string: 0.27.0
       postcss: 8.4.30
+      postcss-load-config: 4.0.1(postcss@8.4.30)
       sorcery: 0.11.0
       strip-indent: 3.0.0
       svelte: 4.2.1

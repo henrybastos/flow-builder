@@ -1,5 +1,5 @@
 <script>
-    export let isOptionnCollapsed = false;
+    export let isOptionnCollapsed = true;
 
     export let isFieldsetCollapsed = false;
     
@@ -46,7 +46,7 @@
         {/if}
     </legend>
     <div class={`${ isFieldsetCollapsed ? 'max-h-0 overflow-hidden' : 'max-h-[4000rem] overflow-visible' }`}>
-        <slot />
+        <slot {isFieldsetCollapsed} />
     </div>
  </fieldset>
 
