@@ -1,6 +1,8 @@
 import puppeteer from "puppeteer";
 import { checkForEnvPlaceholder, trimEnvPlaceholder, replaceEnvPlaceholder } from "$lib/utils.js";
 
+import comboKeys from "$lib/operations/comboKeys";
+
 // //*/div[contains(text(), 'https://alessandrobechelin.kebook.com.br')]
 
 /** 
@@ -137,7 +139,7 @@ export async function POST ({ request }) {
     }
 
 
-    
+
 
     async function evalOperation (_operation, _env) {
         if (logCommands) {
@@ -180,17 +182,7 @@ export async function POST ({ request }) {
                 await page.keyboard.press(_operation.key);
                 break;
             case 'combo_keys':
-                for(const key of _operation.mod_keys) {
-                    await page.keyboard.down(key);
-                }
-
-                for(const key of _operation.keys) {
-                    await page.keyboard.press(key);
-                }
-
-                for(const key of _operation.mod_keys) {
-                    await page.keyboard.up(key);
-                }
+                await comboKeys(page, _operation.key, _operation.mod_keys);
                 break;
             case 'scrape_attr':
                 responsePayload[_operation.response_slot] = await _scrapeAttribute(_operation);
