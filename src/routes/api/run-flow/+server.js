@@ -39,9 +39,8 @@ export async function POST ({ request }) {
     console.log('Calling local endpoint: [::1]:5173/api/run-flow');
 
     async function _startEngine () {
-        const browser = await puppeteer.launch({
-            headless: false,
-        });
+        
+        const browser = await _connectOrLaunchBrowser();
         
         const [page] = await browser.pages();
 
@@ -50,6 +49,25 @@ export async function POST ({ request }) {
         });
 
         return [page, browser];
+    }
+
+    async function _connectOrLaunchBrowser () {
+        let _browser;
+
+        // Tries to connect to a running browser instance. If it fails, it launches a new one.
+        try {
+            console.log(`Attempting to connect at ${ payload.config.ws_endpoint }...`);
+            _browser = await puppeteer.connect({ browserWSEndpoint: payload.config.ws_endpoint })
+            console.log(`Browser connected at ${ payload.config.ws_endpoint }`);
+        } catch (_err) {
+            console.error(`Failed to connect at ${ payload.config.ws_endpoint }. Launching a new browser...`);
+            _browser = await puppeteer.launch({
+                headless: false,
+            });
+            console.log(`New browser launched: ${ _browser.wsEndpoint() }`);
+        }
+
+        return _browser;
     }
 
     function _checkEnvVars (_env, _field_name, _field_value) {
@@ -233,10 +251,16 @@ export async function POST ({ request }) {
     try {   
         // responsePayload.base_url = payload.base_url;
         await runFlow(payload.flows.main_flow, payload.env);
-        payload.config.ws_endpoint
-        // await browser.close();
+
+        if (payload.config.ws_endpoint || !payload.config.close_browser_on_finish) {
+            console.log(`Browser cannot be closed: ${ payload.config.ws_endpoint } / ${ payload.config.close_browser_on_finish }`);
+        } else {
+            await browser.close();
+        }
+        
         responsePayload.status = {
             message: 'All operations done.',
+            ws_endpoint: browser.wsEndpoint(),
             code: 200
         };
         console.dir(responsePayload, { depth: null });

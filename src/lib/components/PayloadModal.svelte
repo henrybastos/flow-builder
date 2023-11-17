@@ -5,7 +5,6 @@
     import TabsBar from "./TabsBar.svelte";
 
     const controller = new AbortController();
-    const signal = controller.signal;
 
     let payloadModal;
     let isFLowAPILoading;
@@ -46,24 +45,17 @@
         isFLowAPILoading = true;
 
         if (Object.keys(_payload.flows.main_flow).length > 0) {
-            const FLOW_RUNNER_ENDPOINT = 'http://localhost:5173/api/run-flow' ?? 'https://kmt-main-repository-mrm27z6irq-rj.a.run.app/run-flow';
-            console.log(`Calling endpoint: ${ FLOW_RUNNER_ENDPOINT }`);
-
-            const runFlowRequest = new Request(FLOW_RUNNER_ENDPOINT, {
+            try {
+                let response = await fetch('http://localhost:5173/api/run-flow', {
                 method: 'POST',
-                signal,
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify( _payload )
             });
-
-            runFlowRequest.signal.onabort = () => console.log('[SYS] Aborted');
-
-            try {
-                let response = await fetch(runFlowRequest);
                 console.log('Parsing response to JSON...');
                 response = await response.json();
+                console.log(response);
                 console.log('Done');
             } catch (err) {
                 console.error(body.error);
@@ -72,6 +64,7 @@
         } else {
             console.error('Empty Main Flow. Nothing to run.');
         }
+
         isFLowAPILoading = false;
     }
 
