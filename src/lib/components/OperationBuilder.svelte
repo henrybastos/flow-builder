@@ -60,10 +60,13 @@
             <!-- Loops each Input Field -->
             {#each Object.entries(operation.input_fields) as [field_name, field]}
 
-                <!-- Determines which kind of Input Field it its -->
+                <!-- If it's not a button, it creates a Label for the input -->
                 {#if field.type !== 'btn'}
                     <label class="col-start-1 col-end-2 whitespace-nowrap pr-4 my-auto" for={ field_name }>{ field.label }</label>
-                {:else if field.type === 'text'}
+                {/if}
+
+                <!-- Determines which kind of Input Field it its -->
+                {#if field.type === 'text'}
                     <input 
                         class={`col-start-2 input-md ${ checkForEnvPlaceholder(field.value) ? 'font-code text-green-600' : 'font-sans' }`}
                         bind:value={ field.value } 
