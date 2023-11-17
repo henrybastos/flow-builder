@@ -117,7 +117,6 @@ export async function POST ({ request }) {
     async function _evaluateRegex ({ target, regex }) {
         const [_element] = await _getElement(target);
         return await _element.evaluate((el, _regex) => el.value.match(new RegExp(_regex, 'g')), regex);
-        // return await _element.evaluate((el) => el.value.match(/(?<=widget).+/g)[0].slice(1,-1));
     }
 
     async function _checkElement ({ target, success_flow, error_flow }) {
@@ -234,6 +233,7 @@ export async function POST ({ request }) {
     try {   
         // responsePayload.base_url = payload.base_url;
         await runFlow(payload.flows.main_flow, payload.env);
+        payload.config.ws_endpoint
         // await browser.close();
         responsePayload.status = {
             message: 'All operations done.',

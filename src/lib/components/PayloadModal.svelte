@@ -68,21 +68,9 @@
             } catch (err) {
                 console.error(body.error);
                 console.error('body error');
-
-                // if (body?.error) {
-                //     runFlowMessage.type = 'error';
-                //     runFlowMessage.message = response.error.message;
-                // } else {
-                //     console.log(response);
-                //     console.log('Response success');
-                //     runFlowMessage.type = 'success';
-                //     runFlowMessage.message = response.status.message;
-                // }
             }
         } else {
             console.error('Empty Main Flow. Nothing to run.');
-            // runFlowMessage.type = 'error';
-            // runFlowMessage.message = 'Empty Main Flow. Nothing to run.';
         }
         isFLowAPILoading = false;
     }
@@ -97,25 +85,19 @@
 
         Object.entries(payloadJSON.flows).forEach(([ _flow_name, _flow_body ]) => {
             PAYLOAD.addFlow(_flow_name);
+
             Object.values(_flow_body).forEach((operation) => {
                 if ( $FLOW_BUILDER_OPERATION_TEMPLATES[operation.command] ) {
                     const operationBody = structuredClone( $FLOW_BUILDER_OPERATION_TEMPLATES[operation.command] );
                     
                     if (operationBody?.input_fields) {
-                        // if (_operation_body?.input_fields) {
-                        //     Object.values(_operation_body.input_fields).forEach(input => {
-                        //         if (input.type === 'dropdown') {
-                        //             input.options = Object.keys(flows);
-                        //         }
-                        //     })
-                        // }
 
                         Object.entries(operationBody.input_fields).forEach(([key, value]) => {
                             value.value = operation[key];
                         })
                     }
 
-                    PAYLOAD.addCommand(_flow_name, operationBody);
+                    PAYLOAD.addOperation(_flow_name, operationBody);
                 }
             })
         });
@@ -133,7 +115,7 @@
     }
 </script>
 
-<button on:click={() => payloadModal.open()} class="btn-md btn-full mb-4">
+<button on:click={() => payloadModal.open()} class="btn-md">
     <i class="ti ti-script text-blue-500"></i>
     Process JSON
 </button>
@@ -141,7 +123,7 @@
 <Modal on:open={onPayloadModalOpenHandler} on:close={onPayloadModalCloseHandler} bind:this={payloadModal} title="Payload">
     <TabsBar let:activeTab modalTabs={tabs}>
         {#if activeTab === 'payload'}
-            <textarea class="code" bind:value={payloadModalTextearea} name="" id="" cols="30" rows="20"></textarea>
+            <textarea class="font-code" bind:value={payloadModalTextearea} name="" id="" cols="30" rows="20"></textarea>
             
             {#if runFlowMessage.message !== ''}
                 <span class={`${ runFlowMessage.type === 'error' ? 'text-red-600' : 'text-green-600' } mt-4`}>

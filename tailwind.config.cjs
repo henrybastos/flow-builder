@@ -8,6 +8,12 @@ const config = {
         'sans': ['Outfit'],
         'code': ['JetBrains Mono']
      },
+     colors: {
+      primary: {
+        100: '#FF0001',
+        200: '#FF0002'
+      }
+     }
     },
   },
 
