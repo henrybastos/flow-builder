@@ -43,7 +43,7 @@
     isDynamic={ !isMainFlow(flowName) }
     extraOptions={{removeFieldset}}
     fieldsetCollapsedPlaceholder={`${ Object.values($PAYLOAD.flows[flowName]).length } operations...`}
-    class={isMainFlow(flowName) ? $PAYLOAD.config.ws_endpoint ? 'border-green-500' : 'border-blue-500' : ''}
+    class={isMainFlow(flowName) ? $PAYLOAD?.config?.ws_endpoint ? 'border-green-500' : 'border-blue-500' : ''}
 >
     {#each Object.values($PAYLOAD.flows[flowName]) as operation, index (operation.id)}
         <OperationBuilder {operation} flowsDropdownOptions={ [{ label: 'flow_01', value: 'Flow 01' }] } />

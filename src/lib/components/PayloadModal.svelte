@@ -74,8 +74,6 @@
         PAYLOAD.resetPayload();
         PAYLOAD.setEnv(payloadJSON.env);
 
-        console.log(payloadJSON);
-
         Object.entries(payloadJSON.flows).forEach(([ _flow_name, _flow_body ]) => {
             PAYLOAD.addFlow(_flow_name);
 
@@ -94,6 +92,9 @@
                 }
             })
         });
+
+        console.log(payloadJSON);
+        PAYLOAD.loadConfig(payloadJSON.config);
 
         console.log($PAYLOAD);
         payloadModal.close();

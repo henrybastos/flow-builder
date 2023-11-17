@@ -20,6 +20,26 @@ function createPayload () {
     
     return {
         subscribe,
+        // Fixes some old presets without the config object
+        _fix_fixNullConfig: () => {
+            update(_payload => {
+                return {
+                    ..._payload,
+                    config: {
+                        ws_endpoint: false,
+                        close_browser_on_finish: false
+                    }
+                }
+            })
+        },
+        loadConfig: (_config) => {
+            update(_payload => {
+                return {
+                    ..._payload,
+                    config: _config
+                }
+            })
+        },
         setConfig: (_config, _value) => {
             update(_payload => {
                 return {

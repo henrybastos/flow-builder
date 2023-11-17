@@ -5,7 +5,6 @@
 
     export let appendToast;
     let pageSettingsModal;
-    // $: wsEndpoint = $PAYLOAD.config.ws_endpoint || '';
     let wsEndpoint = '';
 
     function saveTempPresetToLocalStorage () {
@@ -32,16 +31,21 @@
         PAYLOAD.setConfig('close_browser_on_finish', detail);
         console.log($PAYLOAD);
     }
+
+    function openModal () {
+        wsEndpoint = $PAYLOAD?.config?.ws_endpoint || '';
+        pageSettingsModal.open();
+    }
 </script>
 
-<button on:click={() => pageSettingsModal.open()} class="btn-md">
+<button on:click={openModal} class="btn-md">
     <i class="ti ti-settings text-blue-500"></i>
     Settings
 </button>
 
-<Modal bind:this={pageSettingsModal} title="Settings">
+<Modal bind:this={pageSettingsModal} title="Settings" let:openDangerModal>
     <div class="btn-bar">
-        <button on:click={clearTempPresetToLocalStorage} class="btn-sm btn-danger w-full">
+        <button on:click={() => openDangerModal(clearTempPresetToLocalStorage, { danger_modal_title: 'Clear local storage?' })} class="btn-sm btn-danger w-full">
             <i class="ti ti-database-x"></i>
             Clear Local Storage
         </button>
