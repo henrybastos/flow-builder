@@ -52,7 +52,7 @@
 <header class="fixed flex flex-row justify-between items-center py-3 px-4 w-full bg-neutral-900">
     <h3>Flow Builder</h3>
 
-    <div>
+    <div class="inline-flex gap-x-2">
         <PresetsModal {appendToast}/>
     
         <PageSettings {appendToast}/>

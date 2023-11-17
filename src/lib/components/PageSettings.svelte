@@ -59,9 +59,8 @@
             <label class:ws-active-label={wsEndpoint} class="col-start-1 col-end-2 whitespace-nowrap mr-4 my-auto transition-all" for="ws_input">Web Socket Endpoint</label>
             <input on:change={updateWSEnpoint} bind:value={wsEndpoint} name="ws_input" class:ws-active-label={wsEndpoint} class="input-md grow" type="text" placeholder="ws://123.456.789">
 
-            <span class="col-span-full">
-                <Switch on:toggle={updateCloseBrowserOnFinish} label="Close browser on finish" />
-            </span>
+            <label class="col-start-1 col-end-2 whitespace-nowrap mr-4 my-auto transition-all" for="close_browser_switch">Close browser on finish</label>
+            <Switch on:toggle={updateCloseBrowserOnFinish} />
         </div>
     </div>
 </Modal>
