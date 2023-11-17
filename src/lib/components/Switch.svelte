@@ -8,18 +8,19 @@
         off: 'ti-toggle-left'
     }
 
-    export let checkState = false;
+    // Logic has to be inverted, for some reason T _ T
+    export let unchecked = true;
 
-    let onClass = `${ icon.on } text-green-400`;
-    let offClass = `${ icon.off } text-neutral-400`;
+    $: iconClass = unchecked ? `${ icon.off } text-neutral-400` : `${ icon.on } text-green-400`;
 
     function onToggle () {
-        dispatch('toggle', checkState);
+        dispatch('toggle', unchecked);
+        console.log(unchecked);
     }
 </script>
 
 <label class="flex items-center w-fit select-none cursor-pointer">
     { label }
-    <i class={`ti ${ checkState ? onClass : offClass } ml-2 text-2xl text-neutral-400`}></i>
-    <input on:change={onToggle} bind:checked={checkState} class="bg-red-600 absolute invisible" type="checkbox" name="" id="">
+    <i class={`ti ${ iconClass } ml-2 text-2xl text-neutral-400`}></i>
+    <input on:change={onToggle} bind:checked={unchecked} class="absolute invisible" type="checkbox">
 </label>

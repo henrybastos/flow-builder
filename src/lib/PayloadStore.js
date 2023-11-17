@@ -3,7 +3,8 @@ import { writable } from "svelte/store";
 function createPayload () {
     const initStruct = {
         config: {
-            ws_endpoint: undefined
+            ws_endpoint: false,
+            close_browser_on_finish: false
         },
         env: {},
         flows: {
