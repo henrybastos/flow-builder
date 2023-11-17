@@ -15,10 +15,14 @@
     export let flowName;
 
     function addOp (_flow_name, _operation) {
-        PAYLOAD.addCommand(_flow_name, _operation);
+        PAYLOAD.addOperation(_flow_name, _operation);
         console.log($PAYLOAD);
         // console.log(JSON.stringify($PAYLOAD, null, 3));
         addOperationsModal.close();
+    }
+
+    function isMainFlow (_flow_name) {
+        return _flow_name === 'main_flow'
     }
 
     const removeFieldset = {
@@ -36,9 +40,10 @@
 <Fieldset 
     isFieldsetCollapsed={ hasFieldsetReachedOperationsLimit }
     legend={ snakeCaseToPascalCase(flowName, true) } 
-    isDynamic={flowName !== 'main_flow' ? true : false}
+    isDynamic={ !isMainFlow(flowName) }
     extraOptions={{removeFieldset}}
     fieldsetCollapsedPlaceholder={`${ Object.values($PAYLOAD.flows[flowName]).length } operations...`}
+    class={isMainFlow(flowName) ? $PAYLOAD.config.ws_endpoint ? 'border-green-500' : 'border-blue-500' : ''}
 >
     {#each Object.values($PAYLOAD.flows[flowName]) as operation, index (operation.id)}
         <OperationBuilder {operation} flowsDropdownOptions={ [{ label: 'flow_01', value: 'Flow 01' }] } />

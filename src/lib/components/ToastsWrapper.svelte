@@ -16,7 +16,7 @@
     }
 </script>
 
-<div class="fixed inset-0 top-3 bg-transparent z-50 flex flex-col justify-start items-end box-border overflow-hidden pointer-events-none">
+<div class="fixed inset-0 top-24 bg-transparent z-50 flex flex-col justify-start items-end box-border overflow-hidden pointer-events-none">
     {#each toastCollection as toast}
         <Toast message={ toast.message } type={ toast.type }/>
     {/each}

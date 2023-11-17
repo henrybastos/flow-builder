@@ -40,7 +40,7 @@
     }
 </script>
 
-<button on:click={() => presetsModal.open()} class="btn-md w-full col-span-full">
+<button on:click={() => presetsModal.open()} class="btn-md">
     <i class="ti ti-bookmarks text-blue-500"></i>
     Presets
 </button>

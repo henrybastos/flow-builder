@@ -4,7 +4,6 @@
     export let isFieldsetCollapsed = false;
     
     export let legend;
-    export let className = '';
     export let fieldsetCollapsedPlaceholder = '...';
     
     export let isDynamic = false;
@@ -24,9 +23,8 @@
     }
 </script>
 
-
 <!-- svelte-ignore a11y-click-events-have-key-events -->
-<fieldset class={className}>
+<fieldset class={`${ $$restProps?.class || '' }`}> 
     {#if isFieldsetCollapsed}
         <span on:click={toggleFieldsetSize} class="font-medium text-lg text-center text-neutral-500 hover:text-neutral-400 cursor-pointer">{ fieldsetCollapsedPlaceholder }</span>
     {/if}
