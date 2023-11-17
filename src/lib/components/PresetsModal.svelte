@@ -63,7 +63,7 @@
                </button>
 
                <button class="btn-md" on:click={() => openDangerModal(() => updatePreset(preset_name), { danger_modal_title: `Update preset ${ preset_name }?` })}>
-                   <i class="ti ti-corner-right-up-double"></i>
+                   <i class="ti ti-arrows-transfer-up"></i>
                </button>
 
                <button class="btn-md btn-danger" on:click={() => openDangerModal(() => removePreset(preset_name), { danger_modal_title: `Remove preset ${ preset_name }?` })}>
