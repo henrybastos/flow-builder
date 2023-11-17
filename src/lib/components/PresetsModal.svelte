@@ -9,7 +9,6 @@
 
    function savePreset () {
         FLOW_PRESETS.savePreset({ [newPresetName]: { ...$PAYLOAD } });
-
         console.log('Preset saved!');
         newPresetName = '';
     }
@@ -26,12 +25,17 @@
 
     function loadPreset (_preset_name) {
         PAYLOAD.loadPayload($FLOW_PRESETS[_preset_name]);
-        console.log($PAYLOAD);
+
+        if (!$PAYLOAD?.config) {
+            console.log('[FIX] No config found. Loading empty one...');
+            PAYLOAD._fix_fixNullConfig();
+        }
         presetsModal.close();
     }
 
-    function editPreset () {
-        console.log('Edit preset!');
+    function updatePreset (_preset_name) {
+        FLOW_PRESETS.savePreset({ [_preset_name]: { ...$PAYLOAD } });
+        console.log('Preset updated!');
     }
 
     export function open () {
@@ -52,15 +56,17 @@
 >
    <div class="btn-bar mb-3">
        {#each Object.keys($FLOW_PRESETS) as preset_name}
-           <div class="flex flex-row col-span-full">
-               <button class="btn-md grow" on:click={() => loadPreset(preset_name)}>
+           <div class="flex flex-nowrap col-span-full gap-x-3">
+               <button class="btn-md col-span-full w-full" on:click={() => loadPreset(preset_name)}>
                    <i class="ti ti-bookmark-filled text-blue-500"></i>
                    { preset_name }
                </button>
-               <!-- <button class="btn-md" on:click={() => editPreset(preset_name)}>
-                   <i class="ti ti-ballpen"></i>
-               </button> -->
-               <button class="btn-md btn-danger ml-3" on:click={() => openDangerModal(() => removePreset(preset_name), { danger_modal_title: `Remove preset ${ preset_name }?` })}>
+
+               <button class="btn-md" on:click={() => openDangerModal(() => updatePreset(preset_name), { danger_modal_title: `Update preset ${ preset_name }?` })}>
+                   <i class="ti ti-corner-right-up-double"></i>
+               </button>
+
+               <button class="btn-md btn-danger" on:click={() => openDangerModal(() => removePreset(preset_name), { danger_modal_title: `Remove preset ${ preset_name }?` })}>
                    <i class="ti ti-trash-x"></i>
                </button>
            </div>
@@ -83,7 +89,7 @@
            <i class="ti ti-book-upload text-blue-500"></i>
            Save Preset
        </button>
-       <p class="text-red-600 col-span-full peer-invalid/preset-name:visible invisible">Invalid preset name</p>
 
+       <p class="text-red-600 col-span-full peer-invalid/preset-name:visible invisible">Invalid preset name</p>
    </div>
 </Modal>
