@@ -21,6 +21,8 @@
 
 <label class="flex items-center w-fit select-none cursor-pointer">
     { label }
-    <i class={`ti ${ iconClass } ml-2 text-2xl text-neutral-400`}></i>
     <input on:change={onToggle} bind:checked={unchecked} class="absolute invisible" type="checkbox">
+    <span class="border-2 border-neutral-600 rounded-md p-1 w-12 ml-3">
+        <span class={`block h-4 w-4 rounded-sm transition-all ${ unchecked ? 'ml-0 bg-neutral-600' : 'ml-5 bg-green-400' }`}></span>
+    </span>
 </label>
