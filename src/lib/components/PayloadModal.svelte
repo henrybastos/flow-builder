@@ -3,6 +3,8 @@
     import { PAYLOAD } from "$lib/PayloadStore";
     import Modal from "./Modal.svelte";
     import TabsBar from "./TabsBar.svelte";
+    import { LOGGER, TAGS } from "$lib/LogStore";
+    import LogMessage from "./LogMessage.svelte";
 
     const controller = new AbortController();
 
@@ -53,9 +55,14 @@
                 },
                 body: JSON.stringify( _payload )
             });
+                LOGGER.logMessage('Parsing response to JSON...', $TAGS.system);
+
                 console.log('Parsing response to JSON...');
                 response = await response.json();
                 console.log(response);
+
+                LOGGER.logMessage('Done!', $TAGS.success);
+                LOGGER.logMessage(`WS Endpoint: ${ response.body.ws_endpoint }`, $TAGS.success);
                 console.log('Done');
             } catch (err) {
                 console.error(body.error);
@@ -114,7 +121,7 @@
     Process JSON
 </button>
 
-<Modal on:open={onPayloadModalOpenHandler} on:close={onPayloadModalCloseHandler} bind:this={payloadModal} title="Payload">
+<Modal on:open={onPayloadModalOpenHandler} on:close={onPayloadModalCloseHandler} bind:this={payloadModal} title="Payload" class="w-[90vw]">
     <TabsBar let:activeTab modalTabs={tabs}>
         {#if activeTab === 'payload'}
             <textarea class="font-code" bind:value={payloadModalTextearea} name="" id="" cols="30" rows="20"></textarea>
@@ -125,6 +132,8 @@
                         { runFlowMessage.message }
                 </span>
             {/if}
+
+            <!-- { Object.values($LOGGER.messages).slice(-1)[0].message } -->
         
             <div class="btn-bar">
                 <button disabled={isFLowAPILoading} on:click={async () => await sendFlowPayload(JSON.parse(payloadModalTextearea))} class="btn-md w-full mt-4">
@@ -147,6 +156,12 @@
                     <i class="ti ti-file-upload text-blue-500"></i>
                     Abort
                 </button> -->
+            </div>
+        {:else if activeTab === 'console'}
+            <div class="border-2 border-neutral-800 rounded-md p-3 bg-neutral-950">
+                {#each Object.entries($LOGGER.messages) as [msg_key, msg], _ (msg_key)}
+                    <LogMessage message={msg} />
+                {/each}
             </div>
         {/if}
     </TabsBar>

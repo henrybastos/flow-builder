@@ -69,7 +69,7 @@
     </div>
 </dialog>
 
-<dialog on:click={handleOutsideClick} on:open on:close bind:this={modal} class="max-h-[80vh] w-[50vw]">
+<dialog on:click={handleOutsideClick} on:open on:close bind:this={modal} class={`max-h-[80vh] ${ $$restProps.class || 'w-[60rem]' }`}>
     <div class="relative">
         <h3 class="text-2xl mb-6 mt-3 ml-1">{ title }</h3>
         <i on:click={close} class="ti ti-x align-middle absolute text-neutral-500 hover:text-neutral-300 cursor-pointer top-[50%] -translate-y-[50%] text-2xl right-6"></i>

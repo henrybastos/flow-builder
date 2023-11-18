@@ -16,7 +16,7 @@ For the automation to work, the server-side receives a POST request with the fol
 
 ## The `payload` object
 
-There's the `env` object and the `flows` object, composing the `payload`.
+There's the `payload` object, composed by two objects: `env` and `flows`.
 
 ```json
 {

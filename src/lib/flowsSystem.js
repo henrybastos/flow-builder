@@ -1,6 +1,7 @@
 /* eslint-disable no-self-assign */
 import { addFlowOperationBody } from "./operationsSystem";
 import { convertToSnakeCase } from "$lib/utils";
+import { genUUID } from "./utils";
 
 let addOperationsModal, addFlowModal, payloadModal;
 let flows, payload, payloadModalTextearea;
@@ -43,7 +44,7 @@ export function addFlow (_new_flow_name) {
 // $FLOW_BUILDER_OPERATION_TEMPLATES[_operation_command]
 export function addOperation (_flow_operation_owner, _operation_command) {
     let newOperationBody = structuredClone(flowBuilderOperationsTemplates[_operation_command]);
-    newOperationBody.id = Math.random().toString().slice(2);
+    newOperationBody.id = genUUID();
 
     Object.entries(newOperationBody.input_fields).forEach(([input_name, input]) => {
         if (input.type === 'dropdown' && input_name === 'flow') {
@@ -124,7 +125,7 @@ export function loadFlow () {
                     })
                 }
     
-                operationBody.id = Math.random().toString().slice(2);
+                operationBody.id = genUUID();
                 addFlowOperationBody(flows, operationBody, flow_name);
                 addOperationsModal.close();
                 flows[flow_name].env = flow_body.env;

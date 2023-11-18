@@ -156,8 +156,6 @@ export async function POST ({ request }) {
     }
 
 
-
-
     async function evalOperation (_operation, _env) {
         if (logCommands) {
             console.log(_operation);
@@ -258,7 +256,7 @@ export async function POST ({ request }) {
             await browser.close();
         }
         
-        responsePayload.status = {
+        responsePayload.body = {
             message: 'All operations done.',
             ws_endpoint: browser.wsEndpoint(),
             code: 200

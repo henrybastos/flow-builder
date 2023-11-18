@@ -9,7 +9,6 @@
 
     function onToggle () {
         dispatch('toggle', unchecked);
-        console.log(unchecked);
     }
 </script>
 

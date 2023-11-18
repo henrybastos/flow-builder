@@ -1,4 +1,5 @@
 import { writable } from "svelte/store";
+import { genUUID } from "./utils";
 
 function createPayload () {
     const initStruct = {
@@ -82,7 +83,7 @@ function createPayload () {
                 if (strict_flows && !_payload.flows[_flow_name]) {
                     console.error(`[STRICT_FLOWS] Undefined flow: ${_flow_name}`);
                 } else {
-                    _operation.id = Math.random().toString().slice(2);
+                    _operation.id = genUUID();
 
                     return {
                         ..._payload,

@@ -213,3 +213,7 @@ export function replaceEnvPlaceholder (_str, _env) {
     const envVariable = _env[trimEnvPlaceholder(_str)];
     return _str.replaceAll(/%.*%/g, envVariable);
 }
+
+export function genUUID () {
+    return Math.random().toString().slice(2);
+}
