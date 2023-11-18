@@ -29,7 +29,6 @@
 
     function updateCloseBrowserOnFinish ({ detail }) {
         PAYLOAD.setConfig('close_browser_on_finish', detail);
-        console.log($PAYLOAD);
     }
 
     function openModal () {

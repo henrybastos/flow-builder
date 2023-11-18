@@ -49,19 +49,26 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 </svelte:head>
 
-<header class="fixed flex flex-row justify-between items-center py-3 px-4 w-full bg-neutral-900">
-    <h3>Flow Builder</h3>
-
-    <div class="inline-flex gap-x-2">
-        <PresetsModal {appendToast}/>
+<header class="fixed w-full bg-neutral-900">
+    <div class="flex flex-row justify-between items-center py-3 px-4 w-full">
+        <h3>Flow Builder</h3>
     
-        <PageSettings {appendToast}/>
+        <div class="inline-flex gap-x-2">
+            <PresetsModal {appendToast}/>
         
-        <AddFlowModal />
-
-        <PayloadModal />
+            <PageSettings {appendToast}/>
+            
+            <AddFlowModal />
+    
+            <PayloadModal />
+        </div>
     </div>
+
+    <span class={`flex w-full px-2 font-normal bg-green-500 ${ $PAYLOAD.config.ws_endpoint ? 'visible h-min' : 'invisible h-0' }`}>
+        Web Socket connected at { $PAYLOAD.config.ws_endpoint }
+    </span>
 </header>
+
 
 <main class="flex flex-col w-[50rem] mt-24">
     {#each Object.keys($PAYLOAD.flows) as flow_name}
@@ -71,3 +78,4 @@
     <ToastsWrapper bind:appendToast={appendToast}/>
     <p class="text-center text-neutral-500 mb-4">Powered by Tailwind, SvelteKit and Puppeteer</p>
 </main>
+
