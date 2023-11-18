@@ -1,5 +1,8 @@
 <script>
-    export let inputName, inputValueHandler, inputLabel, inputPlaceholder;
+    export let inputName
+    export let inputValueHandler
+    export let inputLabel
+    export let inputPlaceholder;
 </script>
 
 <div class="labeled-input">

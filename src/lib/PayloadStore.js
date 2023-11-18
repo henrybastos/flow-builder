@@ -2,6 +2,10 @@ import { writable } from "svelte/store";
 
 function createPayload () {
     const initStruct = {
+        config: {
+            ws_endpoint: false,
+            close_browser_on_finish: false
+        },
         env: {},
         flows: {
             main_flow: {}
@@ -16,6 +20,37 @@ function createPayload () {
     
     return {
         subscribe,
+        // Fixes some old presets without the config object
+        _fix_fixNullConfig: () => {
+            update(_payload => {
+                return {
+                    ..._payload,
+                    config: {
+                        ws_endpoint: false,
+                        close_browser_on_finish: false
+                    }
+                }
+            })
+        },
+        loadConfig: (_config) => {
+            update(_payload => {
+                return {
+                    ..._payload,
+                    config: _config
+                }
+            })
+        },
+        setConfig: (_config, _value) => {
+            update(_payload => {
+                return {
+                    ..._payload,
+                    config: {
+                        ..._payload.config,
+                        [_config]: _value
+                    }
+                }
+            })
+        },
         setStrictFlows: (_state) => {strict_flows = _state},
         setEnv: (_env) => update(_payload => {
             return {
@@ -38,16 +73,16 @@ function createPayload () {
                 env: { ..._payload.env },
                 flows: {
                     ..._payload.flows,
-                    [_flow_name]: {}
+                    [_flow_name]: []
                 } 
             }
         }),
-        addCommand: (_flow_name, _command) => {
+        addOperation: (_flow_name, _operation) => {
             update((_payload) => {
                 if (strict_flows && !_payload.flows[_flow_name]) {
                     console.error(`[STRICT_FLOWS] Undefined flow: ${_flow_name}`);
                 } else {
-                    _command.id = Math.random().toString().slice(2);
+                    _operation.id = Math.random().toString().slice(2);
 
                     return {
                         ..._payload,
@@ -55,7 +90,7 @@ function createPayload () {
                             ..._payload.flows,
                             [_flow_name]: {
                                 ...(_payload.flows[_flow_name] ?? {}),
-                                [_command.id]: _command
+                                [_operation.id]: _operation
                             }
                         }
                     }
