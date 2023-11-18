@@ -1,6 +1,8 @@
 import puppeteer from "puppeteer";
 import { checkForEnvPlaceholder, trimEnvPlaceholder, replaceEnvPlaceholder } from "$lib/utils.js";
 
+import comboKeys from "$lib/operations/comboKeys";
+
 // //*/div[contains(text(), 'https://alessandrobechelin.kebook.com.br')]
 
 /** 
@@ -37,9 +39,8 @@ export async function POST ({ request }) {
     console.log('Calling local endpoint: [::1]:5173/api/run-flow');
 
     async function _startEngine () {
-        const browser = await puppeteer.launch({
-            headless: false,
-        });
+        
+        const browser = await _connectOrLaunchBrowser();
         
         const [page] = await browser.pages();
 
@@ -50,6 +51,25 @@ export async function POST ({ request }) {
         return [page, browser];
     }
 
+    async function _connectOrLaunchBrowser () {
+        let _browser;
+
+        // Tries to connect to a running browser instance. If it fails, it launches a new one.
+        try {
+            console.log(`Attempting to connect at ${ payload.config.ws_endpoint }...`);
+            _browser = await puppeteer.connect({ browserWSEndpoint: payload.config.ws_endpoint })
+            console.log(`Browser connected at ${ payload.config.ws_endpoint }`);
+        } catch (_err) {
+            console.error(`Failed to connect at ${ payload.config.ws_endpoint }. Launching a new browser...`);
+            _browser = await puppeteer.launch({
+                headless: false,
+            });
+            console.log(`New browser launched: ${ _browser.wsEndpoint() }`);
+        }
+
+        return _browser;
+    }
+
     function _checkEnvVars (_env, _field_name, _field_value) {
         if (ENV_VARIABLES_ALLOWLIST.includes(_field_name) && checkForEnvPlaceholder(_field_value)) {
             return replaceEnvPlaceholder(_field_value, _env);
@@ -58,14 +78,15 @@ export async function POST ({ request }) {
         return _field_value;
     }
 
+    async function _waitForSelector (_target, _timeout = 15000) {
+        await page.waitForSelector(`xpath/${ _target }`, {
+            timeout: _timeout
+        });
+    }
+
     async function _getElement (_target) {
-        if (payload?.wait_timeout) {
-            await page.waitForSelector(`xpath/${ _target }`, {
-                timeout: payload.wait_timeout
-            });
-        } else {
-            await page.waitForSelector(`xpath/${ _target }`);
-        }
+        await _waitForSelector(_target, payload?.wait_timeout);
+
         return await page.$$(`xpath/${ _target }`);
     }
 
@@ -114,7 +135,6 @@ export async function POST ({ request }) {
     async function _evaluateRegex ({ target, regex }) {
         const [_element] = await _getElement(target);
         return await _element.evaluate((el, _regex) => el.value.match(new RegExp(_regex, 'g')), regex);
-        // return await _element.evaluate((el) => el.value.match(/(?<=widget).+/g)[0].slice(1,-1));
     }
 
     async function _checkElement ({ target, success_flow, error_flow }) {
@@ -134,6 +154,9 @@ export async function POST ({ request }) {
             await runFlow(payload.flows[flow], _env);
         }
     }
+
+
+
 
     async function evalOperation (_operation, _env) {
         if (logCommands) {
@@ -176,17 +199,7 @@ export async function POST ({ request }) {
                 await page.keyboard.press(_operation.key);
                 break;
             case 'combo_keys':
-                for(const key of _operation.mod_keys) {
-                    await page.keyboard.down(key);
-                }
-
-                for(const key of _operation.keys) {
-                    await page.keyboard.press(key);
-                }
-
-                for(const key of _operation.mod_keys) {
-                    await page.keyboard.up(key);
-                }
+                await comboKeys(page, _operation.key, _operation.mod_keys);
                 break;
             case 'scrape_attr':
                 responsePayload[_operation.response_slot] = await _scrapeAttribute(_operation);
@@ -217,6 +230,9 @@ export async function POST ({ request }) {
             case 'set_payload_slot':
                 responsePayload[_operation.response_slot] = _operation.value;
                 break;
+            case 'wait_for_selector':
+                await _waitForSelector(_operation.target, _operation.timeout);
+                break;
             case 'close_browser':
                 await browser.close();
                 console.log('All done!');
@@ -235,9 +251,16 @@ export async function POST ({ request }) {
     try {   
         // responsePayload.base_url = payload.base_url;
         await runFlow(payload.flows.main_flow, payload.env);
-        // await browser.close();
+
+        if (payload.config.ws_endpoint || !payload.config.close_browser_on_finish) {
+            console.log(`Browser cannot be closed: ${ payload.config.ws_endpoint } / ${ payload.config.close_browser_on_finish }`);
+        } else {
+            await browser.close();
+        }
+        
         responsePayload.status = {
             message: 'All operations done.',
+            ws_endpoint: browser.wsEndpoint(),
             code: 200
         };
         console.dir(responsePayload, { depth: null });
