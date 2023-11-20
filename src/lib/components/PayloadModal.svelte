@@ -6,6 +6,7 @@
     import { LOGGER, TAGS } from "$lib/LogStore";
     import LogMessage from "./LogMessage.svelte";
     import { onMount } from "svelte";
+    import { CURRENT_PRESET_NAME } from "$lib/PresetsStore";
 
     const controller = new AbortController();
 
@@ -163,6 +164,10 @@
 <Modal let:openDangerModal on:open={onPayloadModalOpenHandler} on:close={onPayloadModalCloseHandler} bind:this={payloadModal} title="Payload" class="w-[90vw]">
     <TabsBar let:activeTab modalTabs={tabs}>
         {#if activeTab === 'payload'}
+            <a class="clear-btn mb-2" href={`data:text/json;charset=utf-8,${ encodeURIComponent(payloadModalTextearea) }`} download={`${ $CURRENT_PRESET_NAME.match(/[A-z,0-9]*[^\s:_,.]/gi).join('_').toLowerCase() || 'preset' }.json`}>
+                Download payload
+            </a>
+
             <textarea class="font-code" bind:value={payloadModalTextearea} name="" id="" cols="30" rows="20"></textarea>
             
             {#if runFlowMessage.message !== ''}
