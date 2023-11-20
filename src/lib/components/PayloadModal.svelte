@@ -107,7 +107,11 @@
         });
 
         console.log(payloadJSON);
-        PAYLOAD.loadConfig(payloadJSON.config);
+        if (payloadJSON.config) {
+            PAYLOAD.loadConfig(payloadJSON.config);
+        } else {
+            PAYLOAD._fix_fixNullConfig();
+        }
 
         console.log($PAYLOAD);
         payloadModal.close();
