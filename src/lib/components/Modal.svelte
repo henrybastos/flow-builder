@@ -21,10 +21,16 @@
         closeDangerModal();
     };
 
-    export async function openDangerModal (_callback, _options, _danger_dispatch_message) {
+    /**
+     * Opens the Danger modal.
+     * @param {function} _callback
+     * @param {{ danger_modal_title: string, danger_confirm: string, danger_cancel: string }} _options
+     * @param {string} _danger_dispatch_message
+     */
+    export async function openDangerModal (_on_confirm_callback, _options, _danger_dispatch_message) {
         dangerConfirmEventMessage = _danger_dispatch_message;
-        if (_callback) { 
-            dangerConfirmCallbackAction = _callback; 
+        if (_on_confirm_callback) { 
+            dangerConfirmCallbackAction = _on_confirm_callback; 
         }
         if (_options) { 
             const { danger_modal_title, danger_confirm, danger_cancel } = _options;
