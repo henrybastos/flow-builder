@@ -56,10 +56,10 @@
     title="Presets" 
     let:openDangerModal 
 >
-   <div class="btn-bar mb-3">
+   <div class="btn-bar mb-3 overflow-y-auto max-h-[30rem] p-3 border-2 border-neutral-800 bg-neutral-950 rounded-lg">
        {#each Object.keys($FLOW_PRESETS) as preset_name}
            <div class="flex flex-nowrap col-span-full gap-x-3">
-               <button class="btn-md col-span-full w-full" on:click={() => loadPreset(preset_name)}>
+               <button class="btn-md col-span-full w-full outline-offset-1" on:click={() => loadPreset(preset_name)}>
                    <i class="ti ti-bookmark-filled text-blue-500"></i>
                    { preset_name }
                </button>
