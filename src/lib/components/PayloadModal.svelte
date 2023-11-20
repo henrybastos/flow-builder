@@ -5,6 +5,7 @@
     import TabsBar from "./TabsBar.svelte";
     import { LOGGER, TAGS } from "$lib/LogStore";
     import LogMessage from "./LogMessage.svelte";
+    import { onMount } from "svelte";
 
     const controller = new AbortController();
 
@@ -16,6 +17,10 @@
         message: ''
     };
     let tabs = ['payload', 'console'];
+
+    onMount(() => {
+        console.log();
+    })
 
     function transformToJSON () {
         let payloadBuffer = structuredClone($PAYLOAD);
@@ -49,12 +54,12 @@
         if (Object.keys(_payload.flows.main_flow).length > 0) {
             try {
                 let response = await fetch('http://localhost:5173/api/run-flow', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify( _payload )
-            });
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify( _payload )
+                });
                 LOGGER.logMessage('Parsing response to JSON...', $TAGS.system);
 
                 console.log('Parsing response to JSON...');
@@ -66,9 +71,10 @@
                 console.log('Done');
             } catch (err) {
                 console.error(body.error);
-                console.error('body error');
+                LOGGER.logMessage('Fetch error. Something went wrong.', $TAGS.error);
             }
         } else {
+            LOGGER.logMessage('Main Flow cannot be empty. Nothing to run.', $TAGS.error);
             console.error('Empty Main Flow. Nothing to run.');
         }
 
@@ -133,7 +139,15 @@
                 </span>
             {/if}
 
-            <!-- { Object.values($LOGGER.messages).slice(-1)[0].message } -->
+            
+            <div class="console_screen mt-4 items-center">
+                {#if Object.values($LOGGER.messages).length > 0}
+                    <span class="whitespace-nowrap mr-1 font-code">Last message:</span>
+                    <LogMessage message={Object.values($LOGGER.messages).slice(-1)[0]} />
+                {:else}
+                    <span class="text-neutral-500">Nothing to see here =)</span>
+                {/if}
+            </div>
         
             <div class="btn-bar">
                 <button disabled={isFLowAPILoading} on:click={async () => await sendFlowPayload(JSON.parse(payloadModalTextearea))} class="btn-md w-full mt-4">
@@ -158,7 +172,7 @@
                 </button> -->
             </div>
         {:else if activeTab === 'console'}
-            <div class="border-2 border-neutral-800 rounded-md p-3 bg-neutral-950">
+            <div class="console_screen flex-col">
                 {#each Object.entries($LOGGER.messages) as [msg_key, msg], _ (msg_key)}
                     <LogMessage message={msg} />
                 {/each}

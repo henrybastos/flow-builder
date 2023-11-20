@@ -9,6 +9,10 @@ export const TAGS = writable({
    success: {
       type: 'success',
       label: '[SUCCESS]'
+   },
+   error: {
+      type: 'error',
+      label: '[ERROR]'
    }
 })
 
@@ -21,6 +25,11 @@ function createLogger () {
 
    return {
       subscribe,
+      /**
+       * Logs a message to the Payload Modal Console
+       * @param {string} _message 
+       * @param {'system'|'success'} _tag 
+       */
       logMessage: (_message, _tag) => {
          update(_log => {
             const new_message = {
