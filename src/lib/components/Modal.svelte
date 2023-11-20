@@ -65,7 +65,7 @@
     }
 </script>
 
-<dialog bind:this={dangerModal} class="max-w-[32rem]">
+<dialog bind:this={dangerModal}>
     <div class="relative">
         <h3 class="text-2xl mb-6 ml-1 text-red-600 whitespace-nowrap">{ dangerModalTitlePlaceholder }</h3>
     </div>
