@@ -105,7 +105,7 @@ export async function POST ({ request }) {
         return await page.$$(`xpath/${ _target }`);
     }
 
-    async function _clickElement ({ target, count = 1 }, _click_type = 'machine') {
+    async function _clickElement ({ target }, _click_type = 'machine') {
         const [_element] = await _getElement(target);
 
         if (_click_type === 'user') {

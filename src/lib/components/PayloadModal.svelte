@@ -6,9 +6,11 @@
     import { LOGGER, TAGS } from "$lib/LogStore";
     import LogMessage from "./LogMessage.svelte";
     import { onMount } from "svelte";
-    import { CURRENT_PRESET_NAME } from "$lib/PresetsStore";
+    import { CURRENT_PRESET_NAME, FLOW_PRESETS } from "$lib/PresetsStore";
 
     const controller = new AbortController();
+    $: payloadToURI = `data:text/json;charset=utf-8,${ encodeURIComponent(payloadModalTextearea) }`;
+    $: payloadURIPresetName = `${ $CURRENT_PRESET_NAME?.match(/[A-z,0-9]*[^\s:_,.]/gi)?.join('_')?.toLowerCase() || 'preset' }.json`;
 
     let payloadModal;
     let isFLowAPILoading;
@@ -164,9 +166,20 @@
 <Modal let:openDangerModal on:open={onPayloadModalOpenHandler} on:close={onPayloadModalCloseHandler} bind:this={payloadModal} title="Payload" class="w-[90vw]">
     <TabsBar let:activeTab modalTabs={tabs}>
         {#if activeTab === 'payload'}
-            <a class="clear-btn mb-2" href={`data:text/json;charset=utf-8,${ encodeURIComponent(payloadModalTextearea) }`} download={`${ $CURRENT_PRESET_NAME.match(/[A-z,0-9]*[^\s:_,.]/gi).join('_').toLowerCase() || 'preset' }.json`}>
-                Download payload
-            </a>
+
+            <div class="inline-flex justify-start">
+                <a class="clear-btn mb-2" 
+                    href={payloadToURI} 
+                    download={payloadURIPresetName}>
+                    Download payload
+                </a>
+
+                <a class="clear-btn mb-2" 
+                    href={`data:text/json;charset=utf-8,${ encodeURIComponent(JSON.stringify($FLOW_PRESETS)) }`} 
+                    download={'all_presets.json'}>
+                    Download raw full payload
+                </a>
+            </div>
 
             <textarea class="font-code" bind:value={payloadModalTextearea} name="" id="" cols="30" rows="20"></textarea>
             
