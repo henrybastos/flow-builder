@@ -100,6 +100,7 @@ function createPayload () {
         },
         moveOperation: (_flow_name, _operation, _direction) => {
             update(_payload => {
+                console.log(_flow_name);
                 const current_flow = _payload.flows[_flow_name];
                 const currentOperationIndex = Object.keys(current_flow).indexOf(_operation.id);
                 let current_flow_arr = Object.entries(current_flow);

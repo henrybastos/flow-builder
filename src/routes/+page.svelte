@@ -64,13 +64,13 @@
         </div>
     </div>
 
-    <span class={`flex w-full px-2 font-normal bg-green-500 ${ $PAYLOAD.config.ws_endpoint ? 'visible h-min' : 'invisible h-0' }`}>
+    <span class={`flex w-full px-2 py-1 font-normal bg-green-600 ${ $PAYLOAD.config.ws_endpoint ? 'visible h-min' : 'invisible h-0' }`}>
         Web Socket connected at { $PAYLOAD.config.ws_endpoint }
     </span>
 </header>
 
 
-<main class="flex flex-col w-[50rem] mt-24">
+<main class="flex flex-col w-[50rem] mt-28">
     {#each Object.keys($PAYLOAD.flows) as flow_name}
         <Flow flowName={flow_name} />
     {/each}

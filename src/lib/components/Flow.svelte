@@ -6,7 +6,6 @@
     import { FLOW_BUILDER_OPERATION_TEMPLATES } from "$lib/store";
 
     import { snakeCaseToPascalCase } from "$lib/utils";
-    import { setContext } from "svelte";
 
     let addOperationsModal;
     let openDangerModal;
@@ -32,8 +31,6 @@
     }
 
     $: hasFieldsetReachedOperationsLimit = Object.values($PAYLOAD.flows[flowName]).length > operationsLimit;
-
-    setContext('flow_name', flowName);
 </script>
 
 <!-- isFieldsetCollapsed is set to true (collapsed) only if the flow is not the Main Flow and the flow is not empty. -->
@@ -46,7 +43,7 @@
     class={isMainFlow(flowName) ? $PAYLOAD?.config?.ws_endpoint ? 'border-green-500' : 'border-blue-500' : ''}
 >
     {#each Object.values($PAYLOAD.flows[flowName]) as operation, index (operation.id)}
-        <OperationBuilder {operation} flowsDropdownOptions={ [{ label: 'flow_01', value: 'Flow 01' }] } />
+        <OperationBuilder {flowName} {operation} flowsDropdownOptions={ [{ label: 'flow_01', value: 'Flow 01' }] } />
     {/each}
 
     <button on:click={() => addOperationsModal.open()} class="btn-md w-full">

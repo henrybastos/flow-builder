@@ -1,11 +1,10 @@
 <script>
     import Dropdown from "./Dropdown.svelte";
     import CollapsableOptions from "./CollapsableOptions.svelte";
-    import { getContext } from "svelte";
     import { PAYLOAD } from "$lib/PayloadStore";
     import { checkForEnvPlaceholder } from "$lib/utils";
 
-    let flowName = getContext('flow_name');
+    export let flowName;
 
     export let operation;
     let disabled = false;

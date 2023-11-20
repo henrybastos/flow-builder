@@ -7,6 +7,9 @@ function createPresetsStore () {
       subscribe,
       loadPresets: (_presets) => set(_presets),
       savePreset: (_preset_flow) => {
+         // Prevents invalid already closed web socket endpoints
+         Object.values(_preset_flow)[0].config.ws_endpoint = '';
+
          if (typeof _preset_flow === 'object') {
             update((_presets) => {
                _presets = {..._presets, ..._preset_flow};

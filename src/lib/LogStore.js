@@ -13,6 +13,10 @@ export const TAGS = {
    error: {
       type: 'error',
       label: '[ERROR]'
+   },
+   warning: {
+      type: 'warning',
+      label: '[WARNING]'
    }
 }
 
@@ -26,7 +30,7 @@ function createLogger () {
    /**
     * Logs a message to the Payload Modal Console Screen.
     * @param {string} _message 
-    * @param {'system'|'success'} _tag 
+    * @param {'system'|'success'|'error'|'warning'} _tag 
     */
    function logMessage (_message, _tag) {
       update(_log => {
