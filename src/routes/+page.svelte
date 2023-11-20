@@ -7,9 +7,10 @@
     import PayloadModal from '$lib/components/PayloadModal.svelte';
     import AddFlowModal from '$lib/components/AddFlowModal.svelte';
     import ToastsWrapper from "$lib/components/ToastsWrapper.svelte";
+    import UpdateCurrentPresetModal from '$lib/components/UpdateCurrentPresetModal.svelte';
     import Flow from '$lib/components/Flow.svelte';
     import { onMount } from 'svelte';
-    import { FLOW_PRESETS } from '$lib/PresetsStore';
+    import { FLOW_PRESETS, CURRENT_PRESET_NAME } from '$lib/PresetsStore';
 
     let appendToast;
 
@@ -54,6 +55,10 @@
         <h3>Flow Builder</h3>
     
         <div class="inline-flex gap-x-2">
+            {#if $CURRENT_PRESET_NAME}
+                <UpdateCurrentPresetModal />
+            {/if}
+
             <PresetsModal {appendToast}/>
         
             <PageSettings {appendToast}/>

@@ -28,3 +28,4 @@ function createPresetsStore () {
 }
 
 export const FLOW_PRESETS = createPresetsStore();
+export const CURRENT_PRESET_NAME = writable('');

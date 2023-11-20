@@ -1,8 +1,9 @@
 <script>
    import Modal from "./Modal.svelte";
-   import { FLOW_PRESETS } from "$lib/PresetsStore";
+   import { FLOW_PRESETS, CURRENT_PRESET_NAME } from "$lib/PresetsStore";
    import { PAYLOAD } from "$lib/PayloadStore";
 
+   let loadedPreset;
    let presetsModal;
    let newPresetName;
    export let appendToast;
@@ -24,6 +25,7 @@
     }
 
     function loadPreset (_preset_name) {
+        $CURRENT_PRESET_NAME = _preset_name;
         PAYLOAD.loadPayload($FLOW_PRESETS[_preset_name]);
 
         if (!$PAYLOAD?.config) {
