@@ -19,7 +19,9 @@
     let tabs = ['payload', 'console'];
 
     onMount(() => {
-        console.log();
+        if (localStorage.getItem('logs')) {
+            LOGGER.loadLogs(localStorage.getItem('logs'));
+        }
     })
 
     function transformToJSON () {
@@ -60,21 +62,22 @@
                     },
                     body: JSON.stringify( _payload )
                 });
-                LOGGER.logMessage('Parsing response to JSON...', $TAGS.system);
+                LOGGER.logMessage('Parsing response to JSON...', TAGS.system);
 
                 console.log('Parsing response to JSON...');
                 response = await response.json();
                 console.log(response);
 
-                LOGGER.logMessage('Done!', $TAGS.success);
-                LOGGER.logMessage(`WS Endpoint: ${ response.body.ws_endpoint }`, $TAGS.success);
+                LOGGER.logMessage('Done!', TAGS.success);
+                LOGGER.logMessage(`WS Endpoint: ${ response.body.ws_endpoint }`, TAGS.success);
                 console.log('Done');
             } catch (err) {
                 console.error(body.error);
-                LOGGER.logMessage('Fetch error. Something went wrong.', $TAGS.error);
+                LOGGER.logMessage('Fetch error. Something went wrong.', TAGS.error);
             }
         } else {
-            LOGGER.logMessage('Main Flow cannot be empty. Nothing to run.', $TAGS.error);
+            console.log($LOGGER);
+            LOGGER.logMessage('Main Flow cannot be empty. Nothing to run.', TAGS.error);
             console.error('Empty Main Flow. Nothing to run.');
         }
 
@@ -131,7 +134,7 @@
     Process JSON
 </button>
 
-<Modal on:open={onPayloadModalOpenHandler} on:close={onPayloadModalCloseHandler} bind:this={payloadModal} title="Payload" class="w-[90vw]">
+<Modal let:openDangerModal on:open={onPayloadModalOpenHandler} on:close={onPayloadModalCloseHandler} bind:this={payloadModal} title="Payload" class="w-[90vw]">
     <TabsBar let:activeTab modalTabs={tabs}>
         {#if activeTab === 'payload'}
             <textarea class="font-code" bind:value={payloadModalTextearea} name="" id="" cols="30" rows="20"></textarea>
@@ -176,6 +179,7 @@
                 </button> -->
             </div>
         {:else if activeTab === 'console'}
+            <button class="clear-btn mb-2" on:click={() => openDangerModal(LOGGER.clearLogs, { danger_modal_title: 'Clear logs from Local Storage?', danger_confirm: 'Clear' })}>Clear logs</button>
             <div class="console_screen flex-col">
                 {#each Object.entries($LOGGER.messages) as [msg_key, msg], _ (msg_key)}
                     <LogMessage message={msg} />
