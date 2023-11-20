@@ -9,6 +9,7 @@
 
     function addFlow () {
         PAYLOAD.addFlow(convertToSnakeCase(newFlowName), isWSFlow);
+        PAYLOAD._fix_fixNullConfig();
         addFlowModal.close();
     }
 
