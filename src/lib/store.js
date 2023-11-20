@@ -253,5 +253,18 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = writable({
                 value: ''
             }
         }
+    },
+    wait_seconds: {
+        command: 'wait_seconds',
+        label: 'Wait Seconds',
+        icon: 'ti-clock',
+        input_fields: {
+            time: {
+                type: 'text',
+                label: 'Timeout time (ms)',
+                placeholder: '15000',
+                value: ''
+            }
+        }
     }
 }) 

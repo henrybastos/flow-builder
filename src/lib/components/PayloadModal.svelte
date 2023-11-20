@@ -16,11 +16,18 @@
         type: 'error',
         message: ''
     };
+    let lastWSEndpoint;
     let tabs = ['payload', 'console'];
 
     onMount(() => {
+        // const SSE = new EventSource('http://localhost:5173/api/run-flow');
+        // SSE.onmessage = msg => console.log(msg);
+        
         if (localStorage.getItem('logs')) {
             LOGGER.loadLogs(localStorage.getItem('logs'));
+        }
+        if (localStorage.getItem('last_ws_endpoint')) {
+            lastWSEndpoint = localStorage.getItem('last_ws_endpoint');
         }
     })
 
@@ -49,12 +56,30 @@
         payloadModalTextearea = JSON.stringify(payloadBuffer, null, 3);
     }
 
+    async function cancelRequest () {
+        await fetch('http://localhost:5173/api/run-flow', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify( {
+                config: { ws_endpoint: lastWSEndpoint },
+                flows: { main_flow: [{ command: 'close_browser' }] }
+            } )
+        });
+
+        isFLowAPILoading = false;
+
+        LOGGER.logMessage('Request canceled by the user.', TAGS.warning);
+    }
+
     async function sendFlowPayload (_payload) {
         let response;
         isFLowAPILoading = true;
 
         if (Object.keys(_payload.flows.main_flow).length > 0) {
             try {
+                LOGGER.logMessage('Calling API...', TAGS.system);
                 let response = await fetch('http://localhost:5173/api/run-flow', {
                     method: 'POST',
                     headers: {
@@ -66,13 +91,14 @@
 
                 console.log('Parsing response to JSON...');
                 response = await response.json();
-                console.log(response);
+
+                lastWSEndpoint = response.body.ws_endpoint;
+                localStorage.setItem('last_ws_endpoint', lastWSEndpoint);
 
                 LOGGER.logMessage('Done!', TAGS.success);
                 LOGGER.logMessage(`WS Endpoint: ${ response.body.ws_endpoint }`, TAGS.success);
-                console.log('Done');
             } catch (err) {
-                console.error(body.error);
+                console.error(err);
                 LOGGER.logMessage('Fetch error. Something went wrong.', TAGS.error);
             }
         } else {
@@ -147,7 +173,7 @@
             {/if}
 
             
-            <div class="console_screen mt-4 items-center">
+            <div class="console_screen mt-4 items-center overflow-hidden">
                 {#if Object.values($LOGGER.messages).length > 0}
                     <span class="whitespace-nowrap mr-1 font-code">Last message:</span>
                     <LogMessage message={Object.values($LOGGER.messages).slice(-1)[0]} />
@@ -157,16 +183,20 @@
             </div>
         
             <div class="btn-bar">
-                <button disabled={isFLowAPILoading} on:click={async () => await sendFlowPayload(JSON.parse(payloadModalTextearea))} class="btn-md w-full mt-4">
-                    {#if isFLowAPILoading}
+                {#if isFLowAPILoading}
+                    <button on:click={async () => await cancelRequest()} class="btn-md w-full mt-4">
                         <span class="w-full inline-flex justify-center">
                             <i class="ti ti-loader-2 text-neutral-400 animate-spin-icon"></i>
+                            Cancel
                         </span>
-                    {:else }
+                    </button>
+                {:else }
+                    <button on:click={async () => await sendFlowPayload(JSON.parse(payloadModalTextearea))} class="btn-md w-full mt-4">
                         <i class="ti ti-arrows-split-2 text-blue-500"></i>
                         Run flow
-                    {/if}
-                </button>
+                    </button>
+                {/if}
+
         
                 <button on:click={loadPayload} class="btn-md w-full mt-4">
                     <i class="ti ti-file-upload text-blue-500"></i>

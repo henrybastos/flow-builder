@@ -22,4 +22,8 @@
   .tag_error {
       @apply text-red-600;
   }
+
+  .tag_warning {
+      @apply text-orange-500;
+  }
 </style>

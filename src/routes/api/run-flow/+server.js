@@ -32,6 +32,20 @@ const ENV_VARIABLES_ALLOWLIST = [
 ]
 
 export async function POST ({ request }) {
+    // const stream = new ReadableStream({
+    //     start(controller) {
+    //         // You can enqueue multiple data asynchronously here.
+    //         const myData = ["abc", "def"]
+    //         myData.forEach(data => {
+    //             controller.enqueue(`data: ${data}\n\n`)
+    //         })
+    //         controller.close() 
+    //     },
+    //     cancel() {
+    //         // cancel your resources here
+    //     }
+    // });
+    
     const payload = await request.json();
     const [page, browser] = await _startEngine();
     let responsePayload = {};
@@ -65,6 +79,7 @@ export async function POST ({ request }) {
                 headless: false,
             });
             console.log(`New browser launched: ${ _browser.wsEndpoint() }`);
+            // response.write(`data: Socket WS Endpoint: ${ _browser.wsEndpoint() }\n\n`);
         }
 
         return _browser;
@@ -91,15 +106,16 @@ export async function POST ({ request }) {
     }
 
     async function _clickElement ({ target, count = 1 }, _click_type = 'machine') {
-        for (let i = count; i > 0; i--) {
-            const [_element] = await _getElement(target);
-            
-            if (_click_type === 'user') {
-                await _element.click();
-            } else {
-                await _element.evaluate(el => el.click());
-            }
+        const [_element] = await _getElement(target);
+
+        if (_click_type === 'user') {
+            await _element.click();
+        } else {
+            await _element.evaluate(el => el.click());
         }
+        // Needs inspecition
+        // for (let i = count; i > 0; i--) {
+        // }
     }
 
     async function _typeElement ({ target, value }) {
@@ -220,10 +236,11 @@ export async function POST ({ request }) {
             case 'eval_regex':
                 responsePayload[_operation.response_slot] = await _evaluateRegex(_operation);
                 break;
-            case 'wait':
+            case 'wait_seconds':
                 await new Promise((res) => {
                     setTimeout(res, _operation.time);
                 });
+                console.log("Times' up!");
                 break;
             case 'set_payload_slot':
                 responsePayload[_operation.response_slot] = _operation.value;
@@ -262,6 +279,13 @@ export async function POST ({ request }) {
             code: 200
         };
         console.dir(responsePayload, { depth: null });
+        // return new Response(stream, {
+        //         headers: {
+        //         // Denotes the response as SSE
+        //         'Content-Type': 'text/event-stream', 
+        //         // Optional. Request the GET request not to be cached.
+        //         'Cache-Control': 'no-cache', 
+        //     }});
         return new Response(JSON.stringify( responsePayload ));
     } catch (err) {
         console.log(err);
