@@ -2,31 +2,45 @@
     import { onMount } from "svelte";
 
     let SSEData = '';
+    let cancelRequest = false;
 
-    onMount(async () => {
+    async function fetchServer () {
         const response = await fetch('http://localhost:5173/api/socket', {
             method: 'POST',
             headers: {
-            'Content-Type': 'text/event-stream'
+                'Content-Type': 'text/event-stream'
             },
             body: {
             "user_id": 123
             }
         })
 
-        const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
+        console.log(response);
+        await handleStream(response);
+    }
+
+    async function handleStream (_res) {
+        const reader = _res.body.pipeThrough(new TextDecoderStream()).getReader();
 
         while (true) {
-            const {value, done} = await reader.read();
-            if (done) break;
-            console.log(value);
-            SSEData = value;
-            if (SSEData.match(/\[ERROR\] Close browser/gi)) {
-                console.error('Erro! Close the browser.');
+            if (cancelRequest) {
+                console.error('Close the browser!');
                 await reader.cancel();
             }
+
+            const {value, done} = await reader.read();
+
+            if (done) break;
+            SSEData = JSON.parse(value);
+            console.log(SSEData.msg);
         }
+    }
+
+    onMount(async () => {
+        await fetchServer();
     })
 </script>
 
-<p>{ SSEData }</p>
+<p>{ SSEData.msg }</p>
+
+<button class="btn-md" on:click={() => cancelRequest = true}>Close conection</button>
