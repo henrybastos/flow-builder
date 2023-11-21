@@ -31,21 +31,9 @@ const ENV_VARIABLES_ALLOWLIST = [
     'value'
 ]
 
+let streamController;
+
 export async function POST ({ request }) {
-    // const stream = new ReadableStream({
-    //     start(controller) {
-    //         // You can enqueue multiple data asynchronously here.
-    //         const myData = ["abc", "def"]
-    //         myData.forEach(data => {
-    //             controller.enqueue(`data: ${data}\n\n`)
-    //         })
-    //         controller.close() 
-    //     },
-    //     cancel() {
-    //         // cancel your resources here
-    //     }
-    // });
-    
     const payload = await request.json();
     const [page, browser] = await _startEngine();
     let responsePayload = {};
@@ -63,6 +51,16 @@ export async function POST ({ request }) {
         });
 
         return [page, browser];
+    }
+
+    /**
+     * 
+     * @param {string} _event 
+     * @param {string} _data 
+     * @returns {string} The formatted string to send through SSE.
+     */
+    function formatEnqueuedData (_event, _data) {
+        return `event: ${ _event }\ndata: ${ _data }\n\n`
     }
 
     async function _connectOrLaunchBrowser () {
@@ -194,14 +192,13 @@ export async function POST ({ request }) {
             case 'goto':    
                 try {
                     await page.goto(_operation.target, { waitUntil: 'networkidle0' });
+
+                    streamController.enqueue(formatEnqueuedData('operation_log', JSON.stringify({
+                        message: `Successfully gone to URL: ${ _operation.target }`,
+                        status_message: 'success'
+                    })));
                 } catch (err) {
                     console.log(err);
-                    responsePayload.body = {
-                        message: `Could not naviagate to URL: ${ _operation.target }`,
-                        status_code: 404,
-                        status_message: 'error'
-                    };
-                    return new Response(JSON.stringify( responsePayload ));
                 }
                 break;
             case 'reload':    
@@ -282,39 +279,61 @@ export async function POST ({ request }) {
         }
     }
 
-    try {   
-        // responsePayload.base_url = payload.base_url;
-        await runFlow(payload.flows.main_flow, payload.env);
+    async function _execStream () {
+        try {   
+            // responsePayload.base_url = payload.base_url;
+            await runFlow(payload.flows.main_flow, payload.env);
+    
+            if (payload.config.ws_endpoint || !payload.config.close_browser_on_finish) {
+                console.log(`Browser cannot be closed: ${ payload.config.ws_endpoint } / ${ payload.config.close_browser_on_finish }`);
+            } else {
+                await browser.close();
+            }
+            
+            console.dir(responsePayload, { depth: null });
 
-        if (payload.config.ws_endpoint || !payload.config.close_browser_on_finish) {
-            console.log(`Browser cannot be closed: ${ payload.config.ws_endpoint } / ${ payload.config.close_browser_on_finish }`);
-        } else {
-            await browser.close();
+            streamController.enqueue(formatEnqueuedData('system', JSON.stringify({
+                message: 'All operations done.',
+                status_code: 200,
+                status_message: 'success',
+                ws_endpoint: browser.wsEndpoint()
+            })));
+
+            streamController.close()
+            // return new Response(JSON.stringify( responsePayload ));
+        } catch (err) {
+            console.log(err);
+
+            streamController.enqueue(formatEnqueuedData('system', JSON.stringify({
+                message: 'An error has occurred.',
+                status_code: 500,
+                status_message: 'error',
+                error: err
+            })));
+            
+            streamController.close()
+            // return new Response(JSON.stringify({ 
+            //     error: {
+            //         raw: err,
+            //         message: err.message
+            //     },
+            //  }));
         }
-        
-        responsePayload.body = {
-            message: 'All operations done.',
-            status_code: 200,
-            status_message: 'success',
-            ws_endpoint: browser.wsEndpoint()
-        };
-
-        console.dir(responsePayload, { depth: null });
-        // return new Response(stream, {
-        //         headers: {
-        //         // Denotes the response as SSE
-        //         'Content-Type': 'text/event-stream', 
-        //         // Optional. Request the GET request not to be cached.
-        //         'Cache-Control': 'no-cache', 
-        //     }});
-        return new Response(JSON.stringify( responsePayload ));
-    } catch (err) {
-        console.log(err);
-        return new Response(JSON.stringify({ 
-            error: {
-                raw: err,
-                message: err.message
-            },
-         }));
     }
+
+    const stream = new ReadableStream({
+        async start(controller) {
+            streamController = controller;
+            await _execStream();
+        }
+    });     
+    
+    return new Response(stream, {
+        headers: {
+            'Cache-Control': 'no-cache',
+            'Content-Type': 'text/event-stream',
+            'Access-Control-Allow-Origin': '*',
+            'Connection': 'keep-alive',
+        }
+    });   
 }

@@ -23,14 +23,14 @@
         const reader = _res.body.pipeThrough(new TextDecoderStream()).getReader();
 
         while (true) {
+            const {value, done} = await reader.read();
+
+            if (done) break;
+
             if (cancelRequest) {
                 console.error('Close the browser!');
                 await reader.cancel();
             }
-
-            const {value, done} = await reader.read();
-
-            if (done) break;
             SSEData = JSON.parse(value);
             console.log(SSEData.msg);
         }

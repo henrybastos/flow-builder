@@ -22,6 +22,9 @@
     let lastWSEndpoint;
     let tabs = ['payload', 'console'];
 
+    let SSEData = '';
+    let cancelRequest = false;
+
     onMount(() => {
         // const SSE = new EventSource('http://localhost:5173/api/run-flow');
         // SSE.onmessage = msg => console.log(msg);
@@ -59,21 +62,35 @@
         payloadModalTextearea = JSON.stringify(payloadBuffer, null, 3);
     }
 
-    async function cancelRequest () {
-        await fetch('http://localhost:5173/api/run-flow', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify( {
-                config: { ws_endpoint: lastWSEndpoint },
-                flows: { main_flow: [{ command: 'close_browser' }] }
-            } )
+    async function handleStream (_res) {
+        const reader = _res.body.pipeThrough(new TextDecoderStream()).getReader();
+
+        while (true) {
+            const {value, done} = await reader.read();
+
+            if (done) break;
+
+            if (cancelRequest) {
+                console.error('Close the browser!');
+                LOGGER.logMessage('Request canceled by the user.', TAGS.warning);
+                await reader.cancel();
+            }
+
+            console.log(parseSSEData(value));
+            // SSEData = JSON.parse(value);
+            // LOGGER.logMessage(SSEData.message, TAGS[SSEData.status_message]);
+            // console.log(SSEData);
+        }
+    }
+
+    function parseSSEData (_raw_data) {
+        let lines = _raw_data.split('\n\n').filter(v=>v);
+        lines.map(event => event.split('\n').trim());
+
+        return lines.map(line => {
+            const [event, data] = line.split(':').map(segment => segment.trim());
+            return { event, data }
         });
-
-        isFLowAPILoading = false;
-
-        LOGGER.logMessage('Request canceled by the user.', TAGS.warning);
     }
 
     async function sendFlowPayload (_payload) {
@@ -92,22 +109,25 @@
                     },
                     body: JSON.stringify( _payload )
                 });
+
                 LOGGER.logMessage('Parsing response to JSON...', TAGS.system);
 
+                await handleStream(response);
+
                 console.log('Parsing response to JSON...');
-                response = await response.json();
+                // response = await response.json();
 
-                lastWSEndpoint = response.body.ws_endpoint;
-                localStorage.setItem('last_ws_endpoint', lastWSEndpoint);
+                // lastWSEndpoint = response.body.ws_endpoint;
+                // localStorage.setItem('last_ws_endpoint', lastWSEndpoint);
 
+                // LOGGER.logMessage(`WS Endpoint: ${ response.body.ws_endpoint }`, TAGS.success);
                 LOGGER.logMessage('Done!', TAGS.success);
-                LOGGER.logMessage(`WS Endpoint: ${ response.body.ws_endpoint }`, TAGS.success);
             } catch (err) {
                 console.error(err);
                 LOGGER.logMessage('Fetch error. Something went wrong.', TAGS.error);
             }
 
-            LOGGER.logMessage(`Response: ${ response.body.message }`, TAGS[response.body.status_message]);
+            // LOGGER.logMessage(`Response: ${ response.body.message }`, TAGS[response.body.status_message]);
         } else {
             console.log($LOGGER);
             LOGGER.logMessage('Main Flow cannot be empty. Nothing to run.', TAGS.error);
