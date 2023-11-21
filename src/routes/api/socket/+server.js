@@ -1,22 +1,20 @@
 export async function POST () {
-    const stream = new ReadableStream({
-		async start(controller) {
-            let counter = 0;
+    async function mainStream(_ctrlr) {
+        let counter = 0;
 
-            await enqueueMyData(controller, JSON.stringify({msg: `[SYS] Counter: ${ counter }`}));
-            
-            counter++
-            await enqueueMyData(controller, JSON.stringify({msg: `[SYS] Counter: ${ counter }`}));
-            
-            // await enqueueMyData(controller, JSON.stringify({ msg: `[ERROR] Close browser` }));
-            
-            counter++
-            await enqueueMyData(controller, JSON.stringify({msg: `[SYS] Counter: ${ counter }`}));
-            
-            counter++
-            await enqueueMyData(controller, JSON.stringify({msg: `[SYS] Counter: ${ counter }`}));
-		}
-	});
+        await enqueueMyData(_ctrlr, JSON.stringify({msg: `[SYS] Counter: ${ counter }`}));
+        
+        counter++
+        await enqueueMyData(_ctrlr, JSON.stringify({msg: `[SYS] Counter: ${ counter }`}));
+        
+        // await enqueueMyData(_ctrlr, JSON.stringify({ msg: `[ERROR] Close browser` }));
+        
+        counter++
+        await enqueueMyData(_ctrlr, JSON.stringify({msg: `[SYS] Counter: ${ counter }`}));
+        
+        counter++
+        await enqueueMyData(_ctrlr, JSON.stringify({msg: `[SYS] Counter: ${ counter }`}));
+    }
     
     async function enqueueMyData (_ctrlr, _data) {
         await new Promise((res) => {
@@ -26,6 +24,12 @@ export async function POST () {
         return;
     }
 
+    const stream = new ReadableStream({
+        async start(controller) {
+            await mainStream(controller);
+        }
+    });     
+    
     return new Response(stream, {
         headers: {
             'Cache-Control': 'no-cache',
@@ -33,5 +37,5 @@ export async function POST () {
             'Access-Control-Allow-Origin': '*',
             'Connection': 'keep-alive',
         }
-    });
+    });   
 }
