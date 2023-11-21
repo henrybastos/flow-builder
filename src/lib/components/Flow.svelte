@@ -12,6 +12,7 @@
     let operationsLimit = 5;
 
     export let flowName;
+    export let loadedPresetName;
 
     function addOp (_flow_name, _operation) {
         PAYLOAD.addOperation(_flow_name, _operation);
@@ -34,6 +35,9 @@
 </script>
 
 <!-- isFieldsetCollapsed is set to true (collapsed) only if the flow is not the Main Flow and the flow is not empty. -->
+
+{ loadedPresetName }
+
 <Fieldset 
     isFieldsetCollapsed={ hasFieldsetReachedOperationsLimit }
     legend={ snakeCaseToPascalCase(flowName, true) } 

@@ -67,6 +67,8 @@ export async function POST ({ request }) {
 
     async function _connectOrLaunchBrowser () {
         let _browser;
+        const width = 1366;
+        const height = 720;
 
         // Tries to connect to a running browser instance. If it fails, it launches a new one.
         try {
@@ -77,6 +79,13 @@ export async function POST ({ request }) {
             console.error(`Failed to connect at ${ payload.config.ws_endpoint }. Launching a new browser...`);
             _browser = await puppeteer.launch({
                 headless: false,
+                args: [
+                    `--window-size=${ width },${ height + 200 }`
+                ],
+                defaultViewport: {
+                    width,
+                    height
+                }
             });
             console.log(`New browser launched: ${ _browser.wsEndpoint() }`);
             // response.write(`data: Socket WS Endpoint: ${ _browser.wsEndpoint() }\n\n`);
@@ -183,7 +192,17 @@ export async function POST ({ request }) {
 
         switch (_operation.command) {
             case 'goto':    
-                await page.goto(_operation.target, { waitUntil: 'networkidle0' });
+                try {
+                    await page.goto(_operation.target, { waitUntil: 'networkidle0' });
+                } catch (err) {
+                    console.log(err);
+                    responsePayload.body = {
+                        message: `Could not naviagate to URL: ${ _operation.target }`,
+                        status_code: 404,
+                        status_message: 'error'
+                    };
+                    return new Response(JSON.stringify( responsePayload ));
+                }
                 break;
             case 'reload':    
                 await page.reload({ waitUntil: ['networkidle0', "domcontentloaded"] });
@@ -275,9 +294,11 @@ export async function POST ({ request }) {
         
         responsePayload.body = {
             message: 'All operations done.',
-            ws_endpoint: browser.wsEndpoint(),
-            code: 200
+            status_code: 200,
+            status_message: 'success',
+            ws_endpoint: browser.wsEndpoint()
         };
+
         console.dir(responsePayload, { depth: null });
         // return new Response(stream, {
         //         headers: {

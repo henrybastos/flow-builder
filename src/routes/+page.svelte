@@ -13,6 +13,7 @@
     import { FLOW_PRESETS, CURRENT_PRESET_NAME } from '$lib/PresetsStore';
 
     let appendToast;
+    let loadedPresetName = '';
 
     function checkAndLoadTempPreset () {
         if (localStorage?.getItem('temp_preset')) {
@@ -51,11 +52,12 @@
         <h3>Flow Builder</h3>
     
         <div class="inline-flex gap-x-2">
+
+            <PresetsModal on:preset_loaded={({ detail }) => loadedPresetName = detail.presetName} {appendToast}/>
+
             {#if $CURRENT_PRESET_NAME}
                 <UpdateCurrentPresetModal />
             {/if}
-
-            <PresetsModal {appendToast}/>
         
             <PageSettings {appendToast}/>
             
@@ -73,7 +75,7 @@
 
 <main class="flex flex-col w-[50rem] mt-28">
     {#each Object.keys($PAYLOAD.flows) as flow_name}
-        <Flow flowName={flow_name} />
+        <Flow {loadedPresetName} flowName={flow_name} />
     {/each}
     
     <ToastsWrapper bind:appendToast={appendToast}/>
