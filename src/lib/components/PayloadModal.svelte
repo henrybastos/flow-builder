@@ -81,9 +81,11 @@
         isFLowAPILoading = true;
 
         if (Object.keys(_payload.flows.main_flow).length > 0) {
+            let response;
+
             try {
                 LOGGER.logMessage('Calling API...', TAGS.system);
-                let response = await fetch('http://localhost:5173/api/run-flow', {
+                response = await fetch('http://localhost:5173/api/run-flow', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -104,6 +106,8 @@
                 console.error(err);
                 LOGGER.logMessage('Fetch error. Something went wrong.', TAGS.error);
             }
+
+            LOGGER.logMessage(`Response: ${ response.body.message }`, TAGS[response.body.status_message]);
         } else {
             console.log($LOGGER);
             LOGGER.logMessage('Main Flow cannot be empty. Nothing to run.', TAGS.error);

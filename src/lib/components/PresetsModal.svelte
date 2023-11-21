@@ -2,11 +2,14 @@
    import Modal from "./Modal.svelte";
    import { FLOW_PRESETS, CURRENT_PRESET_NAME } from "$lib/PresetsStore";
    import { PAYLOAD } from "$lib/PayloadStore";
+   import { createEventDispatcher } from "svelte";
 
    let loadedPreset;
    let presetsModal;
    let newPresetName;
    export let appendToast;
+
+   const dispatch = createEventDispatcher();
 
    function savePreset () {
         FLOW_PRESETS.savePreset({ [newPresetName]: { ...$PAYLOAD } });
@@ -32,6 +35,8 @@
             console.log('[FIX] No config found. Loading empty one...');
             PAYLOAD._fix_fixNullConfig();
         }
+
+        dispatch('preset_loaded', { presetName: _preset_name });
         presetsModal.close();
     }
 
