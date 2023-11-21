@@ -3,24 +3,24 @@ export async function POST () {
 		async start(controller) {
             let counter = 0;
 
-            await enqueueMyData(controller, `[SYS] Counter: ${ counter }`);
+            await enqueueMyData(controller, JSON.stringify({msg: `[SYS] Counter: ${ counter }`}));
             
             counter++
-            await enqueueMyData(controller, `[SYS] Counter: ${ counter }`);
+            await enqueueMyData(controller, JSON.stringify({msg: `[SYS] Counter: ${ counter }`}));
             
-            await enqueueMyData(controller, `[ERROR] Close browser`);
-            
-            counter++
-            await enqueueMyData(controller, `[SYS] Counter: ${ counter }`);
+            // await enqueueMyData(controller, JSON.stringify({ msg: `[ERROR] Close browser` }));
             
             counter++
-            await enqueueMyData(controller, `[SYS] Counter: ${ counter }`);
+            await enqueueMyData(controller, JSON.stringify({msg: `[SYS] Counter: ${ counter }`}));
+            
+            counter++
+            await enqueueMyData(controller, JSON.stringify({msg: `[SYS] Counter: ${ counter }`}));
 		}
 	});
     
     async function enqueueMyData (_ctrlr, _data) {
         await new Promise((res) => {
-            setTimeout(res, 5000);
+            setTimeout(res, 2000);
         })
         _ctrlr.enqueue(_data);
         return;
