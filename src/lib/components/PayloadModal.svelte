@@ -77,20 +77,30 @@
             }
 
             console.log(parseSSEData(value));
-            // SSEData = JSON.parse(value);
-            // LOGGER.logMessage(SSEData.message, TAGS[SSEData.status_message]);
+            // SSEData = parseSSEData(value).map(({ event, data }) => {
+            //     try {
+            //         data = JSON.parse(data);
+            //     } catch (err) {
+            //         data = data;
+            //     }
+
+            //     return { event, data };
+            // });
             // console.log(SSEData);
+            // LOGGER.logMessage(data.message, TAGS[data.status_message]);
         }
     }
 
     function parseSSEData (_raw_data) {
-        let lines = _raw_data.split('\n\n').filter(v=>v);
-        lines.map(event => event.split('\n').trim());
+        let lines = _raw_data.split('\n').filter(v=>v);
 
-        return lines.map(line => {
-            const [event, data] = line.split(':').map(segment => segment.trim());
-            return { event, data }
+        const [event, data] = lines.map(line => {
+            let [, ...data] = line.split(':');
+            data = data.join('').trim();
+            return data;
         });
+
+        return { event, data };
     }
 
     async function sendFlowPayload (_payload) {
