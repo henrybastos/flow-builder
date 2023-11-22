@@ -1,18 +1,21 @@
 <script>
    import Modal from "./Modal.svelte";
    import { FLOW_PRESETS, CURRENT_PRESET_NAME } from "$lib/PresetsStore";
-   import { PAYLOAD } from "$lib/PayloadStore";
+   import { PAYLOAD, PAYLOAD_BUFFER } from "$lib/PayloadStore";
    import { createEventDispatcher } from "svelte";
+   import { checkClickOnGuideIDs } from "$lib/utils";
 
    let loadedPreset;
    let presetsModal;
    let newPresetName;
+   let isPresetNameEditable = '';
+   let presetNameEdit;
    export let appendToast;
 
    const dispatch = createEventDispatcher();
 
    function savePreset () {
-        FLOW_PRESETS.savePreset({ [newPresetName]: { ...$PAYLOAD } });
+        FLOW_PRESETS.savePreset({ [newPresetName || 'New Preset']: { ...$PAYLOAD } });
         console.log('Preset saved!');
         newPresetName = '';
     }
@@ -30,6 +33,7 @@
     function loadPreset (_preset_name) {
         $CURRENT_PRESET_NAME = _preset_name;
         PAYLOAD.loadPayload($FLOW_PRESETS[_preset_name]);
+        $PAYLOAD_BUFFER.loadBuffer($PAYLOAD);
 
         if (!$PAYLOAD?.config) {
             console.log('[FIX] No config found. Loading empty one...');
@@ -45,11 +49,45 @@
         console.log('Preset updated!');
     }
 
+    function renamePreset (_old_preset_name, _mod_preset_name) {
+        console.log(`Old: ${ _old_preset_name } :: Modified: ${ _mod_preset_name }`);
+    }
+
     export function open () {
         // exportFlowsToJson();
         presetsModal.open();
     }
+
+    function toggleEditPresetName (_preset_name) {
+        
+        if (isPresetNameEditable === _preset_name) {
+            isPresetNameEditable = '';            
+        } else {
+            isPresetNameEditable = _preset_name;
+            presetNameEdit = _preset_name;
+        }
+    }
+
+    function _window_checkEditPresetNameClick (_target) {
+        // Disables isPresetNameEditable if click is not the Edit Preset Name button or icon
+        const allowedEditPresetGuideIDs = [
+            'edit_preset_name_icon', 
+            'edit_preset_name_btn', 
+            'edit_preset_name_input',
+            'save_preset_name',
+            'save_preset_name_icon'
+        ]
+        if (!checkClickOnGuideIDs(allowedEditPresetGuideIDs, _target)) {
+            isPresetNameEditable = ''; 
+        }
+    }
+
+    function _window_handleClicks (_event) {
+        _window_checkEditPresetNameClick(_event.target);
+    }
 </script>
+
+<svelte:window on:click={_window_handleClicks} />
 
 <button on:click={() => presetsModal.open()} class="btn-md">
     <i class="ti ti-bookmarks text-blue-500"></i>
@@ -64,16 +102,33 @@
    <div class="btn-bar mb-3 overflow-y-auto max-h-[30rem] p-3 border-2 border-neutral-800 bg-neutral-950 rounded-lg">
        {#each Object.keys($FLOW_PRESETS) as preset_name}
            <div class="flex flex-nowrap col-span-full gap-x-3">
-               <button class="btn-md col-span-full w-full outline-offset-1" on:click={() => loadPreset(preset_name)}>
-                   <i class="ti ti-bookmark-filled text-blue-500"></i>
-                   { preset_name }
+                {#if isPresetNameEditable === preset_name}
+                    <input data-guide-id="edit_preset_name_input" class="btn-md col-span-full w-full outline-offset-1" type="text" bind:value={ presetNameEdit }>
+
+                    {#if presetNameEdit.trim() !== preset_name.trim()}    
+                        <button data-guide-id="save_preset_name" class="btn-md" on:click={() => renamePreset(preset_name, presetNameEdit)}>
+                            <i data-guide-id="save_edit_preset_name_icon" class="ti ti-device-floppy text-green-500"></i>
+                        </button>
+                    {/if}
+                {:else}
+                    <button class="btn-md col-span-full w-full outline-offset-1" on:click={() => loadPreset(preset_name)}>
+                        <i class="ti ti-bookmark-filled text-blue-500"></i>
+                        { preset_name }
+                    </button>
+                {/if}
+
+               <!-- Edit preset name -->
+               <button data-guide-id="edit_preset_name_btn" class="btn-md" on:click={() => toggleEditPresetName(preset_name)}>
+                   <i data-guide-id="edit_preset_name_icon" class="ti ti-ballpen"></i>
                </button>
 
+               <!-- Update preset -->
                <button class="btn-md" on:click={() => openDangerModal(() => updatePreset(preset_name), { danger_modal_title: `Update preset ${ preset_name }?` })}>
                    <i class="ti ti-arrows-transfer-up"></i>
                </button>
 
-               <button class="btn-md btn-danger" on:click={() => openDangerModal(() => removePreset(preset_name), { danger_modal_title: `Remove preset ${ preset_name }?` })}>
+               <!-- Delete preset -->
+               <button class="btn-md btn-danger" on:click={() => openDangerModal(() => removePreset(preset_name), { danger_modal_title: `Delete preset ${ preset_name }?` })}>
                    <i class="ti ti-trash-x"></i>
                </button>
            </div>
