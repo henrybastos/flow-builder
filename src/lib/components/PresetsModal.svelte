@@ -49,9 +49,11 @@
         console.log('Preset updated!');
     }
 
-    function renamePreset (_old_preset_name, _mod_preset_name) {
-        FLOW_PRESETS.renamePreset(_old_preset_name, _mod_preset_name);
-        $CURRENT_PRESET_NAME = _mod_preset_name;
+    function renamePreset (_old_preset_name, _new_preset_name) {
+        FLOW_PRESETS.renamePreset(_old_preset_name, _new_preset_name);
+        if ($CURRENT_PRESET_NAME === _old_preset_name) {
+            $CURRENT_PRESET_NAME = _new_preset_name;
+        }
         isPresetNameEditable = '';
     }
 
