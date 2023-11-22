@@ -122,12 +122,15 @@
 
                 await handleStream(response);
 
+                if ($PAYLOAD.config.close_browser_on_cancel_request) {
+                    await closeBrowserOnCancelRequest();
+                }
+
                 // response = await response.json();
 
                 // lastWSEndpoint = response.body.ws_endpoint;
                 // localStorage.setItem('last_ws_endpoint', lastWSEndpoint);
 
-                // LOGGER.logMessage(`WS Endpoint: ${ response.body.ws_endpoint }`, TAGS.success);
                 if (cancelRequest === true) {
                     LOGGER.logMessage('Request canceled by the user.', TAGS.warning);
                     console.warn('Request canceled by the user.');
@@ -146,6 +149,17 @@
         }
 
         isFLowAPILoading = false;
+    }
+
+    async function closeBrowserOnCancelRequest () {
+        await fetch('http://localhost:5173/api/run-flow', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify( _payload )
+        });
+        console.warn('Close!');
     }
 
     function loadPayload () {

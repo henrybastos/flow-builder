@@ -1,4 +1,5 @@
-import puppeteer from "puppeteer";
+import puppeteer from "puppeteer-extra";
+import pluginStealth from 'puppeteer-extra-plugin-stealth';
 import { checkForEnvPlaceholder, trimEnvPlaceholder, replaceEnvPlaceholder } from "$lib/utils.js";
 
 import comboKeys from "$lib/operations/comboKeys";
@@ -43,7 +44,7 @@ let streamController;
 /**
  * 
  * @param {string} _response_event A label to the event, for identification.
- * @param {string} _response_payload The JSON to be passed as response.
+ * @param {string|{ message: string, status_message: string }} _response_payload The JSON to be passed as response.
  */
 function logToClient (_response_event, _response_payload) {
     streamController.enqueue(
@@ -60,6 +61,7 @@ export async function POST ({ request }) {
 
     async function _startEngine () {
         
+        puppeteer.use(pluginStealth())
         const browser = await _connectOrLaunchBrowser();
         
         const [page] = await browser.pages();
@@ -67,6 +69,14 @@ export async function POST ({ request }) {
         page.on('dialog', async (dialog) => {
             await dialog.accept();
         });
+
+        await page.setExtraHTTPHeaders({ 
+            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36', 
+            'upgrade-insecure-requests': '1', 
+            'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8', 
+            'accept-encoding': 'gzip, deflate, br', 
+            'accept-language': 'en-US,en;q=0.9,en;q=0.8' 
+        }); 
 
         return [page, browser];
     }
@@ -79,12 +89,14 @@ export async function POST ({ request }) {
         // Tries to connect to a running browser instance. If it fails, it launches a new one.
         try {
             console.log(`Attempting to connect at ${ payload.config.ws_endpoint }...`);
-            _browser = await puppeteer.connect({ browserWSEndpoint: payload.config.ws_endpoint })
+            _browser = await puppeteer.connect({ browserWSEndpoint: payload.config.ws_endpoint });
             console.log(`Browser connected at ${ payload.config.ws_endpoint }`);
         } catch (_err) {
             console.error(`Failed to connect at ${ payload.config.ws_endpoint }. Launching a new browser...`);
+            
             _browser = await puppeteer.launch({
                 headless: false,
+                executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
                 args: [
                     `--window-size=${ width },${ height + 200 }`
                 ],
@@ -93,8 +105,8 @@ export async function POST ({ request }) {
                     height
                 }
             });
+
             console.log(`New browser launched: ${ _browser.wsEndpoint() }`);
-            // response.write(`data: Socket WS Endpoint: ${ _browser.wsEndpoint() }\n\n`);
         }
 
         return _browser;
@@ -116,7 +128,6 @@ export async function POST ({ request }) {
 
     async function _getElement (_target) {
         await _waitForSelector(_target, payload?.wait_timeout);
-
         return await page.$$(`xpath/${ _target }`);
     }
 
@@ -168,12 +179,19 @@ export async function POST ({ request }) {
         return await _element.evaluate((el, _regex) => el.value.match(new RegExp(_regex, 'g')), regex);
     }
 
+    /**
+     * 
+     * @param {{ target: string, success_flow: string, error_flow: string }} operation 
+     * @returns The name of the flow (success or error).
+     */
     async function _checkElement ({ target, success_flow, error_flow }) {
         try {
             await _getElement(target);
+            console.log(`Running flow: ${ success_flow }`);
             return success_flow;
         } catch (err) {
             console.log(err);
+            console.log(`Running flow: ${ error_flow }`);
             return error_flow;
         }
     }
@@ -309,6 +327,10 @@ export async function POST ({ request }) {
     }
 
     async function _execStream () {
+        logToClient(SSE_EVENTS.system, {
+            message: `WS Endpoint: ${ browser.wsEndpoint() }`,
+            status_message: 'info'
+        });
         try {   
             await runFlow(payload.flows.main_flow, payload.env);
     

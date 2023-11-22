@@ -202,18 +202,8 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = writable({
         icon: 'ti-repeat',
         input_fields: {
             method: {
-                type: 'dropdown',
-                label: 'Method',
-                options: [
-                    {
-                        value: 'by_env_array',
-                        label: 'By Env Array'
-                    },
-                    {
-                        value: 'by_flow',
-                        label: 'By flow'
-                    }
-                ],
+                type: 'text',
+                label: 'No. of times',
                 value: '',
             }
         }
@@ -266,5 +256,10 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = writable({
                 value: ''
             }
         }
+    },
+    close_browser: {
+        command: 'close_browser',
+        label: 'Close browser',
+        icon: 'ti-clock'
     }
 }) 
