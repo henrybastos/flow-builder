@@ -18,6 +18,12 @@ import comboKeys from "$lib/operations/comboKeys";
 
 const logCommands = false;
 
+const SSE_EVENTS = {
+    operation_log: 'operation_log',
+    system: 'system',
+    response: 'response'
+}
+
 const ENV_VARIABLES_ALLOWLIST = [
     'target',
     'trigger_target',
@@ -32,6 +38,18 @@ const ENV_VARIABLES_ALLOWLIST = [
 ]
 
 let streamController;
+
+
+/**
+ * 
+ * @param {string} _response_event A label to the event, for identification.
+ * @param {string} _response_payload The JSON to be passed as response.
+ */
+function logToClient (_response_event, _response_payload) {
+    streamController.enqueue(
+        `event: ${ _response_event }\ndata: ${ JSON.stringify(_response_payload) }\n\n`
+    );
+}
 
 export async function POST ({ request }) {
     const payload = await request.json();
@@ -51,16 +69,6 @@ export async function POST ({ request }) {
         });
 
         return [page, browser];
-    }
-
-    /**
-     * 
-     * @param {string} _event 
-     * @param {string} _data 
-     * @returns {string} The formatted string to send through SSE.
-     */
-    function formatEnqueuedData (_event, _data) {
-        return `event: ${ _event }\ndata: ${ _data }\n\n`
     }
 
     async function _connectOrLaunchBrowser () {
@@ -190,16 +198,12 @@ export async function POST ({ request }) {
 
         switch (_operation.command) {
             case 'goto':    
-                try {
-                    await page.goto(_operation.target, { waitUntil: 'networkidle0' });
-
-                    streamController.enqueue(formatEnqueuedData('operation_log', JSON.stringify({
-                        message: `Successfully gone to URL: ${ _operation.target }`,
-                        status_message: 'success'
-                    })));
-                } catch (err) {
-                    console.log(err);
-                }
+                logToClient(SSE_EVENTS.operation_log, {
+                    message: `Navigating to: ${ _operation.target }`,
+                    status_message: 'info'
+                });
+                
+                await page.goto(_operation.target, { waitUntil: 'networkidle0' });
                 break;
             case 'reload':    
                 await page.reload({ waitUntil: ['networkidle0', "domcontentloaded"] });
@@ -214,12 +218,27 @@ export async function POST ({ request }) {
                 await _typeElement({ target: _operation.picker_target, value: _operation.color });
                 break;
             case 'click':
+                logToClient(SSE_EVENTS.operation_log, {
+                    message: `Clicking element: ${ _operation.target }`,
+                    status_message: 'info'
+                });
+
                 await _clickElement(_operation);
                 break;
             case 'user_click':    
+                logToClient(SSE_EVENTS.operation_log, {
+                    message: `User clicking element: ${ _operation.target }`,
+                    status_message: 'info'
+                });
+                
                 await _clickElement(_operation, 'user');
                 break;
             case 'type':
+                logToClient(SSE_EVENTS.operation_log, {
+                    message: `Typing ${ _operation.value } to ${ _operation.target }`,
+                    status_message: 'info'
+                });
+
                 await _typeElement(_operation);
                 break;
             case 'select':
@@ -232,9 +251,19 @@ export async function POST ({ request }) {
                 await comboKeys(page, _operation.key, _operation.mod_keys);
                 break;
             case 'scrape_attr':
+                logToClient(SSE_EVENTS.operation_log, {
+                    message: `Scrapping ${ _operation.attr } from ${ _operation.target }`,
+                    status_message: 'info'
+                });
+
                 responsePayload[_operation.response_slot] = await _scrapeAttribute(_operation);
                 break;
             case 'scrape_multiple_attr':
+                logToClient(SSE_EVENTS.operation_log, {
+                    message: `Scrapping multiple ${ _operation.attr } from ${ _operation.target }`,
+                    status_message: 'info'
+                });
+
                 responsePayload[_operation.response_slot] = await _scrapeMultipleAttributes(_operation);
                 break;
             case 'set_attr':
@@ -281,7 +310,6 @@ export async function POST ({ request }) {
 
     async function _execStream () {
         try {   
-            // responsePayload.base_url = payload.base_url;
             await runFlow(payload.flows.main_flow, payload.env);
     
             if (payload.config.ws_endpoint || !payload.config.close_browser_on_finish) {
@@ -290,34 +318,28 @@ export async function POST ({ request }) {
                 await browser.close();
             }
             
-            console.dir(responsePayload, { depth: null });
+            // console.dir(responsePayload, { depth: null });
 
-            streamController.enqueue(formatEnqueuedData('system', JSON.stringify({
+            logToClient(SSE_EVENTS.response, {
                 message: 'All operations done.',
                 status_code: 200,
                 status_message: 'success',
-                ws_endpoint: browser.wsEndpoint()
-            })));
+                ws_endpoint: browser.wsEndpoint(),
+                payload: responsePayload
+            });
 
-            streamController.close()
-            // return new Response(JSON.stringify( responsePayload ));
+            streamController.close();
         } catch (err) {
             console.log(err);
 
-            streamController.enqueue(formatEnqueuedData('system', JSON.stringify({
-                message: 'An error has occurred.',
+            logToClient(SSE_EVENTS.system, {
+                message: 'An error has occurred :(',
                 status_code: 500,
                 status_message: 'error',
                 error: err
-            })));
+            });
             
-            streamController.close()
-            // return new Response(JSON.stringify({ 
-            //     error: {
-            //         raw: err,
-            //         message: err.message
-            //     },
-            //  }));
+            streamController.close();
         }
     }
 
