@@ -217,3 +217,13 @@ export function replaceEnvPlaceholder (_str, _env) {
 export function genUUID () {
     return Math.random().toString().slice(2);
 }
+
+/**
+ * Checks if click was on any of the elements with the guides
+ * @param {*} _guides 
+ * @param {*} _target 
+ * @returns 
+ */
+export function checkClickOnGuideIDs (_guides, _target) {
+    return _guides.includes(_target.dataset.guideId);
+}
