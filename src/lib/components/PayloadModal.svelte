@@ -12,7 +12,7 @@
     $: payloadToURI = `data:text/json;charset=utf-8,${ encodeURIComponent(payloadModalTextearea) }`;
     $: payloadURIPresetName = `${ $CURRENT_PRESET_NAME?.match(/[A-z,0-9]*[^\s:_,.]/gi)?.join('_')?.toLowerCase() || 'preset' }.json`;
 
-    let test_payload;
+    let responsePayload = 'Nothing to display :D';
 
     let payloadModal;
     let isFLowAPILoading;
@@ -22,9 +22,8 @@
         message: ''
     };
     let lastWSEndpoint;
-    let tabs = ['payload', 'console'];
+    let tabs = ['payload', 'console', 'response payload'];
 
-    let SSEData = '';
     let cancelRequest = false;
 
     onMount(() => {
@@ -65,6 +64,7 @@
     }
 
     async function handleStream (_res) {
+        let SSEData = '';
         const reader = _res.body.pipeThrough(new TextDecoderStream()).getReader();
 
         while (true) {
@@ -72,9 +72,8 @@
 
             if (done) break;
 
+            // To fix
             if (cancelRequest) {
-                console.error('Close the browser!');
-                LOGGER.logMessage('Request canceled by the user.', TAGS.warning);
                 await reader.cancel();
             }
 
@@ -83,8 +82,7 @@
             LOGGER.logMessage(SSEData.data.message, TAGS[SSEData.data.status_message]);
 
             if (SSEData.event === 'response') {
-                LOGGER.logMessage(JSON.stringify(SSEData.data.payload, null, 3), TAGS.info);
-                // test_payload = JSON.stringify(SSEData.data.payload, null, 3);
+                responsePayload = JSON.stringify(SSEData.data.payload, null, 3);
             }
         }
     }
@@ -100,8 +98,8 @@
     }
 
     async function sendFlowPayload (_payload) {
-        let response;
         isFLowAPILoading = true;
+        cancelRequest = false;
 
         if (Object.keys(_payload.flows.main_flow).length > 0) {
             let response;
@@ -126,7 +124,13 @@
                 // localStorage.setItem('last_ws_endpoint', lastWSEndpoint);
 
                 // LOGGER.logMessage(`WS Endpoint: ${ response.body.ws_endpoint }`, TAGS.success);
-                LOGGER.logMessage('Done!', TAGS.success);
+                if (cancelRequest === true) {
+                    LOGGER.logMessage('Request canceled by the user.', TAGS.warning);
+                    console.warning('Request canceled by the user.');
+                } else {
+                    LOGGER.logMessage('Done!', TAGS.success);
+                    console.log('Done!');
+                }
             } catch (err) {
                 console.error(err);
                 LOGGER.logMessage('Fetch error. Something went wrong.', TAGS.error);
@@ -208,7 +212,7 @@
                 </a>
             </div>
 
-            <textarea class="font-code" bind:value={payloadModalTextearea} name="" id="" cols="30" rows="20"></textarea>
+            <textarea class="font-code bg-neutral-950 hover:bg-neutral-950" bind:value={payloadModalTextearea} name="" id="" cols="30" rows="20"></textarea>
             
             {#if runFlowMessage.message !== ''}
                 <span class={`${ runFlowMessage.type === 'error' ? 'text-red-600' : 'text-green-600' } mt-4`}>
@@ -229,15 +233,20 @@
         
             <div class="btn-bar">
                 {#if isFLowAPILoading}
-                    <button on:click={async () => await cancelRequest()} class="btn-md w-full mt-4">
+                    <button disabled={cancelRequest} on:click={() => cancelRequest = true} class="btn-md w-full mt-4">
                         <span class="w-full inline-flex justify-center">
-                            <i class="ti ti-loader-2 text-neutral-400 animate-spin-icon"></i>
-                            Cancel
+                            {#if cancelRequest}
+                                <i class="ti ti-loader-2 text-neutral-400 animate-spin-icon mr-2"></i>
+                                Canceling request
+                            {:else}
+                                <i class="ti ti-loader-2 text-neutral-400 animate-spin-icon mr-2"></i>
+                                Cancel
+                            {/if}
                         </span>
                     </button>
                 {:else }
                     <button on:click={async () => await sendFlowPayload(JSON.parse(payloadModalTextearea))} class="btn-md w-full mt-4">
-                        <i class="ti ti-arrows-split-2 text-blue-500"></i>
+                        <i class="ti ti-arrows-split-2 text-blue-500 mr-2"></i>
                         Run flow
                     </button>
                 {/if}
@@ -260,6 +269,8 @@
                     <LogMessage message={msg} />
                 {/each}
             </div>
+        {:else if activeTab === 'response payload'}
+            <textarea class="font-code bg-neutral-950 hover:bg-neutral-950" bind:value={responsePayload} name="" id="" cols="30" rows="20"></textarea>
         {/if}
     </TabsBar>
 </Modal>
