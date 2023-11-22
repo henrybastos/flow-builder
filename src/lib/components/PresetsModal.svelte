@@ -51,6 +51,7 @@
 
     function renamePreset (_old_preset_name, _mod_preset_name) {
         FLOW_PRESETS.renamePreset(_old_preset_name, _mod_preset_name);
+        $CURRENT_PRESET_NAME = _mod_preset_name;
         isPresetNameEditable = '';
     }
 

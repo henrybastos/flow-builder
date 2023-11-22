@@ -1,11 +1,13 @@
 <script>
     import { PAYLOAD } from "$lib/PayloadStore";
+    import { onMount } from "svelte";
     import Modal from "./Modal.svelte";
     import Switch from "./Switch.svelte";
 
     export let appendToast;
     let pageSettingsModal;
-    let wsEndpoint = '';
+
+    let wsEndpoint;
 
     function saveTempPresetToLocalStorage () {
         try {
@@ -24,6 +26,7 @@
     }
 
     function updateWSEnpoint () {
+        // wsEndpoint = $PAYLOAD?.config?.ws_endpoint || '';
         PAYLOAD.setConfig('ws_endpoint', wsEndpoint);
     }
 
@@ -35,10 +38,7 @@
         PAYLOAD.setConfig('close_browser_on_cancel_request', detail);
     }
 
-    
-
     function openModal () {
-        wsEndpoint = $PAYLOAD?.config?.ws_endpoint || '';
         pageSettingsModal.open();
     }
 </script>
