@@ -64,27 +64,31 @@
     }
 
     async function handleStream (_res) {
-        let SSEData = '';
         const reader = _res.body.pipeThrough(new TextDecoderStream()).getReader();
+        await loopReader(reader);
+    }
 
-        while (true) {
-            const {value, done} = await reader.read();
+    async function loopReader (_reader) {
+        const {value, done} = await _reader.read();
+        let SSEData = '';
 
-            if (done) break;
+        if (done) return;
+        console.log('Attempting...');
 
-            // To fix
-            if (cancelRequest) {
-                await reader.cancel();
-            }
-
-            SSEData = parseSSEData(value);
-            try { SSEData.data = JSON.parse(SSEData.data) } catch (err) {  };
-            LOGGER.logMessage(SSEData.data.message, TAGS[SSEData.data.status_message]);
-
-            if (SSEData.event === 'response') {
-                responsePayload = JSON.stringify(SSEData.data.payload, null, 3);
-            }
+        // To fix
+        if (cancelRequest) {
+            await _reader.cancel();
         }
+
+        SSEData = parseSSEData(value);
+        try { SSEData.data = JSON.parse(SSEData.data) } catch (err) {  };
+        LOGGER.logMessage(SSEData.data.message, TAGS[SSEData.data.status_message]);
+
+        if (SSEData.event === 'response') {
+            responsePayload = JSON.stringify(SSEData.data.payload, null, 3);
+        }
+
+        await loopReader(_reader);
     }
 
     function parseSSEData (_raw_data) {
@@ -126,7 +130,7 @@
                 // LOGGER.logMessage(`WS Endpoint: ${ response.body.ws_endpoint }`, TAGS.success);
                 if (cancelRequest === true) {
                     LOGGER.logMessage('Request canceled by the user.', TAGS.warning);
-                    console.warning('Request canceled by the user.');
+                    console.warn('Request canceled by the user.');
                 } else {
                     LOGGER.logMessage('Done!', TAGS.success);
                     console.log('Done!');
