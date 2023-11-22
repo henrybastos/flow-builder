@@ -12,6 +12,8 @@
     $: payloadToURI = `data:text/json;charset=utf-8,${ encodeURIComponent(payloadModalTextearea) }`;
     $: payloadURIPresetName = `${ $CURRENT_PRESET_NAME?.match(/[A-z,0-9]*[^\s:_,.]/gi)?.join('_')?.toLowerCase() || 'preset' }.json`;
 
+    let test_payload;
+
     let payloadModal;
     let isFLowAPILoading;
     let payloadModalTextearea;
@@ -76,18 +78,14 @@
                 await reader.cancel();
             }
 
-            console.log(parseSSEData(value));
-            // SSEData = parseSSEData(value).map(({ event, data }) => {
-            //     try {
-            //         data = JSON.parse(data);
-            //     } catch (err) {
-            //         data = data;
-            //     }
+            SSEData = parseSSEData(value);
+            try { SSEData.data = JSON.parse(SSEData.data) } catch (err) {  };
+            LOGGER.logMessage(SSEData.data.message, TAGS[SSEData.data.status_message]);
 
-            //     return { event, data };
-            // });
-            // console.log(SSEData);
-            // LOGGER.logMessage(data.message, TAGS[data.status_message]);
+            if (SSEData.event === 'response') {
+                LOGGER.logMessage(JSON.stringify(SSEData.data.payload, null, 3), TAGS.info);
+                // test_payload = JSON.stringify(SSEData.data.payload, null, 3);
+            }
         }
     }
 
@@ -95,9 +93,7 @@
         let lines = _raw_data.split('\n').filter(v=>v);
 
         const [event, data] = lines.map(line => {
-            let [, ...data] = line.split(':');
-            data = data.join('').trim();
-            return data;
+            return ( line.slice(7).trim(), line.slice(6).trim() );
         });
 
         return { event, data };
@@ -111,7 +107,7 @@
             let response;
 
             try {
-                LOGGER.logMessage('Calling API...', TAGS.system);
+                LOGGER.logMessage('Calling API...', TAGS.info);
                 response = await fetch('http://localhost:5173/api/run-flow', {
                     method: 'POST',
                     headers: {
@@ -120,11 +116,10 @@
                     body: JSON.stringify( _payload )
                 });
 
-                LOGGER.logMessage('Parsing response to JSON...', TAGS.system);
+                LOGGER.logMessage('Handling response stream...', TAGS.info);
 
                 await handleStream(response);
 
-                console.log('Parsing response to JSON...');
                 // response = await response.json();
 
                 // lastWSEndpoint = response.body.ws_endpoint;
@@ -136,8 +131,6 @@
                 console.error(err);
                 LOGGER.logMessage('Fetch error. Something went wrong.', TAGS.error);
             }
-
-            // LOGGER.logMessage(`Response: ${ response.body.message }`, TAGS[response.body.status_message]);
         } else {
             console.log($LOGGER);
             LOGGER.logMessage('Main Flow cannot be empty. Nothing to run.', TAGS.error);

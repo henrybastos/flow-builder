@@ -2,7 +2,7 @@ import { writable } from "svelte/store";
 import { genUUID } from "./utils";
 
 export const TAGS = {
-   system: {
+   info: {
       type: 'info',
       label: '[SYS]'
    },
@@ -30,7 +30,7 @@ function createLogger () {
    /**
     * Logs a message to the Payload Modal Console Screen.
     * @param {string} _message 
-    * @param {'system'|'success'|'error'|'warning'} _tag 
+    * @param {'info'|'success'|'error'|'warning'} _tag 
     */
    function logMessage (_message, _tag) {
       update(_log => {
