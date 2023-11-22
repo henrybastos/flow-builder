@@ -6,7 +6,7 @@
     import { LOGGER, TAGS } from "$lib/LogStore";
     import LogMessage from "./LogMessage.svelte";
     import { onMount } from "svelte";
-    import { CURRENT_PRESET_NAME, FLOW_PRESETS } from "$lib/PresetsStore";
+    import { FLOW_PRESETS, CURRENT_PRESET_NAME } from "$lib/PresetsStore";
 
     const controller = new AbortController();
     $: payloadToURI = `data:text/json;charset=utf-8,${ encodeURIComponent(payloadModalTextearea) }`;
@@ -111,11 +111,13 @@
         isFLowAPILoading = true;
         cancelRequest = false;
 
+        console.log(_payload);
+
         if (Object.keys(_payload.flows.main_flow).length > 0) {
             let response;
 
             try {
-                LOGGER.logMessage('Calling API...', TAGS.info);
+                LOGGER.logMessage(`[PRESET # ${ $CURRENT_PRESET_NAME }] Calling API...`, TAGS.info);
                 response = await fetch('http://localhost:5173/api/run-flow', {
                     method: 'POST',
                     headers: {
@@ -128,14 +130,10 @@
 
                 await handleStream(response);
 
-                if ($PAYLOAD.config.close_browser_on_cancel_request) {
-                    await closeBrowserOnCancelRequest();
-                }
-
-                // response = await response.json();
-
-                // lastWSEndpoint = response.body.ws_endpoint;
-                // localStorage.setItem('last_ws_endpoint', lastWSEndpoint);
+                // WIP
+                // if ($PAYLOAD.config.close_browser_on_cancel_request) {
+                //     await closeBrowserOnCancelRequest();
+                // }
 
                 if (cancelRequest === true) {
                     LOGGER.logMessage('Request canceled by the user.', TAGS.warning);
@@ -158,12 +156,24 @@
     }
 
     async function closeBrowserOnCancelRequest () {
+        const closeBrowserPayload = {
+            "config": {
+                "ws_endpoint": false,
+                "close_browser_on_finish": false,
+                "close_browser_on_cancel_request": false
+            },
+            "env": {},
+            "flows": {
+                "main_flow": [{ "command": "close_browser" }]
+            }
+        }
+
         await fetch('http://localhost:5173/api/run-flow', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify( _payload )
+            body: JSON.stringify( closeBrowserPayload )
         });
         console.warn('Close!');
     }
@@ -206,6 +216,7 @@
 
     function onPayloadModalOpenHandler () {
         payloadModalTextearea = transformToJSON($PAYLOAD);
+        console.log(payloadModalTextearea);
     }
 
     function onPayloadModalCloseHandler () {
