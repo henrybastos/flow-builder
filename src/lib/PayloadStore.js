@@ -142,22 +142,3 @@ function createPayload () {
 }
 
 export const PAYLOAD = createPayload();
-
-function createBufferPayload () {
-    const { subscribe, set } = writable({});
-
-    /**
-     * Sets a structured clone
-     * @param {Object} _payload 
-     */
-    function loadBuffer(_payload) {
-        set(structuredClone(_payload));
-    }
-
-    return {
-        subscribe,
-        loadBuffer
-    }
-}
-
-export const PAYLOAD_BUFFER = createBufferPayload();

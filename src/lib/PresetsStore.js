@@ -1,7 +1,25 @@
 import { writable } from "svelte/store";
 
+let _flag_saveToLocalStorage = true;
+
 function createPresetsStore () {
    const { subscribe, update, set } = writable({});
+
+   /**
+    * 
+    * @param {string} _old_preset_name 
+    * @param {string} _new_preset_name 
+    * @param {Object} _preset_body 
+    */
+   function renamePreset (_old_preset_name, _new_preset_name) {
+      update(_presets => {
+         _presets[_new_preset_name] = _presets[_old_preset_name];
+         delete _presets[_old_preset_name];
+
+         if (_flag_saveToLocalStorage) { localStorage.setItem('presets', JSON.stringify(_presets)) };
+         return _presets;
+      })
+   }
 
    return {
       subscribe,
@@ -13,14 +31,17 @@ function createPresetsStore () {
          if (typeof _preset_flow === 'object') {
             update((_presets) => {
                _presets = {..._presets, ..._preset_flow};
-               localStorage.setItem('presets', JSON.stringify(_presets));
+
+               if (_flag_saveToLocalStorage) { localStorage.setItem('presets', JSON.stringify(_presets)) };
                return _presets;
             });
          }
       },
+      renamePreset,
       removePreset: (_preset_name) => update((_presets) => {
          delete _presets[_preset_name];
-         localStorage.setItem('presets', JSON.stringify(_presets));
+
+         if (_flag_saveToLocalStorage) { localStorage.setItem('presets', JSON.stringify(_presets)) };
          return _presets;
       }),
       clearPresets: () => set({})

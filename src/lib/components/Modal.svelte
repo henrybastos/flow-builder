@@ -63,7 +63,7 @@
     }
 </script>
 
-<dialog bind:this={dangerModal}>
+<dialog bind:this={dangerModal} class="p-3">
     <div class="relative">
         <h3 class="text-2xl mb-6 ml-1 text-red-600 whitespace-nowrap">{ dangerModalTitlePlaceholder }</h3>
     </div>
@@ -73,7 +73,7 @@
     </div>
 </dialog>
 
-<dialog on:click={handleOutsideClick} on:open on:close bind:this={modal} class={`max-h-[80vh] ${ $$restProps.class || 'w-[60rem]' }`}>
+<dialog on:click={handleOutsideClick} on:open on:close bind:this={modal} class={`max-h-[90vh] ${ $$restProps.class || 'w-[60rem]' }`}>
     <div data-guide-id="" bind:this={modalBody} class="p-3">
         <div class="relative">
             <h3 class="text-2xl mb-6 mt-3 ml-1">{ title }</h3>
