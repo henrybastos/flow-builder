@@ -1,13 +1,13 @@
 <script>
    import Modal from "./Modal.svelte";
    import { FLOW_PRESETS, CURRENT_PRESET_NAME } from "$lib/PresetsStore";
-   import { PAYLOAD, PAYLOAD_BUFFER } from "$lib/PayloadStore";
+   import { PAYLOAD } from "$lib/PayloadStore";
    import { createEventDispatcher } from "svelte";
    import { checkClickOnGuideIDs } from "$lib/utils";
 
    let loadedPreset;
    let presetsModal;
-   let newPresetName;
+   let inputPresetName;
    let isPresetNameEditable = '';
    let presetNameEdit;
    export let appendToast;
@@ -15,9 +15,10 @@
    const dispatch = createEventDispatcher();
 
    function savePreset () {
-        FLOW_PRESETS.savePreset({ [newPresetName || 'New Preset']: { ...$PAYLOAD } });
+        FLOW_PRESETS.savePreset({ [inputPresetName || 'New Preset']: { ...$PAYLOAD } });
+        $CURRENT_PRESET_NAME = inputPresetName;
         console.log('Preset saved!');
-        newPresetName = '';
+        inputPresetName = '';
     }
 
     function clearPresets () {
@@ -33,7 +34,6 @@
     function loadPreset (_preset_name) {
         $CURRENT_PRESET_NAME = _preset_name;
         PAYLOAD.loadPayload($FLOW_PRESETS[_preset_name]);
-        $PAYLOAD_BUFFER.loadBuffer($PAYLOAD);
 
         if (!$PAYLOAD?.config) {
             console.log('[FIX] No config found. Loading empty one...');
@@ -50,7 +50,8 @@
     }
 
     function renamePreset (_old_preset_name, _mod_preset_name) {
-        console.log(`Old: ${ _old_preset_name } :: Modified: ${ _mod_preset_name }`);
+        FLOW_PRESETS.renamePreset(_old_preset_name, _mod_preset_name);
+        isPresetNameEditable = '';
     }
 
     export function open () {
@@ -59,7 +60,6 @@
     }
 
     function toggleEditPresetName (_preset_name) {
-        
         if (isPresetNameEditable === _preset_name) {
             isPresetNameEditable = '';            
         } else {
@@ -146,7 +146,7 @@
            Load Preset
        </button>
 
-       <input class="input-md peer/preset-name" bind:value={newPresetName} type="text" placeholder="Preset name">
+       <input class="input-md peer/preset-name" bind:value={inputPresetName} type="text" placeholder="Preset name">
        <button on:click={savePreset} class="btn-md w-full">
            <i class="ti ti-book-upload text-blue-500"></i>
            Save Preset

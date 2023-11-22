@@ -38,9 +38,9 @@
         }
     })
 
-    function transformToJSON () {
-        let payloadBuffer = structuredClone($PAYLOAD);
-        Object.entries($PAYLOAD.flows).forEach(([flow_name, flow_body]) => {
+    function transformToJSON (_payload) {
+        let payloadBuffer = structuredClone(_payload);
+        Object.entries(payloadBuffer.flows).forEach(([flow_name, flow_body]) => {
             let flowBuffer = [];
 
             for (let operation of Object.values(flow_body)) {
@@ -57,10 +57,16 @@
             }
 
             payloadBuffer.flows[flow_name] = flowBuffer;
-
-            console.log('Transform to JSON');
         });
-        payloadModalTextearea = JSON.stringify(payloadBuffer, null, 3);
+        return JSON.stringify(payloadBuffer, null, 3);
+    }
+
+    function transformMultipleToJSON (_payload_list) {
+        let _payload_list_json = structuredClone(_payload_list);
+        _payload_list_json = Object.entries(_payload_list_json).map(([ preset_name, preset_payload ]) => {
+            return [preset_name, JSON.parse(transformToJSON(preset_payload))]
+        })
+        return JSON.stringify(Object.fromEntries(_payload_list_json), null, 3);
     }
 
     async function handleStream (_res) {
@@ -199,7 +205,7 @@
     }
 
     function onPayloadModalOpenHandler () {
-        transformToJSON();
+        payloadModalTextearea = transformToJSON($PAYLOAD);
     }
 
     function onPayloadModalCloseHandler () {
@@ -224,13 +230,13 @@
                 </a>
 
                 <a class="clear-btn mb-2" 
-                    href={`data:text/json;charset=utf-8,${ encodeURIComponent(JSON.stringify($FLOW_PRESETS)) }`} 
+                    href={`data:text/json;charset=utf-8,${ encodeURIComponent(transformMultipleToJSON($FLOW_PRESETS)) }`} 
                     download={'all_presets.json'}>
                     Download raw full payload
                 </a>
             </div>
 
-            <textarea class="font-code bg-neutral-950 hover:bg-neutral-950" bind:value={payloadModalTextearea} name="" id="" cols="30" rows="20"></textarea>
+            <textarea class="font-code bg-neutral-950 hover:bg-neutral-950" bind:value={payloadModalTextearea} name="" id="" cols="30" rows="16"></textarea>
             
             {#if runFlowMessage.message !== ''}
                 <span class={`${ runFlowMessage.type === 'error' ? 'text-red-600' : 'text-green-600' } mt-4`}>
@@ -272,17 +278,12 @@
         
                 <button on:click={loadPayload} class="btn-md w-full mt-4">
                     <i class="ti ti-file-upload text-blue-500"></i>
-                    Load payload
+                    Update UI
                 </button>
-
-                <!-- <button on:click={() => controller.abort()} class="btn-md w-full mt-4">
-                    <i class="ti ti-file-upload text-blue-500"></i>
-                    Abort
-                </button> -->
             </div>
         {:else if activeTab === 'console'}
             <button class="clear-btn mb-2" on:click={() => openDangerModal(LOGGER.clearLogs, { danger_modal_title: 'Clear logs from Local Storage?', danger_confirm: 'Clear' })}>Clear logs</button>
-            <div class="console_screen flex-col">
+            <div class="console_screen flex-col overflow-y-auto max-h-[36rem]">
                 {#each Object.entries($LOGGER.messages) as [msg_key, msg], _ (msg_key)}
                     <LogMessage message={msg} />
                 {/each}
