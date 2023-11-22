@@ -31,6 +31,12 @@
         PAYLOAD.setConfig('close_browser_on_finish', detail);
     }
 
+    function updateCloseBrowserOnCancelRequest ({ detail }) {
+        PAYLOAD.setConfig('close_browser_on_cancel_request', detail);
+    }
+
+    
+
     function openModal () {
         wsEndpoint = $PAYLOAD?.config?.ws_endpoint || '';
         pageSettingsModal.open();
@@ -58,8 +64,11 @@
             <label class:ws-active-label={wsEndpoint} class="col-start-1 col-end-2 whitespace-nowrap mr-4 my-auto transition-all" for="ws_input">Web Socket Endpoint</label>
             <input on:change={updateWSEnpoint} bind:value={wsEndpoint} name="ws_input" class:ws-active-label={wsEndpoint} class="input-md grow" type="text" placeholder="ws://123.456.789">
 
-            <label class="col-start-1 col-end-2 whitespace-nowrap mr-4 my-auto transition-all" for="close_browser_switch">Close browser on finish</label>
+            <label class="col-start-1 col-end-2 whitespace-nowrap mr-4 my-auto transition-all">Close browser on finish</label>
             <Switch on:toggle={updateCloseBrowserOnFinish} />
+            
+            <label class="col-start-1 col-end-2 whitespace-nowrap mr-4 my-auto transition-all">Close browser on Cancel Request</label>
+            <Switch on:toggle={updateCloseBrowserOnCancelRequest} />
         </div>
     </div>
 </Modal>
