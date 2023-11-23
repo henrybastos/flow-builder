@@ -19,12 +19,6 @@ import comboKeys from "$lib/operations/comboKeys";
 
 const logCommands = false;
 
-const SSE_EVENTS = {
-    operation_log: 'operation_log',
-    system: 'system',
-    response: 'response'
-}
-
 const ENV_VARIABLES_ALLOWLIST = [
     'target',
     'trigger_target',
@@ -43,7 +37,7 @@ let streamController;
 
 /**
  * 
- * @param {string} _response_event A label to the event, for identification.
+ * @param {'operation_log'|'system'|'response'|'error'} _response_event A label to the event, for identification.
  * @param {string|{ message: string, status_message: string }} _response_payload The JSON to be passed as response.
  */
 function logToClient (_response_event, _response_payload) {
@@ -216,7 +210,7 @@ export async function POST ({ request }) {
 
         switch (_operation.command) {
             case 'goto':    
-                logToClient(SSE_EVENTS.operation_log, {
+                logToClient('operation_log', {
                     message: `Navigating to: ${ _operation.target }`,
                     status_message: 'info'
                 });
@@ -236,7 +230,7 @@ export async function POST ({ request }) {
                 await _typeElement({ target: _operation.picker_target, value: _operation.color });
                 break;
             case 'click':
-                logToClient(SSE_EVENTS.operation_log, {
+                logToClient('operation_log', {
                     message: `Clicking element: ${ _operation.target }`,
                     status_message: 'info'
                 });
@@ -244,7 +238,7 @@ export async function POST ({ request }) {
                 await _clickElement(_operation);
                 break;
             case 'user_click':    
-                logToClient(SSE_EVENTS.operation_log, {
+                logToClient('operation_log', {
                     message: `User clicking element: ${ _operation.target }`,
                     status_message: 'info'
                 });
@@ -252,7 +246,7 @@ export async function POST ({ request }) {
                 await _clickElement(_operation, 'user');
                 break;
             case 'type':
-                logToClient(SSE_EVENTS.operation_log, {
+                logToClient('operation_log', {
                     message: `Typing ${ _operation.value } to ${ _operation.target }`,
                     status_message: 'info'
                 });
@@ -269,7 +263,7 @@ export async function POST ({ request }) {
                 await comboKeys(page, _operation.key, _operation.mod_keys);
                 break;
             case 'scrape_attr':
-                logToClient(SSE_EVENTS.operation_log, {
+                logToClient('operation_log', {
                     message: `Scrapping ${ _operation.attr } from ${ _operation.target }`,
                     status_message: 'info'
                 });
@@ -277,7 +271,7 @@ export async function POST ({ request }) {
                 responsePayload[_operation.response_slot] = await _scrapeAttribute(_operation);
                 break;
             case 'scrape_multiple_attr':
-                logToClient(SSE_EVENTS.operation_log, {
+                logToClient('operation_log', {
                     message: `Scrapping multiple ${ _operation.attr } from ${ _operation.target }`,
                     status_message: 'info'
                 });
@@ -327,22 +321,20 @@ export async function POST ({ request }) {
     }
 
     async function _execStream () {
-        logToClient(SSE_EVENTS.system, {
+        logToClient('system', {
             message: `WS Endpoint: ${ browser.wsEndpoint() }`,
             status_message: 'info'
         });
         try {   
             await runFlow(payload.flows.main_flow, payload.env);
     
-            if (payload.config.ws_endpoint || !payload.config.close_browser_on_finish) {
-                console.log(`Browser cannot be closed: ${ payload.config.ws_endpoint } / ${ payload.config.close_browser_on_finish }`);
-            } else {
+            if (!payload.config.ws_endpoint && payload.config.close_browser_on_finish) {
                 await browser.close();
             }
             
             // console.dir(responsePayload, { depth: null });
 
-            logToClient(SSE_EVENTS.response, {
+            logToClient('response', {
                 message: 'All operations done.',
                 status_code: 200,
                 status_message: 'success',
@@ -354,11 +346,10 @@ export async function POST ({ request }) {
         } catch (err) {
             console.log(err);
 
-            logToClient(SSE_EVENTS.system, {
-                message: 'An error has occurred :(',
+            logToClient('error', {
+                message: `${ err.name } :: ${ err.message }`,
                 status_code: 500,
-                status_message: 'error',
-                error: err
+                status_message: 'error'
             });
             
             streamController.close();

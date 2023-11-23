@@ -88,10 +88,15 @@
 
         SSEData = parseSSEData(value);
         try { SSEData.data = JSON.parse(SSEData.data) } catch (err) {  };
-        LOGGER.logMessage(SSEData.data.message, TAGS[SSEData.data.status_message]);
-
-        if (SSEData.event === 'response') {
-            responsePayload = JSON.stringify(SSEData.data.payload, null, 3);
+        
+        switch (SSEData.event) {
+            case 'response':
+                responsePayload = JSON.stringify(SSEData.data.payload, null, 3);
+                LOGGER.logMessage(SSEData.data.message, TAGS[SSEData.data.status_message]);
+                break;
+            default:
+                LOGGER.logMessage(SSEData.data.message, TAGS[SSEData.data.status_message]);
+            break;
         }
 
         await loopReader(_reader);
@@ -139,8 +144,8 @@
                     LOGGER.logMessage('Request canceled by the user.', TAGS.warning);
                     console.warn('Request canceled by the user.');
                 } else {
-                    LOGGER.logMessage('Done!', TAGS.success);
-                    console.log('Done!');
+                    LOGGER.logMessage('Finished', TAGS.info);
+                    console.log('Finished');
                 }
             } catch (err) {
                 console.error(err);
@@ -203,20 +208,17 @@
             })
         });
 
-        console.log(payloadJSON);
         if (payloadJSON.config) {
             PAYLOAD.loadConfig(payloadJSON.config);
         } else {
             PAYLOAD._fix_fixNullConfig();
         }
 
-        console.log($PAYLOAD);
         payloadModal.close();
     }
 
     function onPayloadModalOpenHandler () {
         payloadModalTextearea = transformToJSON($PAYLOAD);
-        console.log(payloadModalTextearea);
     }
 
     function onPayloadModalCloseHandler () {
