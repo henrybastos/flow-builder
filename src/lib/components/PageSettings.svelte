@@ -64,11 +64,21 @@
             <label class:ws-active-label={wsEndpoint} class="col-start-1 col-end-2 whitespace-nowrap mr-4 my-auto transition-all" for="ws_input">Web Socket Endpoint</label>
             <input on:change={updateWSEnpoint} bind:value={wsEndpoint} name="ws_input" class:ws-active-label={wsEndpoint} class="input-md grow" type="text" placeholder="ws://123.456.789">
 
-            <label class="col-start-1 col-end-2 whitespace-nowrap mr-4 my-auto transition-all">Close browser on finish</label>
-            <Switch on:toggle={updateCloseBrowserOnFinish} />
+            <span class="col-start-1 col-end-2 whitespace-nowrap mr-4 my-auto transition-all text-lg">Close browser on finish</span>
+            <span class="inline-flex gap-x-3">
+                <Switch disabled={$PAYLOAD.config.ws_endpoint} on:toggle={updateCloseBrowserOnFinish} />
+                {#if $PAYLOAD.config.ws_endpoint}
+                    <p class="text-neutral-400">Cannot auto-close browser while using a Web Socket endpoint.</p>
+                {/if}
+            </span>
             
-            <label class="col-start-1 col-end-2 whitespace-nowrap mr-4 my-auto transition-all">Close browser on Cancel Request</label>
-            <Switch on:toggle={updateCloseBrowserOnCancelRequest} />
+            <span class="col-start-1 col-end-2 whitespace-nowrap mr-4 my-auto transition-all text-lg">Close browser on Cancel Request</span>
+            <span class="inline-flex gap-x-3">
+                <Switch disabled={$PAYLOAD.config.ws_endpoint} on:toggle={updateCloseBrowserOnCancelRequest} />
+                {#if $PAYLOAD.config.ws_endpoint}
+                    <p class="text-neutral-400">Cannot auto-close browser while using a Web Socket endpoint.</p>
+                {/if}
+            </span>
         </div>
     </div>
 </Modal>
