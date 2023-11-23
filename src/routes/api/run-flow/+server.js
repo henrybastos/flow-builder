@@ -48,7 +48,7 @@ export async function POST ({ request }) {
                 message: `WS Endpoint: ${ browser.wsEndpoint() }`,
                 status_message: 'info'
             });
-            
+
             await _execStream();
         }
     });  
@@ -108,82 +108,6 @@ export async function POST ({ request }) {
         return _browser;
     }
 
-    async function _waitForSelector (_target, _timeout = 15000) {
-        await page.waitForSelector(`xpath/${ _target }`, {
-            timeout: _timeout
-        });
-    }
-
-    async function _getElement (_target) {
-        await _waitForSelector(_target, payload?.wait_timeout);
-        return await page.$$(`xpath/${ _target }`);
-    }
-
-    async function _clickElement ({ target }, _click_type = 'machine') {
-        const [_element] = await _getElement(target);
-
-        if (_click_type === 'user') {
-            await _element.click();
-        } else {
-            await _element.evaluate(el => el.click());
-        }
-        // Needs inspecition
-        // for (let i = count; i > 0; i--) {
-        // }
-    }
-
-    async function _typeElement ({ target, value }) {
-        const [_element] = await _getElement(target);
-        await _element.type(value);
-    }
-
-    async function _selectInputValue ({ target }) {
-        const [_element] = await _getElement(target);
-        return await _element.evaluate(el => el.select());
-    }
-
-    async function _scrapeAttribute ({ target, attr }) {
-        const [_element] = await _getElement(target);
-        return await _element.evaluate((el, _attr) => el[_attr], attr);
-    }
-
-    async function _scrapeMultipleAttributes ({ target, attr }) {
-        let _returnObj = [];
-        const _elements = await _getElement(target);
-
-        for (const _el of _elements) {
-            _returnObj.push(await _el.evaluate((el, _attr) => el[_attr], attr));
-        }
-        return _returnObj;
-    }
-
-    async function _setAttribute ({ target, attr, value }) {
-        const [_element] = await _getElement(target);
-        return await _element.evaluate((el, _attr, _value) => el[_attr] = _value, attr, value);
-    }
-
-    async function _evaluateRegex ({ target, regex }) {
-        const [_element] = await _getElement(target);
-        return await _element.evaluate((el, _regex) => el.value.match(new RegExp(_regex, 'g')), regex);
-    }
-
-    /**
-     * 
-     * @param {{ target: string, success_flow: string, error_flow: string }} operation 
-     * @returns The name of the flow (success or error).
-     */
-    async function _checkElement ({ target, success_flow, error_flow }) {
-        try {
-            await _getElement(target);
-            console.log(`Running flow: ${ success_flow }`);
-            return success_flow;
-        } catch (err) {
-            console.log(err);
-            console.log(`Running flow: ${ error_flow }`);
-            return error_flow;
-        }
-    }
-
     async function _runFlowForEach ({ env_var, flow }) {
         const envVar = trimEnvPlaceholder(env_var);
         
@@ -208,29 +132,24 @@ export async function POST ({ request }) {
         for (const [_input_name, _input_value] of Object.entries(_operation)) {
             _operation[_input_name] = _checkEnvVars(_env, _input_name, _input_value);
         }
-        await Operations.goto(_operation);
+        
+        Operations._setPayload(payload);
+        
         switch (_operation.command) {
             case 'goto':    
+                await Operations.goto(_operation);
                 break;
             case 'reload':    
                 await page.reload({ waitUntil: ['networkidle0', "domcontentloaded"] });
                 break;
             case 'wait_navigation':    
-                await page.waitForNavigation();
+                await Operations.waitForNavigation();
                 break;
             case 'chrome_picker_set_color':    
-                await _clickElement({ target: _operation.trigger_target });
-                await _clickElement({ target: _operation.picker_target }, 'user');
-                await _selectInputValue({ target: _operation.picker_target });
-                await _typeElement({ target: _operation.picker_target, value: _operation.color });
+                await Operations.chromePickerSetColor(_operation);
                 break;
             case 'click':
-                ServerLogger.logEvent('operation_log', {
-                    message: `Clicking element: ${ _operation.target }`,
-                    status_message: 'info'
-                });
-
-                await _clickElement(_operation);
+                await Operations.clickElement(_operation);
                 break;
             case 'user_click':    
                 ServerLogger.logEvent('operation_log', {
@@ -238,7 +157,7 @@ export async function POST ({ request }) {
                     status_message: 'info'
                 });
                 
-                await _clickElement(_operation, 'user');
+                await Operations.clickElement(_operation, 'user');
                 break;
             case 'type':
                 ServerLogger.logEvent('operation_log', {
@@ -246,10 +165,10 @@ export async function POST ({ request }) {
                     status_message: 'info'
                 });
 
-                await _typeElement(_operation);
+                await Operations.typeElement(_operation);
                 break;
             case 'select':
-                await _selectInputValue(_operation);
+                await Operations.selectInputValue(_operation);
                 break;
             case 'press_key':
                 await page.keyboard.press(_operation.key);
@@ -263,7 +182,7 @@ export async function POST ({ request }) {
                     status_message: 'info'
                 });
 
-                responsePayload[_operation.response_slot] = await _scrapeAttribute(_operation);
+                responsePayload[_operation.response_slot] = await Operations.scrapeAttribute(_operation);
                 break;
             case 'scrape_multiple_attr':
                 ServerLogger.logEvent('operation_log', {
@@ -271,13 +190,13 @@ export async function POST ({ request }) {
                     status_message: 'info'
                 });
 
-                responsePayload[_operation.response_slot] = await _scrapeMultipleAttributes(_operation);
+                responsePayload[_operation.response_slot] = await Operations.scrapeMultipleAttributes(_operation);
                 break;
             case 'set_attr':
-                responsePayload[_operation.response_slot] = await _setAttribute(_operation);
+                responsePayload[_operation.response_slot] = await Operations.setAttribute(_operation);
                 break;
             case 'check_element':
-                await runFlow(payload.flows[await _checkElement(_operation)], payload.env);
+                await runFlow(payload.flows[await Operations.checkElement(_operation)], payload.env);
                 break;
             case 'run_flow':
                 await runFlow(payload.flows[_operation.flow], payload.env);
@@ -286,7 +205,7 @@ export async function POST ({ request }) {
                 await _runFlowForEach(_operation)
                 break;
             case 'eval_regex':
-                responsePayload[_operation.response_slot] = await _evaluateRegex(_operation);
+                responsePayload[_operation.response_slot] = await Operations.evaluateRegex(_operation);
                 break;
             case 'wait_seconds':
                 await new Promise((res) => {
@@ -298,7 +217,7 @@ export async function POST ({ request }) {
                 responsePayload[_operation.response_slot] = _operation.value;
                 break;
             case 'wait_for_selector':
-                await _waitForSelector(_operation.target, _operation.timeout);
+                await Operations.waitForSelector(_operation.target, _operation.timeout);
                 break;
             case 'close_browser':
                 await browser.close();
