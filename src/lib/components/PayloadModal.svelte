@@ -77,9 +77,8 @@
     async function loopReader (_reader) {
         const {value, done} = await _reader.read();
         let SSEData = '';
-
+        
         if (done) return;
-        console.log('Attempting...');
 
         // To fix
         if (cancelRequest) {
@@ -87,36 +86,36 @@
         }
 
         SSEData = parseSSEData(value);
-        try { SSEData.data = JSON.parse(SSEData.data) } catch (err) {  };
-        
-        switch (SSEData.event) {
-            case 'response':
-                responsePayload = JSON.stringify(SSEData.data.payload, null, 3);
-                LOGGER.logMessage(SSEData.data.message, TAGS[SSEData.data.status_message]);
+
+        for (let sse_event of SSEData) {
+            switch (sse_event.event) {
+                case 'response':
+                    responsePayload = JSON.stringify(sse_event.data.payload, null, 3);
+                    LOGGER.logMessage(sse_event.data.message, TAGS[sse_event.data.status_message]);
+                    break;
+                default:
+                    LOGGER.logMessage(sse_event.data.message, TAGS[sse_event.data.status_message]);
                 break;
-            default:
-                LOGGER.logMessage(SSEData.data.message, TAGS[SSEData.data.status_message]);
-            break;
+            }
         }
 
         await loopReader(_reader);
     }
 
     function parseSSEData (_raw_data) {
-        let lines = _raw_data.split('\n').filter(v=>v);
-
-        const [event, data] = lines.map(line => {
-            return ( line.slice(7).trim(), line.slice(6).trim() );
+        let event_collection = _raw_data.split('\n\n').filter(v=>v);
+        
+        return event_collection.map(event_lines => {
+            const [event, data] = event_lines.split('\n').filter(v=>v).map(line => {
+                return ( line.slice(7).trim(), line.slice(6).trim() );
+            });
+            return { event, data: JSON.parse(data) };
         });
-
-        return { event, data };
     }
 
     async function sendFlowPayload (_payload) {
         isFLowAPILoading = true;
         cancelRequest = false;
-
-        console.log(_payload);
 
         if (Object.keys(_payload.flows.main_flow).length > 0) {
             let response;
