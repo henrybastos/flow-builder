@@ -3,6 +3,8 @@ import pluginStealth from 'puppeteer-extra-plugin-stealth';
 import { checkForEnvPlaceholder, trimEnvPlaceholder, replaceEnvPlaceholder } from "$lib/utils.js";
 
 import comboKeys from "$lib/operations/comboKeys";
+import ServerLogger from "./ServerLogger"
+import Operations from "./operations";
 
 // //*/div[contains(text(), 'https://alessandrobechelin.kebook.com.br')]
 
@@ -32,20 +34,6 @@ const ENV_VARIABLES_ALLOWLIST = [
     'value'
 ]
 
-let streamController;
-
-
-/**
- * 
- * @param {'operation_log'|'system'|'response'|'error'} _response_event A label to the event, for identification.
- * @param {string|{ message: string, status_message: string }} _response_payload The JSON to be passed as response.
- */
-function logToClient (_response_event, _response_payload) {
-    streamController.enqueue(
-        `event: ${ _response_event }\ndata: ${ JSON.stringify(_response_payload) }\n\n`
-    );
-}
-
 export async function POST ({ request }) {
     const payload = await request.json();
     const [page, browser] = await _startEngine();
@@ -53,12 +41,26 @@ export async function POST ({ request }) {
 
     console.log('Calling local endpoint: [::1]:5173/api/run-flow');
 
+    const stream = new ReadableStream({
+        async start(controller) {
+            ServerLogger._setController(controller);
+            ServerLogger.logEvent('system', {
+                message: `WS Endpoint: ${ browser.wsEndpoint() }`,
+                status_message: 'info'
+            });
+            
+            await _execStream();
+        }
+    });  
+
     async function _startEngine () {
         
         puppeteer.use(pluginStealth())
         const browser = await _connectOrLaunchBrowser();
         
         const [page] = await browser.pages();
+
+        Operations._setPage(page);
 
         page.on('dialog', async (dialog) => {
             await dialog.accept();
@@ -104,14 +106,6 @@ export async function POST ({ request }) {
         }
 
         return _browser;
-    }
-
-    function _checkEnvVars (_env, _field_name, _field_value) {
-        if (ENV_VARIABLES_ALLOWLIST.includes(_field_name) && checkForEnvPlaceholder(_field_value)) {
-            return replaceEnvPlaceholder(_field_value, _env);
-        }
-
-        return _field_value;
     }
 
     async function _waitForSelector (_target, _timeout = 15000) {
@@ -198,6 +192,13 @@ export async function POST ({ request }) {
         }
     }
 
+    function _checkEnvVars (_env, _field_name, _field_value) {
+        if (ENV_VARIABLES_ALLOWLIST.includes(_field_name) && checkForEnvPlaceholder(_field_value)) {
+            return replaceEnvPlaceholder(_field_value, _env);
+        }
+
+        return _field_value;
+    }
 
     async function evalOperation (_operation, _env) {
         if (logCommands) {
@@ -207,15 +208,9 @@ export async function POST ({ request }) {
         for (const [_input_name, _input_value] of Object.entries(_operation)) {
             _operation[_input_name] = _checkEnvVars(_env, _input_name, _input_value);
         }
-
+        await Operations.goto(_operation);
         switch (_operation.command) {
             case 'goto':    
-                logToClient('operation_log', {
-                    message: `Navigating to: ${ _operation.target }`,
-                    status_message: 'info'
-                });
-                
-                await page.goto(_operation.target, { waitUntil: 'networkidle0' });
                 break;
             case 'reload':    
                 await page.reload({ waitUntil: ['networkidle0', "domcontentloaded"] });
@@ -230,7 +225,7 @@ export async function POST ({ request }) {
                 await _typeElement({ target: _operation.picker_target, value: _operation.color });
                 break;
             case 'click':
-                logToClient('operation_log', {
+                ServerLogger.logEvent('operation_log', {
                     message: `Clicking element: ${ _operation.target }`,
                     status_message: 'info'
                 });
@@ -238,7 +233,7 @@ export async function POST ({ request }) {
                 await _clickElement(_operation);
                 break;
             case 'user_click':    
-                logToClient('operation_log', {
+                ServerLogger.logEvent('operation_log', {
                     message: `User clicking element: ${ _operation.target }`,
                     status_message: 'info'
                 });
@@ -246,7 +241,7 @@ export async function POST ({ request }) {
                 await _clickElement(_operation, 'user');
                 break;
             case 'type':
-                logToClient('operation_log', {
+                ServerLogger.logEvent('operation_log', {
                     message: `Typing ${ _operation.value } to ${ _operation.target }`,
                     status_message: 'info'
                 });
@@ -263,7 +258,7 @@ export async function POST ({ request }) {
                 await comboKeys(page, _operation.key, _operation.mod_keys);
                 break;
             case 'scrape_attr':
-                logToClient('operation_log', {
+                ServerLogger.logEvent('operation_log', {
                     message: `Scrapping ${ _operation.attr } from ${ _operation.target }`,
                     status_message: 'info'
                 });
@@ -271,7 +266,7 @@ export async function POST ({ request }) {
                 responsePayload[_operation.response_slot] = await _scrapeAttribute(_operation);
                 break;
             case 'scrape_multiple_attr':
-                logToClient('operation_log', {
+                ServerLogger.logEvent('operation_log', {
                     message: `Scrapping multiple ${ _operation.attr } from ${ _operation.target }`,
                     status_message: 'info'
                 });
@@ -321,11 +316,7 @@ export async function POST ({ request }) {
     }
 
     async function _execStream () {
-        logToClient('system', {
-            message: `WS Endpoint: ${ browser.wsEndpoint() }`,
-            status_message: 'info'
-        });
-        try {   
+        try {  
             await runFlow(payload.flows.main_flow, payload.env);
     
             if (!payload.config.ws_endpoint && payload.config.close_browser_on_finish) {
@@ -334,7 +325,7 @@ export async function POST ({ request }) {
             
             // console.dir(responsePayload, { depth: null });
 
-            logToClient('response', {
+            ServerLogger.logEvent('response', {
                 message: 'All operations done.',
                 status_code: 200,
                 status_message: 'success',
@@ -342,26 +333,19 @@ export async function POST ({ request }) {
                 payload: responsePayload
             });
 
-            streamController.close();
+            ServerLogger.closeStream();
         } catch (err) {
             console.log(err);
 
-            logToClient('error', {
+            ServerLogger.logEvent('error', {
                 message: `${ err.name } :: ${ err.message }`,
                 status_code: 500,
                 status_message: 'error'
             });
             
-            streamController.close();
+            ServerLogger.closeStream();
         }
-    }
-
-    const stream = new ReadableStream({
-        async start(controller) {
-            streamController = controller;
-            await _execStream();
-        }
-    });     
+    }   
     
     return new Response(stream, {
         headers: {
