@@ -7,6 +7,7 @@
 
     let modal, dangerModal, modalBody;
     let dangerConfirmEventMessage = 'danger_confirm';
+    let modalToasts = [];
 
     export let title;
     export let dangerModalTitlePlaceholder = 'Danger';
@@ -43,19 +44,29 @@
         dangerModal.showModal();
     }
 
-    function closeDangerModal () {
-        dangerModal.close();
-    }
-
+    
     export function open () {
         modal.showModal();
         dispatch('open');
     }
-
+    
     export function close () {
         modal.close();
     }
 
+    /**
+     * 
+     * @param {string} _message
+     * @param {'success'|'info'|'error'|'danger'} _type
+     */
+    export function appendModalToast (_message, _type) {
+        console.log(_message, _type);
+        modalToasts = [...modalToasts, { message: _message, type: _type }];
+    }
+    
+    function closeDangerModal () {
+        dangerModal.close();
+    }
     function handleOutsideClick ({ target }) {
         // if (!modalBody.contains(target)) {
         if (target === modal) {
@@ -75,18 +86,23 @@
     </div>
 </dialog>
 
-<dialog on:click={handleOutsideClick} on:open on:close bind:this={modal} class={`max-h-[90vh] ${ $$restProps.class || 'w-[60rem]' }`}>
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+<dialog on:click={handleOutsideClick} on:open on:close bind:this={modal} class={`max-h-[90vh] ${ $$restProps.class || 'w-[60rem]' } overflow-hidden`}>
     <div data-guide-id="" bind:this={modalBody} class="p-3">
         <div class="relative">
             <h3 class="text-2xl mb-6 mt-3 ml-1">{ title }</h3>
+            <!-- svelte-ignore a11y-no-static-element-interactions -->
             <i on:click={close} class="ti ti-x align-middle absolute text-neutral-500 hover:text-neutral-300 cursor-pointer top-[50%] -translate-y-[50%] text-2xl right-6"></i>
         </div>
     
-        <slot  {openDangerModal} />
+        <slot {openDangerModal} {appendModalToast} />
         
         <!-- MODAL TOASTS -->
-        <!-- <div class="fixed inset-0 top-3 bg-transparent z-50 flex flex-col justify-start items-end box-border overflow-hidden pointer-events-none">
-            <Toast message="aa" />
-        </div> -->
+        <div class="fixed inset-0 top-3 bg-transparent z-50 flex flex-col justify-start items-end box-border overflow-hidden pointer-events-none">
+            {#each modalToasts as { message, type }}
+                <Toast { message } { type }/>
+            {/each}
+        </div>
     </div>
 </dialog>
