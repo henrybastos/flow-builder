@@ -27,9 +27,6 @@
     let cancelRequest = false;
 
     onMount(() => {
-        // const SSE = new EventSource('http://localhost:5173/api/run-flow');
-        // SSE.onmessage = msg => console.log(msg);
-        
         if (localStorage.getItem('logs')) {
             LOGGER.loadLogs(localStorage.getItem('logs'));
         }
@@ -121,7 +118,7 @@
             let response;
 
             try {
-                LOGGER.logMessage(`[PRESET # ${ $CURRENT_PRESET_NAME }] Calling API...`, TAGS.info);
+                LOGGER.logMessage(`${ $CURRENT_PRESET_NAME ? `[PRESET # ${ $CURRENT_PRESET_NAME }] ` : '' }Calling API...`, TAGS.info);
                 response = await fetch('http://localhost:5173/api/run-flow', {
                     method: 'POST',
                     headers: {
