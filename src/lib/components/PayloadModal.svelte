@@ -230,7 +230,7 @@
     Process JSON
 </button>
 
-<Modal let:openDangerModal on:open={onPayloadModalOpenHandler} on:close={onPayloadModalCloseHandler} bind:this={payloadModal} title="Payload" class="w-[90vw]">
+<Modal let:appendModalToast let:openDangerModal on:open={onPayloadModalOpenHandler} on:close={onPayloadModalCloseHandler} bind:this={payloadModal} title="Payload" class="w-[90vw]">
     <TabsBar let:activeTab modalTabs={tabs}>
         {#if activeTab === 'payload'}
 
@@ -261,7 +261,7 @@
             <div class="console_screen mt-4 items-center overflow-hidden">
                 {#if Object.values($LOGGER.messages).length > 0}
                     <span class="whitespace-nowrap mr-1 font-code">Last message:</span>
-                    <LogMessage message={Object.values($LOGGER.messages).slice(-1)[0]} />
+                    <LogMessage data={Object.values($LOGGER.messages).slice(-1)[0]} />
                 {:else}
                     <span class="text-neutral-500">Nothing to see here =)</span>
                 {/if}
@@ -297,7 +297,8 @@
             <button class="clear-btn mb-2" on:click={() => openDangerModal(LOGGER.clearLogs, { danger_modal_title: 'Clear logs from Local Storage?', danger_confirm: 'Clear' })}>Clear logs</button>
             <div class="console_screen flex-col overflow-y-auto max-h-[36rem]">
                 {#each Object.entries($LOGGER.messages) as [msg_key, msg], _ (msg_key)}
-                    <LogMessage message={msg} />
+                    <!-- <span>{ JSON.stringify(msg, null, 3) }</span> -->
+                    <LogMessage on:clipboard_copy={() => appendModalToast('Copied to clipboard!', 'success')} data={msg} />
                 {/each}
             </div>
         {:else if activeTab === 'response payload'}
