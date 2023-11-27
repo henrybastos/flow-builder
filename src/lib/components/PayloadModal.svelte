@@ -13,37 +13,82 @@
     $: payloadToURI = `data:text/json;charset=utf-8,${ encodeURIComponent(payloadModalTextearea) }`;
     $: payloadURIPresetName = `${ $CURRENT_PRESET_NAME?.match(/[A-z,0-9]*[^\s:_,.]/gi)?.join('_')?.toLowerCase() || 'preset' }.json`;
 
-    let responsePayload = 'Nothing to display :D';
+    let responsePayload = JSON.stringify({ response: 'Nothing to display :D' });
 
-    let testObj = { 
-        items: [ 
-            'Item 01', 
-            'Item 02', 
-            'Item 03', 
-            'Item 04', 
-            { 
-                a_items: [ 
-                    'Item A01', 
-                    'Item A02', 
-                    'Item A03',
-                    {
-                        ab_items: [ 
-                        'Item A01', 
-                        'Item A02', 
-                        'Item A03' 
-                        ]
-                    } 
-                ] 
-            }, 
-            { 
-                b_items: [ 
-                    'Item B01', 
-                    'Item B02', 
-                    'Item B03' 
-                ] 
-            } 
+    let testObj = {
+        "videos_PLAYLIST MEGA FUNK": [
+            "MEGA SE PREPARA 2 SETEMBRO (DJ JONATAS FELIPE)",
+            "MEGA DINGO BELL 2019 (ALBINO)",
+            "MEGA É SÓ BOTADÃO (ALBINO)",
+            "MEGA 38 CARREGADO 2020 (ALBINO)",
+            "MEGA KIKA DE NOVO (ALBINO)",
+            "MEGA COCOTA 2019 (ALBINO)",
+            "MEGA QUEM GOSTA (DJ THIAGO SC & DJ JONATAS FELIPE)",
+            "MEGA ÁGUA COCA LATÃO (DJ JONATAS FELIPE)",
+            "MEGA OH JULIANA (ALBINO)",
+            "MEGA COMPREI UM LANÇA (ALBINO & FRACARI)",
+            "MEGA FUNK - BOTA PRA TREMER (DJ Magdiel PR)",
+            "MEGA ENTÃO TOMA - DJ THIAGO SC",
+            "MEGA FUNK DO HELICÓPTERO (DJ DUDU VIEIRA & DJ JONATAS FELIPE) 2019",
+            "MEGA AI DROGA 2019 (ALBINO)",
+            "MEGA VAI LUAN 2020 (ALBINO)",
+            "MEGA RITMADO 4.0 2020 (ALBINO)",
+            "MEGA BANHO DE CHUVA 2019 (ALBINO)",
+            "MEGA EMPURRA EMPURRA 2020 (ALBINO)",
+            "MEGA SOCA COM PRESSÃO (ALBINO)",
+            "MEGA NAMORAR NÃO DA - JUNHO 2019 (ALBINO)",
+            "MEGA SENTADÃO 2019 (ALBINO)",
+            "MEGA FUNK SEM DIREITOS AUTORAIS DE MARÇO VOL 2 DJ MIKA3L CWB",
+            "MEGA FURACÃO 2000 (DJ JONATAS FELIPE)"
         ],
-        items_2: 'just_a_text'
+        "videos_100 Best Rock Songs of 2000's": [
+            "Mudvayne - Happy? (Official HD Video)",
+            "System Of A Down - Chop Suey! (Official HD Video)",
+            "@officialsevendust - Enemy (Official Music Video)",
+            "Slipknot - Duality [OFFICIAL VIDEO] [HD]",
+            "All That Remains - Two Weeks (Official Music Video)",
+            "Rise Against - Savior (Official Music Video)",
+            "Red Hot Chili Peppers - Dani California [Official Music Video]",
+            "Five Finger Death Punch - \"Hard to See\" Prospect Park Records - Official Music Video",
+            "Evanescence - Bring Me To Life (Official Music Video)",
+            "In The End [Official HD Music Video] - Linkin Park",
+            "Paramore: crushcrushcrush [OFFICIAL VIDEO]",
+            "Papa Roach - Lifeline (Official Music Video)",
+            "Alter Bridge - Ties That Bind",
+            "Breaking Benjamin - So Cold",
+            "Incubus - Drive",
+            "Taproot - Poem (Official Video)",
+            "Trapt - Headstrong (Official Music Video) | Warner Vault",
+            "Limp Bizkit - Rollin' (Air Raid Vehicle)",
+            "Skillet - Monster (Official Video)",
+            "Mudvayne - Not Falling (Revised Version) (Official Video)",
+            "Story Of The Year - The Antidote",
+            "Killswitch Engage - My Curse [OFFICIAL VIDEO]",
+            "Foo Fighters - The Pretender",
+            "Korn - Falling Away from Me (Official HD Video)",
+            "Tenacious D - Tribute (Official Video)",
+            "System Of A Down - B.Y.O.B. (Official HD Video)",
+            "Foo Fighters - Best Of You (Official Music Video)",
+            "A Day To Remember - The Downfall of Us All (Official Video)",
+            "Three Days Grace - Animal I Have Become",
+            "Rise Against - Re-Education (Through Labor)",
+            "Hinder - Lips Of An Angel (Official Music Video)",
+            "Deftones - Diamond Eyes [Official Music Video]",
+            "P.O.D. - Youth of the Nation (Official Music Video) [HD]",
+            "AFI - Medicate (Official Music Video)",
+            "P.O.D. Alive (Rocky)",
+            "Static-X - The Only (Official Music Video) | Warner Vault",
+            "Chevelle - The Red (Official HD Video)",
+            "Staind - Right Here (Official Video)",
+            "Still Frame",
+            "Rammstein - Sonne (Official Video)",
+            "Ill Nino - How Can I Live [OFFICIAL VIDEO]",
+            "Drowning Pool - Tear Away",
+            "To Defy the Laws of Tradition",
+            "Better",
+            "Cold (But I'm Still Here) from Evans|Blue",
+            "A Day To Remember - I'm Made of Wax, Larry, What Are You Made Of? (Official Video)"
+        ]
     }
 
     let payloadModal;
@@ -120,6 +165,7 @@
             switch (sse_event.event) {
                 case 'response':
                     responsePayload = JSON.stringify(sse_event.data.payload, null, 3);
+                    console.dir(responsePayload, { depth: null });
                     LOGGER.logMessage(sse_event.data.message, TAGS[sse_event.data.status_message]);
                     break;
                 default:
@@ -331,7 +377,10 @@
                 {/each}
             </div>
         {:else if activeTab === 'response payload'}
-            <GraphicalJson key="response_payload" values={ testObj }/>
+            <div class="max-h-[36rem] overflow-y-auto">
+                <GraphicalJson key="response_payload" values={ testObj }/>
+            </div>
+            <!-- <GraphicalJson key="response_payload" values={ JSON.parse(responsePayload) }/> -->
             <!-- <textarea class="font-code bg-neutral-950 hover:bg-neutral-950" bind:value={responsePayload} name="" id="" cols="30" rows="20"></textarea> -->
         {/if}
     </TabsBar>

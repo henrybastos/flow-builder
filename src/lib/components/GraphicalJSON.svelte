@@ -6,7 +6,7 @@
 </script>
 
 <button class="gui_object_label" on:click={() => isCollapsed = !isCollapsed}>
-    <i class={`ti ti-chevron-right ${ isCollapsed ? 'rotate-0' : 'rotate-90' }`}></i>
+    <i class={`ti ti-chevron-right mr-2 ${ isCollapsed ? 'rotate-0' : 'rotate-90' }`}></i>
     { key }
 </button>
 
