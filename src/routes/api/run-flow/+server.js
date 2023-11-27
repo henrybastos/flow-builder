@@ -38,9 +38,6 @@ export async function POST ({ request }) {
     const [page, browser] = await _startEngine();
     let responsePayload = {};
 
-    Operations._setPage(page);
-    Operations._setBrowser(browser);
-
     console.log('Calling local endpoint: [::1]:5173/api/run-flow');
 
     const stream = new ReadableStream({
@@ -67,12 +64,15 @@ export async function POST ({ request }) {
         });
 
         await page.setExtraHTTPHeaders({ 
-            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36', 
+            'user-agent': 'Chrome/108.0.0.0', 
             'upgrade-insecure-requests': '1', 
             'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8', 
             'accept-encoding': 'gzip, deflate, br', 
             'accept-language': 'en-US,en;q=0.9,en;q=0.8' 
         }); 
+
+        Operations._setPage(page);
+        Operations._setBrowser(browser);
 
         return [page, browser];
     }

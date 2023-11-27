@@ -7,7 +7,7 @@
     import LogMessage from "./LogMessage.svelte";
     import { onMount } from "svelte";
     import { FLOW_PRESETS, CURRENT_PRESET_NAME } from "$lib/PresetsStore";
-    import GuiObject from '$lib/components/GUIObject.svelte';
+    import GraphicalJson from "./GraphicalJSON.svelte";
 
     const controller = new AbortController();
     $: payloadToURI = `data:text/json;charset=utf-8,${ encodeURIComponent(payloadModalTextearea) }`;
@@ -25,7 +25,14 @@
                 a_items: [ 
                     'Item A01', 
                     'Item A02', 
-                    'Item A03' 
+                    'Item A03',
+                    {
+                        ab_items: [ 
+                        'Item A01', 
+                        'Item A02', 
+                        'Item A03' 
+                        ]
+                    } 
                 ] 
             }, 
             { 
@@ -324,7 +331,7 @@
                 {/each}
             </div>
         {:else if activeTab === 'response payload'}
-            <GuiObject values={ testObj }/>
+            <GraphicalJson key="response_payload" values={ testObj }/>
             <!-- <textarea class="font-code bg-neutral-950 hover:bg-neutral-950" bind:value={responsePayload} name="" id="" cols="30" rows="20"></textarea> -->
         {/if}
     </TabsBar>
