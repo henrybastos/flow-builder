@@ -1,19 +1,19 @@
 import { writable } from "svelte/store";
 import { genUUID } from "./utils";
 
-function createPayload () {
-    const initStruct = {
-        config: {
-            ws_endpoint: false,
-            close_browser_on_finish: false,
-            close_browser_on_cancel_request: false
-        },
-        env: {},
-        flows: {
-            main_flow: {}
-        }
-    };
+export const initStruct = {
+    config: {
+        ws_endpoint: false,
+        close_browser_on_finish: false,
+        close_browser_on_cancel_request: false
+    },
+    env: {},
+    flows: {
+        main_flow: {}
+    }
+};
 
+function createPayload () {
     /** @type {boolean} - If true, this flag blocks undefined flows. */
     let strict_flows = true;
 
