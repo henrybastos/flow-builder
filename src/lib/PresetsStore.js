@@ -1,4 +1,5 @@
 import { writable } from "svelte/store";
+import { initStruct } from "./PayloadStore";
 
 let _flag_saveToLocalStorage = true;
 
@@ -21,8 +22,22 @@ function createPresetsStore () {
       })
    }
 
+   function _fix_fixNullConfigForAll () {
+      update(_presets => {
+         return Object.entries(_presets).map(([_preset_name, _preset_payload]) => {
+            return ({
+               [_preset_name]: {
+                  ..._preset_payload,
+                  config: { ...initStruct.config }
+               }
+            })
+         })
+      })
+  }
+
    return {
       subscribe,
+      _fix_fixNullConfigForAll,
       loadPresets: (_presets) => set(_presets),
       savePreset: (_preset_flow) => {
          // Prevents invalid already closed web socket endpoints

@@ -70,7 +70,7 @@
     function handleOutsideClick ({ target }) {
         // if (!modalBody.contains(target)) {
         if (target === modal) {
-            console.log(target);
+            // console.log(target);
             close();
         }
     }

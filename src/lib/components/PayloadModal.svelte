@@ -27,6 +27,7 @@
     let cancelRequest = false;
 
     onMount(() => {
+        console.log($PAYLOAD);
         if (localStorage.getItem('logs')) {
             LOGGER.loadLogs(localStorage.getItem('logs'));
         }
@@ -58,12 +59,16 @@
         return JSON.stringify(payloadBuffer, null, 3);
     }
 
-    function transformMultipleToJSON (_payload_list) {
-        let _payload_list_json = structuredClone(_payload_list);
+    function encodePresetsToURI () {
+        FLOW_PRESETS._fix_fixNullConfigForAll()
+        let _payload_list_json = structuredClone($FLOW_PRESETS);
         _payload_list_json = Object.entries(_payload_list_json).map(([ preset_name, preset_payload ]) => {
             return [preset_name, JSON.parse(transformToJSON(preset_payload))]
         })
-        return JSON.stringify(Object.fromEntries(_payload_list_json), null, 3);
+        
+        return encodeURIComponent(
+                JSON.stringify(Object.fromEntries(_payload_list_json), null, 3)
+        );
     }
 
     async function handleStream (_res) {
@@ -238,11 +243,11 @@
                     Download payload
                 </a>
 
-                <a class="clear-btn mb-2" 
-                    href={`data:text/json;charset=utf-8,${ encodeURIComponent(transformMultipleToJSON($FLOW_PRESETS)) }`} 
+                <!-- <a class="clear-btn mb-2" 
+                    href={`data:text/json;charset=utf-8,${ encodePresetsToURI() }`} 
                     download={'all_presets.json'}>
                     Download raw full payload
-                </a>
+                </a> -->
             </div>
 
             <textarea class="font-code bg-neutral-950 hover:bg-neutral-950" bind:value={payloadModalTextearea} name="" id="" cols="30" rows="16"></textarea>
