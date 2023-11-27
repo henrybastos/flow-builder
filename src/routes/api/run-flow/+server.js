@@ -2,9 +2,8 @@ import puppeteer from "puppeteer-extra";
 import pluginStealth from 'puppeteer-extra-plugin-stealth';
 import { checkForEnvPlaceholder, trimEnvPlaceholder, replaceEnvPlaceholder } from "$lib/utils.js";
 
-import comboKeys from "$lib/operations/comboKeys";
 import ServerLogger from "./ServerLogger"
-import Operations from "./operations";
+import Operations from "./Operations";
 
 // //*/div[contains(text(), 'https://alessandrobechelin.kebook.com.br')]
 
@@ -54,25 +53,25 @@ export async function POST ({ request }) {
     });  
 
     async function _startEngine () {
-        
-        puppeteer.use(pluginStealth())
+        // Avoids unwanted detection
+        puppeteer.use(pluginStealth());
         const browser = await _connectOrLaunchBrowser();
         
         const [page] = await browser.pages();
-
-        Operations._setPage(page);
 
         page.on('dialog', async (dialog) => {
             await dialog.accept();
         });
 
         await page.setExtraHTTPHeaders({ 
-            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36', 
-            'upgrade-insecure-requests': '1', 
+            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko)  Safari/537.36', 
             'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8', 
             'accept-encoding': 'gzip, deflate, br', 
             'accept-language': 'en-US,en;q=0.9,en;q=0.8' 
         }); 
+
+        Operations._setPage(page);
+        Operations._setBrowser(browser);
 
         return [page, browser];
     }
@@ -134,67 +133,11 @@ export async function POST ({ request }) {
         }
         
         Operations._setPayload(payload);
-        
+
+        console.log(`Operation: ${ _operation.command }`);
+
+        // Calls the operation
         switch (_operation.command) {
-            case 'goto':    
-                await Operations.goto(_operation);
-                break;
-            case 'reload':    
-                await page.reload({ waitUntil: ['networkidle0', "domcontentloaded"] });
-                break;
-            case 'wait_navigation':    
-                await Operations.waitForNavigation();
-                break;
-            case 'chrome_picker_set_color':    
-                await Operations.chromePickerSetColor(_operation);
-                break;
-            case 'click':
-                await Operations.clickElement(_operation);
-                break;
-            case 'user_click':    
-                ServerLogger.logEvent('operation_log', {
-                    message: `User clicking element: ${ _operation.target }`,
-                    status_message: 'info'
-                });
-                
-                await Operations.clickElement(_operation, 'user');
-                break;
-            case 'type':
-                ServerLogger.logEvent('operation_log', {
-                    message: `Typing ${ _operation.value } to ${ _operation.target }`,
-                    status_message: 'info'
-                });
-
-                await Operations.typeElement(_operation);
-                break;
-            case 'select':
-                await Operations.selectInputValue(_operation);
-                break;
-            case 'press_key':
-                await page.keyboard.press(_operation.key);
-                break;
-            case 'combo_keys':
-                await comboKeys(page, _operation.key, _operation.mod_keys);
-                break;
-            case 'scrape_attr':
-                ServerLogger.logEvent('operation_log', {
-                    message: `Scrapping ${ _operation.attr } from ${ _operation.target }`,
-                    status_message: 'info'
-                });
-
-                responsePayload[_operation.response_slot] = await Operations.scrapeAttribute(_operation);
-                break;
-            case 'scrape_multiple_attr':
-                ServerLogger.logEvent('operation_log', {
-                    message: `Scrapping multiple ${ _operation.attr } from ${ _operation.target }`,
-                    status_message: 'info'
-                });
-
-                responsePayload[_operation.response_slot] = await Operations.scrapeMultipleAttributes(_operation);
-                break;
-            case 'set_attr':
-                responsePayload[_operation.response_slot] = await Operations.setAttribute(_operation);
-                break;
             case 'check_element':
                 await runFlow(payload.flows[await Operations.checkElement(_operation)], payload.env);
                 break;
@@ -204,24 +147,12 @@ export async function POST ({ request }) {
             case 'run_flow_for_each':
                 await _runFlowForEach(_operation)
                 break;
-            case 'eval_regex':
-                responsePayload[_operation.response_slot] = await Operations.evaluateRegex(_operation);
-                break;
-            case 'wait_seconds':
-                await new Promise((res) => {
-                    setTimeout(res, _operation.time);
-                });
-                console.log("Times' up!");
-                break;
-            case 'set_payload_slot':
-                responsePayload[_operation.response_slot] = _operation.value;
-                break;
-            case 'wait_for_selector':
-                await Operations.waitForSelector(_operation.target, _operation.timeout);
-                break;
-            case 'close_browser':
-                await browser.close();
-                console.log('All done!');
+            default:
+                if (_operation?.response_slot) {
+                    responsePayload[_operation.response_slot] = await Operations[_operation.command](_operation);
+                } else {
+                    await Operations[_operation.command](_operation);
+                }
                 break;
         }
     }
