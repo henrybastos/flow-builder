@@ -167,6 +167,22 @@
   .console_screen {
     @apply flex flex-row border-2 border-neutral-800 rounded-md p-3 bg-neutral-950 min-h-[2.5rem] overflow-y-auto;
   }
+
+  .gui_object {
+    @apply w-full bg-neutral-800 text-lg font-code pl-4 box-border;
+  }
+
+  .gui_object_label {
+    @apply flex outline-none px-3 py-2 bg-neutral-800 hover:bg-neutral-700 transition-all cursor-pointer border-l-2 border-l-blue-500 hover:border-l-blue-500 rounded-none w-full text-lg font-code;
+  }
+
+  .gui_object_body {
+    @apply transition-all;
+  }
+
+  .gui_object_value {
+    @apply flex w-full px-3 py-1 border-l-2 border-l-neutral-600;
+  }
 }
 
 @layer utilities {
