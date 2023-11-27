@@ -12,9 +12,12 @@
 
 {#if !isCollapsed}    
     <div class="gui_object">
-        {#each Object.entries(values) as [key, value]}
+        {#each Object.entries(values) as [key, value], index}
             {#if typeof value === 'string'}
-                <span class="gui_object_value">{ Array.isArray(values) ? value : `${ key } : ${ value }` }</span>
+                <span class="gui_object_value">
+                    <span class="text-neutral-500 mr-2">{ index }</span>
+                    { Array.isArray(values) ? value : `${ key } : ${ value }` }
+                </span>
             {:else}
                 <div transition:slide={{ duration: 400 }} class='gui_object_body'>
                     <svelte:self key={ Array.isArray(value) ? key : Object.keys(value)[0] } values={ Array.isArray(value) ? value : value[Object.keys(value)[0]] } />

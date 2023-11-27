@@ -377,7 +377,7 @@
                 {/each}
             </div>
         {:else if activeTab === 'response payload'}
-            <div class="max-h-[36rem] overflow-y-auto">
+            <div class="max-h-[36rem] overflow-y-auto rounded-md">
                 <GraphicalJson key="response_payload" values={ testObj }/>
             </div>
             <!-- <GraphicalJson key="response_payload" values={ JSON.parse(responsePayload) }/> -->
