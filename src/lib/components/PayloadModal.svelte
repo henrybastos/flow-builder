@@ -7,12 +7,37 @@
     import LogMessage from "./LogMessage.svelte";
     import { onMount } from "svelte";
     import { FLOW_PRESETS, CURRENT_PRESET_NAME } from "$lib/PresetsStore";
+    import GuiObject from '$lib/components/GUIObject.svelte';
 
     const controller = new AbortController();
     $: payloadToURI = `data:text/json;charset=utf-8,${ encodeURIComponent(payloadModalTextearea) }`;
     $: payloadURIPresetName = `${ $CURRENT_PRESET_NAME?.match(/[A-z,0-9]*[^\s:_,.]/gi)?.join('_')?.toLowerCase() || 'preset' }.json`;
 
     let responsePayload = 'Nothing to display :D';
+
+    let testObj = { 
+        items: [ 
+            'Item 01', 
+            'Item 02', 
+            'Item 03', 
+            'Item 04', 
+            { 
+                a_items: [ 
+                    'Item A01', 
+                    'Item A02', 
+                    'Item A03' 
+                ] 
+            }, 
+            { 
+                b_items: [ 
+                    'Item B01', 
+                    'Item B02', 
+                    'Item B03' 
+                ] 
+            } 
+        ],
+        items_2: 'just_a_text'
+    }
 
     let payloadModal;
     let isFLowAPILoading;
@@ -299,7 +324,8 @@
                 {/each}
             </div>
         {:else if activeTab === 'response payload'}
-            <textarea class="font-code bg-neutral-950 hover:bg-neutral-950" bind:value={responsePayload} name="" id="" cols="30" rows="20"></textarea>
+            <GuiObject values={ testObj }/>
+            <!-- <textarea class="font-code bg-neutral-950 hover:bg-neutral-950" bind:value={responsePayload} name="" id="" cols="30" rows="20"></textarea> -->
         {/if}
     </TabsBar>
 </Modal>
