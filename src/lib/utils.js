@@ -209,8 +209,12 @@ export function trimEnvPlaceholder (_str) {
     return _str.match(placeholderMatchRegExp)[0].replaceAll(placeholderReplaceRegExp, '');
 }
 
+export function resolveDotNotation (_obj, _str) {
+    return [_obj, ..._str.split('.')].reduce((a,b) => a[b]);
+}
+
 export function replaceEnvPlaceholder (_str, _env) {
-    const envVariable = _env[trimEnvPlaceholder(_str)];
+    const envVariable = resolveDotNotation(_env, trimEnvPlaceholder(_str));
     return _str.replaceAll(/%.*%/g, envVariable);
 }
 

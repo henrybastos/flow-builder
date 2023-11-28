@@ -17,7 +17,6 @@
 
     function addOp (_flow_name, _operation) {
         PAYLOAD.addOperation(_flow_name, _operation);
-        console.log($PAYLOAD);
         // console.log(JSON.stringify($PAYLOAD, null, 3));
         addOperationsModal.close();
     }
