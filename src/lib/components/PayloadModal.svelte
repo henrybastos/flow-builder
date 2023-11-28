@@ -272,19 +272,19 @@
             PAYLOAD.addFlow(_flow_name);
 
             Object.values(_flow_body).forEach((operation) => {
-                if ( $FLOW_BUILDER_OPERATION_TEMPLATES[operation.command] ) {
-                    const operationBody = structuredClone( $FLOW_BUILDER_OPERATION_TEMPLATES[operation.command] );
+                if ( FLOW_BUILDER_OPERATION_TEMPLATES[operation.command] ) {
+                    const operationBody = structuredClone( FLOW_BUILDER_OPERATION_TEMPLATES[operation.command] );
                     
                     if (operationBody?.input_fields) {
 
                         Object.entries(operationBody.input_fields).forEach(([key, value]) => {
                             value.value = operation[key];
-                        })
+                        });
                     }
 
                     PAYLOAD.addOperation(_flow_name, operationBody);
                 }
-            })
+            });
         });
 
         if (payloadJSON.config) {
@@ -383,7 +383,7 @@
             </div>
         {:else if activeTab === 'response payload'}
             <div class="max-h-[36rem] overflow-y-auto rounded-md">
-                <GraphicalJson key="response_payload" values={ testObj }/>
+                <GraphicalJson key="response_payload" values={ JSON.parse(responsePayload) }/>
             </div>
             <!-- <GraphicalJson key="response_payload" values={ JSON.parse(responsePayload) }/> -->
             <!-- <textarea class="font-code bg-neutral-950 hover:bg-neutral-950" bind:value={responsePayload} name="" id="" cols="30" rows="20"></textarea> -->

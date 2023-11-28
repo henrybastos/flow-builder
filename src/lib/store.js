@@ -100,7 +100,7 @@ export const FLOW_BUILDER_INPUT_FIELD_TEMPLATES = {
  * @property {'btn'} type
  */
 
-export const FLOW_BUILDER_OPERATION_TEMPLATES = writable({
+export const FLOW_BUILDER_OPERATION_TEMPLATES = {
     goto: {
         command: 'goto',
         label: 'Goto',
@@ -261,5 +261,23 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = writable({
         command: 'close_browser',
         label: 'Close browser',
         icon: 'ti-clock'
+    },
+    press_key: {
+        command: 'press_key',
+        label: 'Press key',
+        icon: 'ti-command',
+        input_fields: {
+            key: {
+                type: 'dropdown',
+                label: 'Key',
+                options: [
+                    {
+                        label: 'Enter',
+                        value: 'Enter'
+                    }
+                ],
+                value: ''
+            }
+        }
     }
-}) 
+};

@@ -57,7 +57,7 @@
 
 <Modal bind:this={addOperationsModal} title="Add operation" bind:openDangerModal>
     <div class="grid grid-cols-2 gap-x-4 gap-y-2 h-fit">
-        {#each Object.values($FLOW_BUILDER_OPERATION_TEMPLATES) as operationTemplate}
+        {#each Object.values(FLOW_BUILDER_OPERATION_TEMPLATES) as operationTemplate}
             {#if !operationTemplate.disabled}                
                 <button class="btn btn-md w-full" on:click={() => addOp(flowName, structuredClone(operationTemplate))}>
                     <i class={`ti ${ operationTemplate.icon || 'ti-topology-ring-2' } text-blue-500 mr-1 text-2xl`}></i>
