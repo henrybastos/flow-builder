@@ -15,6 +15,7 @@
 
     let appendToast;
     let loadedPresetName = '';
+    let pageSettingsWSEndpoint;
 
     function checkAndLoadTempPreset () {
         if (localStorage?.getItem('temp_preset')) {
@@ -37,6 +38,11 @@
         }
     }
 
+    function onPresetLoadedHandler ({ detail }) {
+        loadedPresetName = detail.presetName;
+        pageSettingsWSEndpoint = '';
+    }
+
     onMount(() => {
         checkAndLoadTempPreset();
         checkAndLoadPresets();
@@ -54,13 +60,13 @@
     
         <div class="inline-flex gap-x-2">
 
-            <PresetsModal on:preset_loaded={({ detail }) => loadedPresetName = detail.presetName} {appendToast}/>
+            <PresetsModal on:preset_loaded={onPresetLoadedHandler} {appendToast}/>
 
             {#if $CURRENT_PRESET_NAME}
                 <UpdateCurrentPresetModal />
             {/if}
         
-            <PageSettings {appendToast}/>
+            <PageSettings bind:wsEndpoint={pageSettingsWSEndpoint} {appendToast}/>
             
             <AddFlowModal />
     
