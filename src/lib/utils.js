@@ -214,8 +214,8 @@ export function resolveDotNotation (_obj, _str) {
 }
 
 export function replaceEnvPlaceholder (_str, _env) {
-    const envVariable = resolveDotNotation(_env, trimEnvPlaceholder(_str));
-    return _str.replaceAll(/%.*%/g, envVariable);
+    let envVariable = resolveDotNotation(_env, trimEnvPlaceholder(_str));
+    return envVariable.match(placeholderMatchRegExp) ? replaceEnvPlaceholder(envVariable, _env) : envVariable;
 }
 
 export function genUUID () {
@@ -224,8 +224,8 @@ export function genUUID () {
 
 /**
  * Checks if click was on any of the elements with the guides
- * @param {*} _guides 
- * @param {*} _target 
+ * @param {Array<string>} _guides 
+ * @param {string} _target 
  * @returns 
  */
 export function checkClickOnGuideIDs (_guides, _target) {
