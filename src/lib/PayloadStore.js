@@ -25,9 +25,15 @@ function createPayload () {
         // Fixes some old presets without the config object
         _fix_fixNullConfig: () => {
             update(_payload => {
+                let initConfig = structuredClone(initStruct.config);
+                Object.keys(initConfig).forEach(config_name => {
+                    if (_payload.config[config_name] === undefined) {
+                        console.log(`[UNDEFINED CONFIG] Overwriting undefined preset config <${ config_name }> to <${ initConfig[config_name] }>`);
+                        _payload.config[config_name] = initConfig[config_name];
+                    }
+                })
                 return {
-                    ..._payload,
-                    config:{ ...initStruct.config }
+                    ..._payload
                 }
             })
         },

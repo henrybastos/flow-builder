@@ -35,7 +35,8 @@ const ENV_VARIABLES_ALLOWLIST = [
 
 export async function POST ({ request }) {
     const payload = await request.json();
-    const [page, browser] = await _startEngine();
+    // const [page, browser] = await _startEngine();
+    const { browser } = await _startEngine();
     let responsePayload = {};
 
     console.log('Calling local endpoint: [::1]:5173/api/run-flow');
@@ -73,7 +74,7 @@ export async function POST ({ request }) {
         Operations._setPage(page);
         Operations._setBrowser(browser);
 
-        return [page, browser];
+        return { page, browser };
     }
 
     async function _connectOrLaunchBrowser () {

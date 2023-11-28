@@ -1,13 +1,12 @@
 <script>
     import { PAYLOAD } from "$lib/PayloadStore";
-    import { onMount } from "svelte";
     import Modal from "./Modal.svelte";
     import Switch from "./Switch.svelte";
 
     export let appendToast;
     let pageSettingsModal;
 
-    let wsEndpoint;
+    export let wsEndpoint;
 
     function saveTempPresetToLocalStorage () {
         try {
