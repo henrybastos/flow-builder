@@ -67,7 +67,7 @@
                 <!-- Determines which kind of Input Field it its -->
                 {#if field.type === 'text'}
                     <input 
-                        class={`col-start-2 input-md ${ checkForEnvPlaceholder(field.value) ? 'font-code text-green-600' : 'font-sans' }`}
+                         class={`col-start-2 input-md ${ checkForEnvPlaceholder(field.value) ? 'font-code text-green-600' : 'font-sans' }`}
                         bind:value={ field.value } 
                         id={ field_name } 
                         type="text" 
@@ -75,11 +75,16 @@
                     >
                 {:else if field.type === 'dropdown'}
                     <Dropdown 
-                        options={Object.keys($PAYLOAD.flows).map(_flow => ({ value: _flow, label: _flow }))}
+                        options={ 
+                            ['run_flow', 'run_flow_for_each'].includes(operation.command)
+                            ? Object.keys($PAYLOAD.flows).map(_flow => ({ value: _flow, label: _flow }))
+                            : field.options
+                        }
                         bind:selectedOption={ field.value }
                         selectedOptionLabel={ field.value }
                         capitalizeOptionLabel={true}
                     />
+                {:else if field.type === 'dropdown'}
                 {:else if field.type === 'btn'}
                     <button class="btn-sm col-span-full w-full">{ field.label }</button>
                 {/if}
