@@ -1,5 +1,6 @@
 <script>
     import { PAYLOAD } from "$lib/PayloadStore";
+    import { onMount } from "svelte";
     import Modal from "./Modal.svelte";
     import Switch from "./Switch.svelte";
 
@@ -7,10 +8,20 @@
     let pageSettingsModal;
 
     export let wsEndpoint;
+    let lastWSEndpoint;
+
+    onMount(() => {
+        if (localStorage.getItem('last_ws_endpoint')) {
+            lastWSEndpoint = localStorage.getItem('last_ws_endpoint');
+            wsEndpoint = lastWSEndpoint;
+            PAYLOAD.setConfig('ws_endpoint', lastWSEndpoint);
+        }
+    })
 
     function saveTempPresetToLocalStorage () {
         try {
-            localStorage?.setItem('temp_preset', JSON.stringify($PAYLOAD));
+            localStorage.setItem('temp_preset', JSON.stringify($PAYLOAD));
+            localStorage.setItem('last_ws_endpoint', wsEndpoint);
             appendToast('Temp Preset saved!', 'success');
         } catch (err) {
             appendToast('Failed to save Temp Preset', 'error');
@@ -21,6 +32,10 @@
     function clearTempPresetToLocalStorage () {
         if (localStorage?.getItem('temp_preset')) {
             localStorage.removeItem('temp_preset');
+        }
+
+        if (localStorage?.getItem('last_ws_endpoint')) {
+            localStorage.removeItem('last_ws_endpoint');
         }
     }
 
