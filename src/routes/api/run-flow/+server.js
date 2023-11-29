@@ -1,6 +1,6 @@
 import puppeteer from "puppeteer-extra";
 import pluginStealth from 'puppeteer-extra-plugin-stealth';
-import { checkForEnvPlaceholder, trimEnvPlaceholder, replaceEnvPlaceholder } from "$lib/utils.js";
+import { trimEnvPlaceholder, checkEnvVars, checkForGlobalEnvPlaceholder } from "$lib/utils.js";
 
 import ServerLogger from "./ServerLogger"
 import Operations from "./Operations";
@@ -20,7 +20,7 @@ import Operations from "./Operations";
 
 const logCommands = false;
 
-const ENV_VARIABLES_ALLOWLIST = [
+const ENV_VARIABLES_INPUT_ALLOWLIST = [
     'target',
     'trigger_target',
     'picker_target',
@@ -111,17 +111,13 @@ export async function POST ({ request }) {
     async function _runFlowForEach ({ env_var, flow }) {
         const envVar = trimEnvPlaceholder(env_var);
         
-        for (const _env of payload.env[envVar]) {
-            await runFlow(payload.flows[flow], _env);
+        if (checkForGlobalEnvPlaceholder(env_var)) {
+            await runFlow(payload.flows[flow], payload.env);
+        } else {
+            for (const _env of payload.env[envVar]) {
+                await runFlow(payload.flows[flow], _env);
+            }
         }
-    }
-
-    function _checkEnvVars (_env, _field_name, _field_value) {
-        if (ENV_VARIABLES_ALLOWLIST.includes(_field_name) && checkForEnvPlaceholder(_field_value)) {
-            return replaceEnvPlaceholder(_field_value, _env);
-        }
-
-        return _field_value;
     }
 
     async function evalOperation (_operation, _env) {
@@ -130,7 +126,9 @@ export async function POST ({ request }) {
         }
 
         for (const [_input_name, _input_value] of Object.entries(_operation)) {
-            _operation[_input_name] = _checkEnvVars(_env, _input_name, _input_value);
+            if (ENV_VARIABLES_INPUT_ALLOWLIST.includes(_input_name)) {
+                _operation[_input_name] = checkEnvVars(_env, _input_value);
+            }
         }
         
         Operations._setPayload(payload);
