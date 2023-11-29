@@ -95,7 +95,14 @@ export function resolveDotNotation (_obj, _str) {
 }
 
 export function replaceEnvPlaceholder (_str, _env) {
-    let envVariable = resolveDotNotation(_env, trimEnvPlaceholder(_str));
+    let envVariable;
+    if (_str.match(/^%.*%$/g)) {
+        envVariable = resolveDotNotation(_env, trimEnvPlaceholder(_str));
+    } else {
+        const [varToReplace] = _str.match(placeholderMatchRegExp);
+        const valueToReplace = resolveDotNotation(_env, trimEnvPlaceholder(varToReplace));
+        envVariable = _str.replace(varToReplace, valueToReplace);
+    }
     // console.log('MATCH', _str.match(placeholderMatchRegExp), 'STR', );
     // console.log(_str);
     // try {

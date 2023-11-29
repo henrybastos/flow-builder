@@ -50,7 +50,7 @@
 </script>
 
 <svelte:head>
-    <title>KMT • Flow Builder</title>
+    <title>Flow Builder</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 </svelte:head>
 
