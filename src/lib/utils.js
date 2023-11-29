@@ -7,7 +7,7 @@ const globalEnvPlaceholder = "\\$\\$";
 
 const placeholderMatchRegExp = new RegExp(`${ envPlaceholder.start }.*${ envPlaceholder.end }`, 'g');
 const placeholderReplaceRegExp = new RegExp(`(${ envPlaceholder.start }|${ envPlaceholder.end })`, 'g');
-const globalPlaceholderMatchRegExp = new RegExp(`^${ globalEnvPlaceholder }env.`, 'g');
+const globalPlaceholderMatchRegExp = new RegExp(`${ globalEnvPlaceholder }env.`, 'g');
 
 export function filterKeys (_obj, _query) {
     for (let key of Object.keys(_obj)) {
@@ -74,6 +74,7 @@ export function checkForEnvPlaceholder (_str) {
 }
 
 export function checkForGlobalEnvPlaceholder (_str) {
+    // console.log(`[CHECK GLOBAL]: ${ _str } : ${ _str.match(globalPlaceholderMatchRegExp) }`);
     return _str.match(globalPlaceholderMatchRegExp);
     // const trimmed_str = trimEnvPlaceholder(_str).replace(globalPlaceholderMatchRegExp, '');
     // console.log(`[TRIMMED]: ${ trimmed_str }`);
@@ -93,13 +94,20 @@ export function resolveDotNotation (_obj, _str) {
 }
 
 export function replaceEnvPlaceholder (_str, _env) {
-    let envVariable = resolveDotNotation(_env, trimEnvPlaceholder(_str));
-    return envVariable.match(placeholderMatchRegExp) ? replaceEnvPlaceholder(envVariable, _env) : envVariable;
+    let envVariable = resolveDotNotation(_env, _str);
+    return _str.match(placeholderMatchRegExp) ? replaceEnvPlaceholder(envVariable, _env) : envVariable;
 }
 
-export function checkEnvVars (_env, _field_value) {
-    if (checkForEnvPlaceholder(_field_value)) {
-        return replaceEnvPlaceholder(_field_value, _env);
+export function checkEnvVars (_field_value, _env) {
+    let value = _field_value.replace(globalEnvPlaceholder, '');
+    console.log(value);
+    // console.log(`[TRIMMED]: ${ value }`);
+    
+    // value = _env_prefix ? `${_env_prefix}.${value}` : value;
+    // console.log(`[APPENDED]: ${ value }`);
+
+    if (checkForEnvPlaceholder( value )) {
+        return replaceEnvPlaceholder(trimEnvPlaceholder(value), _env);
     }
 
     return _field_value;

@@ -109,14 +109,16 @@ export async function POST ({ request }) {
     }
 
     async function _runFlowForEach ({ env_var, flow }) {
-        const envVar = trimEnvPlaceholder(env_var);
-        
-        if (checkForGlobalEnvPlaceholder(env_var)) {
-            await runFlow(payload.flows[flow], payload.env);
-        } else {
-            for (const _env of payload.env[envVar]) {
-                await runFlow(payload.flows[flow], _env);
-            }
+        // Resolves dot notation problem
+        const _env = checkEnvVars(env_var, payload.env);
+        console.log('[FE ENV]:', _env);
+
+        for (const _scoped_env of _env) {
+            console.log('[SCOPED ENV]:', _scoped_env);
+            // console.log(env_var, 'TEST', checkEnvVars('%url%', payload.env, _env_prefix));
+            // console.log('[CHECK GLOBAL ENV]:', ;
+            // console.log(_env);
+            await runFlow(payload.flows[flow], _scoped_env);
         }
     }
 
@@ -127,7 +129,11 @@ export async function POST ({ request }) {
 
         for (const [_input_name, _input_value] of Object.entries(_operation)) {
             if (ENV_VARIABLES_INPUT_ALLOWLIST.includes(_input_name)) {
-                _operation[_input_name] = checkEnvVars(_env, _input_value);
+                const _env_scope = trimEnvPlaceholder(_input_value);
+                // const _env_prefix = checkForGlobalEnvPlaceholder(_input_value) ? '' : _env_scope;
+                _env = checkForGlobalEnvPlaceholder(_input_value) ? payload.env : _env;
+
+                _operation[_input_name] = checkEnvVars(_input_value, _env);
             }
         }
         
