@@ -90,24 +90,33 @@ export function trimEnvPlaceholder (_str) {
 }
 
 export function resolveDotNotation (_obj, _str) {
+    // console.log('REDUCE', _str, _obj, [_obj, ..._str.split('.')].reduce((a,b) => a[b]));
     return [_obj, ..._str.split('.')].reduce((a,b) => a[b]);
 }
 
 export function replaceEnvPlaceholder (_str, _env) {
-    let envVariable = resolveDotNotation(_env, _str);
-    return _str.match(placeholderMatchRegExp) ? replaceEnvPlaceholder(envVariable, _env) : envVariable;
+    let envVariable = resolveDotNotation(_env, trimEnvPlaceholder(_str));
+    // console.log('MATCH', _str.match(placeholderMatchRegExp), 'STR', );
+    // console.log(_str);
+    // try {
+    //     if (checkForEnvPlaceholder(envVariable)) {
+    //         return replaceEnvPlaceholder(envVariable, _env);
+    //     }
+    // } catch (err) {
+    //     return envVariable;
+    // }
+    return envVariable;
 }
 
 export function checkEnvVars (_field_value, _env) {
     let value = _field_value.replace(globalEnvPlaceholder, '');
-    console.log(value);
     // console.log(`[TRIMMED]: ${ value }`);
     
     // value = _env_prefix ? `${_env_prefix}.${value}` : value;
     // console.log(`[APPENDED]: ${ value }`);
 
     if (checkForEnvPlaceholder( value )) {
-        return replaceEnvPlaceholder(trimEnvPlaceholder(value), _env);
+        return replaceEnvPlaceholder(value, _env);
     }
 
     return _field_value;

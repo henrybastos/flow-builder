@@ -1,6 +1,6 @@
 import puppeteer from "puppeteer-extra";
 import pluginStealth from 'puppeteer-extra-plugin-stealth';
-import { trimEnvPlaceholder, checkEnvVars, checkForGlobalEnvPlaceholder } from "$lib/utils.js";
+import { trimEnvPlaceholder, checkEnvVars, checkForGlobalEnvPlaceholder, checkForEnvPlaceholder } from "$lib/utils.js";
 
 import ServerLogger from "./ServerLogger"
 import Operations from "./Operations";
@@ -111,15 +111,25 @@ export async function POST ({ request }) {
     async function _runFlowForEach ({ env_var, flow }) {
         // Resolves dot notation problem
         const _env = checkEnvVars(env_var, payload.env);
+
         console.log('[FE ENV]:', _env);
 
         for (const _scoped_env of _env) {
             console.log('[SCOPED ENV]:', _scoped_env);
-            // console.log(env_var, 'TEST', checkEnvVars('%url%', payload.env, _env_prefix));
-            // console.log('[CHECK GLOBAL ENV]:', ;
-            // console.log(_env);
             await runFlow(payload.flows[flow], _scoped_env);
         }
+    }
+
+    function resolveEnv (_str, _env) {
+        _env = checkForGlobalEnvPlaceholder(_str) ? payload.env : _env;
+
+        const checkResult = checkEnvVars(_str, _env);
+
+        if (checkForEnvPlaceholder(checkResult)) {
+            return resolveEnv(checkResult, _env);
+        }
+
+        return checkResult;
     }
 
     async function evalOperation (_operation, _env) {
@@ -129,11 +139,7 @@ export async function POST ({ request }) {
 
         for (const [_input_name, _input_value] of Object.entries(_operation)) {
             if (ENV_VARIABLES_INPUT_ALLOWLIST.includes(_input_name)) {
-                const _env_scope = trimEnvPlaceholder(_input_value);
-                // const _env_prefix = checkForGlobalEnvPlaceholder(_input_value) ? '' : _env_scope;
-                _env = checkForGlobalEnvPlaceholder(_input_value) ? payload.env : _env;
-
-                _operation[_input_name] = checkEnvVars(_input_value, _env);
+                _operation[_input_name] = resolveEnv(_input_value, _env);
             }
         }
         

@@ -22,7 +22,6 @@
         type: 'error',
         message: ''
     };
-    let lastWSEndpoint;
     let tabs = ['payload', 'console', 'response payload'];
 
     let cancelRequest = false;
@@ -30,9 +29,6 @@
     onMount(() => {
         if (localStorage.getItem('logs')) {
             LOGGER.loadLogs(localStorage.getItem('logs'));
-        }
-        if (localStorage.getItem('last_ws_endpoint')) {
-            lastWSEndpoint = localStorage.getItem('last_ws_endpoint');
         }
     })
 

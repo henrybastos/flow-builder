@@ -89,6 +89,21 @@ export const FLOW_BUILDER_INPUT_FIELD_TEMPLATES = {
         label: 'Value',
         placeholder: 'Value',
         value: ''
+    },
+    key: {
+        type: 'dropdown',
+        label: 'Key',
+        options: [
+            {
+                label: 'Enter',
+                value: 'Enter'
+            },
+            {
+                label: 'Esc',
+                value: 'Escape'
+            }
+        ],
+        value: ''
     }
 };
 
@@ -267,17 +282,7 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = {
         label: 'Press key',
         icon: 'ti-command',
         input_fields: {
-            key: {
-                type: 'dropdown',
-                label: 'Key',
-                options: [
-                    {
-                        label: 'Enter',
-                        value: 'Enter'
-                    }
-                ],
-                value: ''
-            }
+            key: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.key
         }
     }
 };
