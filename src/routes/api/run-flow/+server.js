@@ -1,6 +1,6 @@
 import puppeteer from "puppeteer-extra";
 import pluginStealth from 'puppeteer-extra-plugin-stealth';
-import { trimEnvPlaceholder, checkEnvVars, checkForGlobalEnvPlaceholder, checkForEnvPlaceholder } from "$lib/utils.js";
+import { checkEnvVars, checkForGlobalEnvPlaceholder, checkForEnvPlaceholder } from "$lib/utils.js";
 
 import ServerLogger from "./ServerLogger"
 import Operations from "./Operations";
@@ -124,6 +124,7 @@ export async function POST ({ request }) {
         _env = checkForGlobalEnvPlaceholder(_str) ? payload.env : _env;
 
         const checkResult = checkEnvVars(_str, _env);
+        console.log('[CHECK RESULT]', checkResult);
 
         if (checkForEnvPlaceholder(checkResult)) {
             return resolveEnv(checkResult, _env);
