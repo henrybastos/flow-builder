@@ -133,6 +133,7 @@ export default class Operations {
      * @returns The name of the flow (success or error).
      */
     static async checkElement ({ target, success_flow, error_flow }) {
+        console.log('CHECK.FLOWS', target, success_flow, error_flow);
         try {
             await this.getElement(target);
             console.log(`Running flow: ${ success_flow }`);
