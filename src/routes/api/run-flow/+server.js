@@ -44,10 +44,12 @@ export async function POST ({ request }) {
     const stream = new ReadableStream({
         async start(controller) {
             ServerLogger._setController(controller);
-            ServerLogger.logEvent('system', {
-                message: `WS Endpoint: ${ browser.wsEndpoint() }`,
-                status_message: 'info'
-            });
+            if (!payload.config.ws_endpoint) {
+                ServerLogger.logEvent('system', {
+                    message: `WS Endpoint: ${ browser.wsEndpoint() }`,
+                    status_message: 'info'
+                });
+            }
 
             await _execStream();
         }
@@ -108,11 +110,13 @@ export async function POST ({ request }) {
         return _browser;
     }
 
-    async function _runFlowForEach ({ env_var, flow }) {
+    async function _runFlowForEach ({ env_var, flow }, _env) {
         // Resolves dot notation problem
-        const _env = checkEnvVars(env_var, payload.env);
+        // const _env = checkEnvVars(env_var, payload.env);
+        const replacedEnv = resolveEnv(env_var, _env);
+        console.log('FOR EACH', _env, replacedEnv);
 
-        for (const _scoped_env of _env) {
+        for (const _scoped_env of replacedEnv) {
             await runFlow(payload.flows[flow], _scoped_env);
         }
     }
@@ -143,10 +147,10 @@ export async function POST ({ request }) {
 
         for (const [_input_name, _input_value] of Object.entries(_operation)) {
             if (ENV_VARIABLES_INPUT_ALLOWLIST.includes(_input_name) && _input_value.match(placeholderMatchRegExp)) {
+                console.log('ENV', _env);
                 const replacedEnv = resolveEnv(_input_value, _env);
-                console.log('ENV', replacedEnv);
+                console.log('RESOLVED ENV', replacedEnv);
                 const needsReplacementInString = _input_value.replaceAll(placeholderMatchRegExp, '') && _input_value.match(placeholderMatchRegExp);
-                console.log('REPLACE', needsReplacementInString, _input_value.replaceAll(placeholderMatchRegExp, 'aaaaaa'));
                 _operation[_input_name] = needsReplacementInString ? _input_value.replace(placeholderMatchRegExp, replacedEnv) : replacedEnv;
             }
         }
@@ -161,10 +165,10 @@ export async function POST ({ request }) {
                 await runFlow(payload.flows[await Operations.checkElement(_operation)], payload.env);
                 break;
             case 'run_flow':
-                await runFlow(payload.flows[_operation.flow], payload.env);
+                await runFlow(payload.flows[_operation.flow], _env);
                 break;
             case 'run_flow_for_each':
-                await _runFlowForEach(_operation)
+                await _runFlowForEach(_operation, _env)
                 break;
             default:
                 if (_operation?.response_slot) {
