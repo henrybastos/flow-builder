@@ -69,68 +69,14 @@ export function convertToSnakeCase (_string) {
     return _string.toLowerCase().replaceAll(/[\s-]/g, '_');
 }
 
-export function checkForEnvPlaceholder (_str) {
-    return _str.match(placeholderMatchRegExp);
-}
-
-export function checkForGlobalEnvPlaceholder (_str) {
-    // console.log(`[CHECK GLOBAL]: ${ _str } : ${ _str.match(globalPlaceholderMatchRegExp) }`);
-    return _str.match(globalPlaceholderMatchRegExp);
-    // const trimmed_str = trimEnvPlaceholder(_str).replace(globalPlaceholderMatchRegExp, '');
-    // console.log(`[TRIMMED]: ${ trimmed_str }`);
-    // if (trimmed_str) {
-    //     checkEnvVars(_env.match(new RegExp(`(?<=${ globalEnvPlaceholder }env\.).*`, 'g')[0]), trimmed_str)
-    // } else {
-    //     return null;
-    // }
-}
-
-export function trimEnvPlaceholder (_str) {
-    return _str.match(placeholderMatchRegExp)[0].replaceAll(placeholderReplaceRegExp, '').replace(globalPlaceholderMatchRegExp, '');
-}
-
-export function resolveDotNotation (_obj, _str) {
-    // console.log('REDUCE', _str, _obj, [_obj, ..._str.split('.')].reduce((a,b) => a[b]));
-    return [_obj, ..._str.split('.')].reduce((a,b) => a[b]);
-}
-
-export function replaceEnvPlaceholder (_str, _env) {
-    let envVariable;
-    envVariable = resolveDotNotation(_env, trimEnvPlaceholder(_str));
-
-    // if (_str.match(/^%.*%$/g)) {
-    //     console.log('BEGIN', _str);
-    //     envVariable = resolveDotNotation(_env, trimEnvPlaceholder(_str));
-    // } else {
-    //     console.log('NOT BEGIN', _str);
-    //     const [varToReplace] = _str.match(placeholderMatchRegExp);
-    //     const valueToReplace = resolveDotNotation(_env, trimEnvPlaceholder(varToReplace));
-    //     console.log('VALUE', valueToReplace);
-    //     envVariable = _str.replace(varToReplace, valueToReplace);
-    // }
-
-    // console.log('MATCH', _str.match(placeholderMatchRegExp), 'STR', );
-    // console.log(_str);
-    // try {
-    //     if (checkForEnvPlaceholder(envVariable)) {
-    //         return replaceEnvPlaceholder(envVariable, _env);
-    //     }
-    // } catch (err) {
-    //     return envVariable;
-    // }
-    
-    return envVariable;
-}
+// checkEnvVars, checkForGlobalEnvPlaceholder, checkForEnvPlaceholder
 
 export function checkEnvVars (_field_value, _env) {
     let value = _field_value.replace(globalEnvPlaceholder, '');
-    // console.log(`[TRIMMED]: ${ value }`);
-    
-    // value = _env_prefix ? `${_env_prefix}.${value}` : value;
-    // console.log(`[APPENDED]: ${ value }`);
 
-    if (checkForEnvPlaceholder( value )) {
-        return replaceEnvPlaceholder(value, _env);
+    if (value.match(placeholderMatchRegExp)) {
+        console.log([_env, ...value.split('.')].reduce((a,b) => a[b]) || 'Env not found');
+        return [_env, ...value.split('.')].reduce((a,b) => a[b]);
     }
 
     return _field_value;

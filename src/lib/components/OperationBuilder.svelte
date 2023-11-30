@@ -2,7 +2,7 @@
     import Dropdown from "./Dropdown.svelte";
     import CollapsableOptions from "./CollapsableOptions.svelte";
     import { PAYLOAD } from "$lib/PayloadStore";
-    import { checkForEnvPlaceholder } from "$lib/utils";
+    import { placeholderMatchRegExp } from "$lib/utils";
 
     export let flowName;
 
@@ -67,7 +67,7 @@
                 <!-- Determines which kind of Input Field it its -->
                 {#if field.type === 'text'}
                     <input 
-                         class={`col-start-2 input-md ${ checkForEnvPlaceholder(field.value) ? 'font-code text-green-600' : 'font-sans' }`}
+                         class={`col-start-2 input-md ${ field.value.match(placeholderMatchRegExp) ? 'font-code text-green-600' : 'font-sans' }`}
                         bind:value={ field.value } 
                         id={ field_name } 
                         type="text" 

@@ -1,6 +1,6 @@
 import puppeteer from "puppeteer-extra";
 import pluginStealth from 'puppeteer-extra-plugin-stealth';
-import { checkEnvVars, checkForGlobalEnvPlaceholder, checkForEnvPlaceholder, placeholderMatchRegExp } from "$lib/utils.js";
+import { checkEnvVars, globalPlaceholderMatchRegExp, placeholderMatchRegExp } from "$lib/utils.js";
 
 import ServerLogger from "./ServerLogger"
 import Operations from "./Operations";
@@ -112,24 +112,25 @@ export async function POST ({ request }) {
         // Resolves dot notation problem
         const _env = checkEnvVars(env_var, payload.env);
 
-        console.log('[FE ENV]:', _env);
-
         for (const _scoped_env of _env) {
-            console.log('[SCOPED ENV]:', _scoped_env);
             await runFlow(payload.flows[flow], _scoped_env);
         }
     }
 
     function resolveEnv (_str, _env) {
-        _env = checkForGlobalEnvPlaceholder(_str) ? payload.env : _env;
-
+        _env = _str.match(globalPlaceholderMatchRegExp) ? payload.env : _env;
         const checkResult = checkEnvVars(_str, _env);
-        console.log('[CHECK RESULT]', checkResult);
 
-        if (checkForEnvPlaceholder(checkResult)) {
-            console.log('result', checkForEnvPlaceholder(checkResult));
+        if (checkResult && checkResult.match(placeholderMatchRegExp)) {
+            if (!checkResult) {
+                ServerLogger.logEvent('error', {
+                    message: `Env variable not found: ${ _str }`,
+                    status_message: 'error'
+                });
+            }
+
             return resolveEnv(checkResult, _env);
-        }
+        } 
 
         return checkResult;
     }
@@ -142,7 +143,8 @@ export async function POST ({ request }) {
         for (const [_input_name, _input_value] of Object.entries(_operation)) {
             if (ENV_VARIABLES_INPUT_ALLOWLIST.includes(_input_name)) {
                 const replacedEnv = resolveEnv(_input_value, _env);
-                const needsReplacementInString = _input_value.split(placeholderMatchRegExp).filter(v => v).length !== 0;
+                const needsReplacementInString = _input_value.replaceAll(placeholderMatchRegExp, '') && _input_value.match(placeholderMatchRegExp);
+                console.log('NEEDS REPLACEMENT', needsReplacementInString || 'It doesn\'t');
                 _operation[_input_name] = needsReplacementInString ? _input_value.replace(placeholderMatchRegExp, replacedEnv) : replacedEnv;
             }
         }
