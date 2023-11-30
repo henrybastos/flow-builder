@@ -5,9 +5,9 @@ const envPlaceholder = {
 
 const globalEnvPlaceholder = "\\$\\$";
 
-const placeholderMatchRegExp = new RegExp(`${ envPlaceholder.start }.*${ envPlaceholder.end }`, 'g');
-const placeholderReplaceRegExp = new RegExp(`(${ envPlaceholder.start }|${ envPlaceholder.end })`, 'g');
-const globalPlaceholderMatchRegExp = new RegExp(`${ globalEnvPlaceholder }env.`, 'g');
+export const placeholderMatchRegExp = new RegExp(`${ envPlaceholder.start }.*${ envPlaceholder.end }`, 'g');
+export const placeholderReplaceRegExp = new RegExp(`(${ envPlaceholder.start }|${ envPlaceholder.end })`, 'g');
+export const globalPlaceholderMatchRegExp = new RegExp(`${ globalEnvPlaceholder }env.`, 'g');
 
 export function filterKeys (_obj, _query) {
     for (let key of Object.keys(_obj)) {
@@ -96,16 +96,18 @@ export function resolveDotNotation (_obj, _str) {
 
 export function replaceEnvPlaceholder (_str, _env) {
     let envVariable;
-    if (_str.match(/^%.*%$/g)) {
-        console.log('BEGIN', _str);
-        envVariable = resolveDotNotation(_env, trimEnvPlaceholder(_str));
-    } else {
-        console.log('NOT BEGIN', _str);
-        const [varToReplace] = _str.match(placeholderMatchRegExp);
-        const valueToReplace = resolveDotNotation(_env, trimEnvPlaceholder(varToReplace));
-        console.log('VALUE', valueToReplace);
-        envVariable = _str.replace(varToReplace, valueToReplace);
-    }
+    envVariable = resolveDotNotation(_env, trimEnvPlaceholder(_str));
+
+    // if (_str.match(/^%.*%$/g)) {
+    //     console.log('BEGIN', _str);
+    //     envVariable = resolveDotNotation(_env, trimEnvPlaceholder(_str));
+    // } else {
+    //     console.log('NOT BEGIN', _str);
+    //     const [varToReplace] = _str.match(placeholderMatchRegExp);
+    //     const valueToReplace = resolveDotNotation(_env, trimEnvPlaceholder(varToReplace));
+    //     console.log('VALUE', valueToReplace);
+    //     envVariable = _str.replace(varToReplace, valueToReplace);
+    // }
 
     // console.log('MATCH', _str.match(placeholderMatchRegExp), 'STR', );
     // console.log(_str);
@@ -116,6 +118,7 @@ export function replaceEnvPlaceholder (_str, _env) {
     // } catch (err) {
     //     return envVariable;
     // }
+    
     return envVariable;
 }
 
