@@ -72,11 +72,11 @@ export function convertToSnakeCase (_string) {
 // checkEnvVars, checkForGlobalEnvPlaceholder, checkForEnvPlaceholder
 
 export function checkEnvVars (_field_value, _env) {
-    let value = _field_value.replace(globalEnvPlaceholder, '');
-
+    let value = _field_value.match(placeholderMatchRegExp)[0].replace(globalPlaceholderMatchRegExp, '');
+    console.log(_field_value, value, value.replaceAll(placeholderReplaceRegExp, ''), _env);
+    
     if (value.match(placeholderMatchRegExp)) {
-        console.log([_env, ...value.split('.')].reduce((a,b) => a[b]) || 'Env not found');
-        return [_env, ...value.split('.')].reduce((a,b) => a[b]);
+        return [_env, ...value.replaceAll(placeholderReplaceRegExp, '').split('.')].reduce((a,b) => a[b]);
     }
 
     return _field_value;

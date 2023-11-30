@@ -119,6 +119,7 @@ export async function POST ({ request }) {
 
     function resolveEnv (_str, _env) {
         _env = _str.match(globalPlaceholderMatchRegExp) ? payload.env : _env;
+        console.log('SCOPE', _str, _str.match(globalPlaceholderMatchRegExp), _env);
         const checkResult = checkEnvVars(_str, _env);
 
         if (checkResult && checkResult.match(placeholderMatchRegExp)) {
@@ -141,10 +142,11 @@ export async function POST ({ request }) {
         }
 
         for (const [_input_name, _input_value] of Object.entries(_operation)) {
-            if (ENV_VARIABLES_INPUT_ALLOWLIST.includes(_input_name)) {
+            if (ENV_VARIABLES_INPUT_ALLOWLIST.includes(_input_name) && _input_value.match(placeholderMatchRegExp)) {
                 const replacedEnv = resolveEnv(_input_value, _env);
+                console.log('ENV', replacedEnv);
                 const needsReplacementInString = _input_value.replaceAll(placeholderMatchRegExp, '') && _input_value.match(placeholderMatchRegExp);
-                console.log('NEEDS REPLACEMENT', needsReplacementInString || 'It doesn\'t');
+                console.log('REPLACE', needsReplacementInString, _input_value.replaceAll(placeholderMatchRegExp, 'aaaaaa'));
                 _operation[_input_name] = needsReplacementInString ? _input_value.replace(placeholderMatchRegExp, replacedEnv) : replacedEnv;
             }
         }
