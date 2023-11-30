@@ -1,6 +1,6 @@
 import puppeteer from "puppeteer-extra";
 import pluginStealth from 'puppeteer-extra-plugin-stealth';
-import { checkEnvVars, checkForGlobalEnvPlaceholder, checkForEnvPlaceholder } from "$lib/utils.js";
+import { checkEnvVars, checkForGlobalEnvPlaceholder, checkForEnvPlaceholder, placeholderMatchRegExp } from "$lib/utils.js";
 
 import ServerLogger from "./ServerLogger"
 import Operations from "./Operations";
@@ -127,6 +127,7 @@ export async function POST ({ request }) {
         console.log('[CHECK RESULT]', checkResult);
 
         if (checkForEnvPlaceholder(checkResult)) {
+            console.log('result', checkForEnvPlaceholder(checkResult));
             return resolveEnv(checkResult, _env);
         }
 
@@ -140,7 +141,9 @@ export async function POST ({ request }) {
 
         for (const [_input_name, _input_value] of Object.entries(_operation)) {
             if (ENV_VARIABLES_INPUT_ALLOWLIST.includes(_input_name)) {
-                _operation[_input_name] = resolveEnv(_input_value, _env);
+                const replacedEnv = resolveEnv(_input_value, _env);
+                const needsReplacementInString = _input_value.split(placeholderMatchRegExp).filter(v => v).length !== 0;
+                _operation[_input_name] = needsReplacementInString ? _input_value.replace(placeholderMatchRegExp, replacedEnv) : replacedEnv;
             }
         }
         
