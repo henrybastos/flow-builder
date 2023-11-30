@@ -152,6 +152,8 @@ export async function POST ({ request }) {
                 console.log('RESOLVED ENV', replacedEnv);
                 const needsReplacementInString = _input_value.replaceAll(placeholderMatchRegExp, '') && _input_value.match(placeholderMatchRegExp);
                 _operation[_input_name] = needsReplacementInString ? _input_value.replace(placeholderMatchRegExp, replacedEnv) : replacedEnv;
+            } else {
+                console.log('OPERATION', _operation);
             }
         }
         
