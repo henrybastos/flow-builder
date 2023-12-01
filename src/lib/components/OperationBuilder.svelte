@@ -76,7 +76,7 @@
                 {:else if field.type === 'dropdown'}
                     <Dropdown 
                         options={ 
-                            ['run_flow', 'run_flow_for_each'].includes(operation.command)
+                            ['run_flow', 'run_flow_for_each', 'check_element'].includes(operation.command)
                             ? Object.keys($PAYLOAD.flows).map(_flow => ({ value: _flow, label: _flow }))
                             : field.options
                         }
