@@ -73,7 +73,7 @@ export function convertToSnakeCase (_string) {
 
 export function checkEnvVars (_field_value, _env) {
     let value = _field_value.match(placeholderMatchRegExp)[0].replace(globalPlaceholderMatchRegExp, '');
-    console.log(_field_value, value, value.replaceAll(placeholderReplaceRegExp, ''), _env);
+    // console.log(_field_value, value, value.replaceAll(placeholderReplaceRegExp, ''), _env);
     
     if (value.match(placeholderMatchRegExp)) {
         return [_env, ...value.replaceAll(placeholderReplaceRegExp, '').split('.')].reduce((a,b) => a[b]);
