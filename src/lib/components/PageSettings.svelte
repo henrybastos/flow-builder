@@ -13,6 +13,7 @@
     onMount(() => {
         if (localStorage.getItem('last_ws_endpoint')) {
             lastWSEndpoint = localStorage.getItem('last_ws_endpoint');
+            console.log('[WS_ENDPOINT]', lastWSEndpoint, wsEndpoint);
             wsEndpoint = lastWSEndpoint;
             PAYLOAD.setConfig('ws_endpoint', lastWSEndpoint);
         }

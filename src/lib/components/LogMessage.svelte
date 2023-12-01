@@ -19,7 +19,7 @@
       <span class={`tag_${ data.tag.type } mx-1`}>{ data.tag.label }</span>
       {#each data.message.split(linkRegex) as msg}
          {#if msg.match(linkRegex)}
-            <span on:click={() => copyToClipboard(msg)} class="text-blue-400 hover:text-blue-500 whitespace-nowrap underline cursor-pointer">{ msg }</span>
+            <span on:click={() => copyToClipboard(msg)} class="text-blue-400 hover:text-blue-500 whitespace-nowrap underline cursor-pointer mx-1">{ msg }</span>
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <!-- svelte-ignore a11y-no-static-element-interactions -->
             <!-- <i  class="ti ti-clipboard hover:text-neutral-300 cursor-pointer ml-1"></i> -->

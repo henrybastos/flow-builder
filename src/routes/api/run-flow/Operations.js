@@ -27,15 +27,7 @@ export default class Operations {
     }
 
     static async wait_for_selector (_target, timeout = 15000 ) {
-        try {
-            await this.page.waitForSelector(`xpath/${ _target }`, { timeout });
-        } catch (error) {
-            console.error(error);
-            ServerLogger.logEvent('operation_log', {
-                message: `Could not find selector  ${ _target }`,
-                status_message: 'error'
-            });
-        }
+        await this.page.waitForSelector(`xpath/${ _target }`, { timeout });
     }
 
     static async getElement (_target) {
@@ -59,6 +51,7 @@ export default class Operations {
     }
 
     static async click ({ target }) {
+        console.log('[_INTERNAL_SYS]', target, this.payload);
         const [element] = await this.getElement(target);
 
         ServerLogger.logEvent('operation_log', {

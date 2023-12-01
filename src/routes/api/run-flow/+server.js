@@ -122,7 +122,7 @@ export async function POST ({ request }) {
         
         for (const [_input_name, _input_value] of Object.entries(_operation)) {
             if (ENV_VARIABLES_INPUT_ALLOWLIST.includes(_input_name)) {
-                    _operation[_input_name] = EnvHandler.checkPlaceholders(_input_value, _env);
+                _operation[_input_name] = EnvHandler.checkPlaceholders(_input_value, _env);
             }
         }
         
@@ -132,7 +132,8 @@ export async function POST ({ request }) {
         // Calls the operation
         switch (_operation.command) {
             case 'check_element':
-                await runFlow(payload.flows[await Operations.checkElement(_operation)], payload.env);
+
+                await runFlow(payload.flows[await Operations.checkElement(_operation)], _env);
                 break;
             case 'run_flow':
                 await runFlow(payload.flows[_operation.flow], _env);
