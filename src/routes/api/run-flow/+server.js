@@ -1,12 +1,9 @@
 import puppeteer from "puppeteer-extra";
 import pluginStealth from 'puppeteer-extra-plugin-stealth';
-import { checkEnvVars, globalPlaceholderMatchRegExp, placeholderMatchRegExp } from "$lib/utils.js";
 import { EnvHandler } from "$lib/EnvHandler";
 
 import ServerLogger from "./ServerLogger"
 import Operations from "./Operations";
-
-// //*/div[contains(text(), 'https://alessandrobechelin.kebook.com.br')]
 
 /** 
  * @typedef {Object} Flow
@@ -36,7 +33,6 @@ const ENV_VARIABLES_INPUT_ALLOWLIST = [
 
 export async function POST ({ request }) {
     const payload = await request.json();
-    // const [page, browser] = await _startEngine();
     const { browser } = await _startEngine();
     let responsePayload = {};
 
@@ -112,37 +108,11 @@ export async function POST ({ request }) {
     }
 
     async function _runFlowForEach ({ env_var, flow }, _env) {
-        // Resolves dot notation problem
-        // const _env = checkEnvVars(env_var, payload.env);
-        // const replacedEnv = resolveEnv(env_var, _env);
-        // console.log('FOR EACH', _env, replacedEnv);
-
-        console.log('[_SYS]', env_var, flow, _env);
         const replacedEnv = EnvHandler.checkPlaceholders(env_var, _env);
-        console.log('[_SYS] [RESOLVED ENV]', replacedEnv);
 
         for (const _scoped_env of replacedEnv) {
             await runFlow(payload.flows[flow], _scoped_env);
         }
-    }
-
-    function resolveEnv (_str, _env) {
-        _env = _str.match(globalPlaceholderMatchRegExp) ? payload.env : _env;
-        // console.log('SCOPE', _str, _str.match(globalPlaceholderMatchRegExp), _env);
-        const checkResult = checkEnvVars(_str, _env);
-
-        if (checkResult && checkResult.match(placeholderMatchRegExp)) {
-            if (!checkResult) {
-                ServerLogger.logEvent('error', {
-                    message: `Env variable not found: ${ _str }`,
-                    status_message: 'error'
-                });
-            }
-
-            return resolveEnv(checkResult, _env);
-        } 
-
-        return checkResult;
     }
 
     async function evalOperation (_operation, _env) {
@@ -151,22 +121,12 @@ export async function POST ({ request }) {
         }
         
         for (const [_input_name, _input_value] of Object.entries(_operation)) {
-            EnvHandler.setGlobalEnv(payload.env);
-            
             if (ENV_VARIABLES_INPUT_ALLOWLIST.includes(_input_name)) {
                     _operation[_input_name] = EnvHandler.checkPlaceholders(_input_value, _env);
-            //     // console.log('ENV', _env);
-            //     const replacedEnv = resolveEnv(_input_value, _env);
-            //     // console.log('RESOLVED ENV', replacedEnv);
-            //     const needsReplacementInString = _input_value.replaceAll(placeholderMatchRegExp, '') && _input_value.match(placeholderMatchRegExp);
-            //     _operation[_input_name] = needsReplacementInString ? _input_value.replace(placeholderMatchRegExp, replacedEnv) : replacedEnv;
-            // } else {
-            //     console.log('OPERATION', _operation);
             }
         }
         
         Operations._setPayload(payload);
-
         console.log(`Operation: ${ _operation.command }`);
 
         // Calls the operation
@@ -200,14 +160,13 @@ export async function POST ({ request }) {
 
     async function _execStream () {
         try {  
+            EnvHandler.setGlobalEnv(payload.env);
             await runFlow(payload.flows.main_flow, payload.env);
     
             if (!payload.config.ws_endpoint && payload.config.close_browser_on_finish) {
                 await browser.close();
             }
             
-            // console.dir(responsePayload, { depth: null });
-
             ServerLogger.logEvent('response', {
                 message: 'All operations done.',
                 status_code: 200,
