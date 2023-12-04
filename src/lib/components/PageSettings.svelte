@@ -6,7 +6,6 @@
 
     export let appendToast;
     let pageSettingsModal;
-
     export let wsEndpoint;
     let lastWSEndpoint;
 
