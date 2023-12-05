@@ -33,33 +33,56 @@ function createPresetsStore () {
             })
          })
       })
-  }
+   }
+
+   function savePreset (_preset_flow) {
+      // Prevents invalid already closed web socket endpoints
+      Object.values(_preset_flow)[0].config.ws_endpoint = '';
+
+      if (typeof _preset_flow === 'object') {
+         update((_presets) => {
+            _presets = {..._presets, ..._preset_flow};
+
+            if (_flag_saveToLocalStorage) { localStorage.setItem('presets', JSON.stringify(_presets)) }
+            return _presets;
+         });
+      }
+   }
+
+   function removePreset (_preset_name) {
+      return update((_presets) => {
+         delete _presets[_preset_name];
+
+         if (_flag_saveToLocalStorage) { localStorage.setItem('presets', JSON.stringify(_presets)) }
+         return _presets;
+      })
+   }
+
+   async function savePresetToLibrary () {
+      const res = await fetch('/api/save-to-library', {
+         method: 'POST',
+         headers: {
+            'Content-Type': 'application/json'
+         },
+         body: JSON.stringify({
+            game: 'Rocket League'
+         })
+      });
+      
+      console.log(res);
+      let _res = await res.json();
+      console.log('Done', _res);
+   }
 
    return {
       subscribe,
       _fix_fixNullConfigForAll,
       loadPresets: (_presets) => set(_presets),
-      savePreset: (_preset_flow) => {
-         // Prevents invalid already closed web socket endpoints
-         Object.values(_preset_flow)[0].config.ws_endpoint = '';
-
-         if (typeof _preset_flow === 'object') {
-            update((_presets) => {
-               _presets = {..._presets, ..._preset_flow};
-
-               if (_flag_saveToLocalStorage) { localStorage.setItem('presets', JSON.stringify(_presets)) }
-               return _presets;
-            });
-         }
-      },
+      clearPresets: () => set({}),
+      savePreset,
       renamePreset,
-      removePreset: (_preset_name) => update((_presets) => {
-         delete _presets[_preset_name];
-
-         if (_flag_saveToLocalStorage) { localStorage.setItem('presets', JSON.stringify(_presets)) }
-         return _presets;
-      }),
-      clearPresets: () => set({})
+      removePreset,
+      savePresetToLibrary
    }
 }
 
