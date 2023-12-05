@@ -59,6 +59,8 @@ export async function POST ({ request }) {
         
         const [page] = await browser.pages();
 
+        page.setViewport({ width: 1366, height: 720 });
+
         page.on('dialog', async (dialog) => {
             await dialog.accept();
         });
@@ -94,13 +96,10 @@ export async function POST ({ request }) {
                 executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
                 args: [
                     `--window-size=${ width },${ height + 200 }`
-                ],
-                defaultViewport: {
-                    width,
-                    height
-                }
+                ]
             });
 
+            
             console.log(`New browser launched: ${ _browser.wsEndpoint() }`);
         }
 
