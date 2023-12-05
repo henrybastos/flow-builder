@@ -98,7 +98,6 @@ export async function POST ({ request }) {
                     `--window-size=${ width },${ height + 200 }`
                 ]
             });
-
             
             console.log(`New browser launched: ${ _browser.wsEndpoint() }`);
         }
