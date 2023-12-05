@@ -304,7 +304,6 @@
             <div class="max-h-[36rem] overflow-y-auto rounded-md">
                 <GraphicalJson key="response_payload" values={ JSON.parse(responsePayload) }/>
             </div>
-            <!-- <GraphicalJson key="response_payload" values={ JSON.parse(responsePayload) }/> -->
             <!-- <textarea class="font-code bg-neutral-950 hover:bg-neutral-950" bind:value={responsePayload} name="" id="" cols="30" rows="20"></textarea> -->
         {/if}
     </TabsBar>

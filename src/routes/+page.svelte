@@ -59,7 +59,6 @@
         <h3>Flow Builder</h3>
     
         <div class="inline-flex gap-x-2">
-
             <PresetsModal on:preset_loaded={onPresetLoadedHandler} {appendToast}/>
 
             {#if $CURRENT_PRESET_NAME}
