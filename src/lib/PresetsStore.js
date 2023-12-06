@@ -37,11 +37,19 @@ function createPresetsStore () {
 
    function savePreset (_preset_flow) {
       // Prevents invalid already closed web socket endpoints
-      Object.values(_preset_flow)[0].config.ws_endpoint = '';
+      try {
+         Object.values(_preset_flow)[0].config.ws_endpoint = '';
+      } catch (err) {
+         _preset_flow.config = structuredClone(initStruct.config);
+         console.error('[ERROR :: NO WS FOUND]', err, '\nFixing config...');
+      };
 
       if (typeof _preset_flow === 'object') {
          update((_presets) => {
-            _presets = {..._presets, ..._preset_flow};
+            _presets = {
+               ..._presets, 
+               ..._preset_flow
+            };
 
             if (_flag_saveToLocalStorage) { localStorage.setItem('presets', JSON.stringify(_presets)) }
             return _presets;
@@ -58,20 +66,47 @@ function createPresetsStore () {
       })
    }
 
-   async function savePresetToLibrary () {
-      const res = await fetch('/api/save-to-library', {
+   async function savePresetToLibrary (_preset) {
+      const res = await fetch('/api/save-preset', {
          method: 'POST',
          headers: {
             'Content-Type': 'application/json'
          },
-         body: JSON.stringify({
-            game: 'Rocket League'
-         })
+         body: JSON.stringify(_preset)
       });
       
       console.log(res);
       let _res = await res.json();
       console.log('Done', _res);
+   }
+
+   async function loadPresetFromLibrary (_preset_name) {
+      const response = await fetch('/api/load-preset?' + new URLSearchParams({ 'preset-name': _preset_name }), {
+         method: 'GET',
+         headers: {
+            'Content-Type': 'application/json'
+         }
+      })
+      return await response.json();
+   }
+
+   async function loadAllPresetsFromLibrary () {
+      const response = await fetch('/api/load-all-presets', {
+         method: 'GET',
+         headers: {
+            'Content-Type': 'application/json'
+         }
+      });
+
+      const presets = await response.json();
+
+      for(const [preset, preset_payload] of Object.entries(presets)) {
+         // console.log(preset_payload);
+         savePreset(preset_payload);
+         _fix_fixNullConfigForAll();
+      }
+
+      return presets;
    }
 
    return {
@@ -82,7 +117,9 @@ function createPresetsStore () {
       savePreset,
       renamePreset,
       removePreset,
-      savePresetToLibrary
+      savePresetToLibrary,
+      loadPresetFromLibrary,
+      loadAllPresetsFromLibrary
    }
 }
 

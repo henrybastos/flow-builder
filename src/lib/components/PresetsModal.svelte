@@ -2,9 +2,10 @@
    import Modal from "./Modal.svelte";
    import { FLOW_PRESETS, CURRENT_PRESET_NAME } from "$lib/PresetsStore";
    import { PAYLOAD } from "$lib/PayloadStore";
-   import { createEventDispatcher } from "svelte";
+   import { createEventDispatcher, onMount } from "svelte";
    import { checkClickOnGuideIDs } from "$lib/utils";
 
+   let ALL_PRESETS = {};
    let loadedPreset;
    let presetsModal;
    let inputPresetName;
@@ -88,6 +89,12 @@
     function _window_handleClicks (_event) {
         _window_checkEditPresetNameClick(_event.target);
     }
+
+    onMount(async () => {
+        // ALL_PRESETS = await FLOW_PRESETS.loadPresetFromLibrary('preset_01.json');
+        ALL_PRESETS = await FLOW_PRESETS.loadAllPresetsFromLibrary();
+        // console.log(ALL_PRESETS);
+    })
 </script>
 
 <svelte:window on:click={_window_handleClicks} />
@@ -103,7 +110,8 @@
     let:openDangerModal 
 >
    <div class="btn-bar mb-3 overflow-y-auto max-h-[30rem] p-3 border-2 border-neutral-800 bg-neutral-950 rounded-lg">
-       {#each Object.keys($FLOW_PRESETS) as preset_name}
+       <!-- {#each Object.keys($FLOW_PRESETS) as preset_name} -->
+       {#each Object.keys(ALL_PRESETS) as preset_name}
            <div class="flex flex-nowrap col-span-full gap-x-3">
                 {#if isPresetNameEditable === preset_name}
                     <input data-guide-id="edit_preset_name_input" class="btn-md col-span-full w-full outline-offset-1" type="text" bind:value={ presetNameEdit }>

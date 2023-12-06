@@ -71,7 +71,13 @@
     
             <PayloadModal />
 
-            <!-- <button class="bg-transparent border-none p-3" on:click={FLOW_PRESETS.savePresetToLibrary}>Save to library</button> -->
+            <!-- <button class="bg-transparent border-none p-3" on:click={async () => await FLOW_PRESETS.savePresetToLibrary({ name: "preset_01", body: $PAYLOAD })}>Save to library</button> -->
+            <button 
+                class="bg-transparent border-none p-3" 
+                on:click={async () => await FLOW_PRESETS.loadAllPresetsFromLibrary()}
+            >
+                Load all presets
+            </button>
         </div>
     </div>
 
