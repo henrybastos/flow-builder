@@ -58,12 +58,13 @@
     function encodePresetsToURI () {
         FLOW_PRESETS._fix_fixNullConfigForAll()
         let _payload_list_json = structuredClone($FLOW_PRESETS);
+        
         _payload_list_json = Object.entries(_payload_list_json).map(([ preset_name, preset_payload ]) => {
             return [preset_name, JSON.parse(transformToJSON(preset_payload))]
         })
         
         return encodeURIComponent(
-                JSON.stringify(Object.fromEntries(_payload_list_json), null, 3)
+            JSON.stringify(Object.fromEntries(_payload_list_json), null, 3)
         );
     }
 
@@ -240,11 +241,11 @@
                     Download payload
                 </a>
 
-                <!-- <a class="clear-btn mb-2" 
+                <a class="clear-btn mb-2" 
                     href={`data:text/json;charset=utf-8,${ encodePresetsToURI() }`} 
                     download={'all_presets.json'}>
                     Download raw full payload
-                </a> -->
+                </a>
             </div>
 
             <textarea class="font-code bg-neutral-950 hover:bg-neutral-950" bind:value={payloadModalTextearea} name="" id="" cols="30" rows="16"></textarea>

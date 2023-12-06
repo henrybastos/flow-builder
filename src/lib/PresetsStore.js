@@ -35,14 +35,18 @@ function createPresetsStore () {
       })
    }
 
-   function savePreset (_preset_flow) {
+   function savePreset (_preset_flow, _preset_name = 'Unknown preset') {
       // Prevents invalid already closed web socket endpoints
       try {
          Object.values(_preset_flow)[0].config.ws_endpoint = '';
       } catch (err) {
-         _preset_flow.config = structuredClone(initStruct.config);
-         console.error('[ERROR :: NO WS FOUND]', err, '\nFixing config...');
-      };
+         if (!_preset_flow?.config) {
+            console.warn(`[WARNING :${ _preset_name }: NO CONFIG FOUND]\n`, err, '\nInitializing config...');
+         } else {
+            console.warn(`[WARNING :${ _preset_name }: NO WS FOUND]`, err, '\nFixing config...');
+            // _preset_flow.config = { ..._preset_flow.config, ws_endpoint: ''}
+         }
+      }
 
       if (typeof _preset_flow === 'object') {
          update((_presets) => {
@@ -98,15 +102,7 @@ function createPresetsStore () {
          }
       });
 
-      const presets = await response.json();
-
-      for(const [preset, preset_payload] of Object.entries(presets)) {
-         // console.log(preset_payload);
-         savePreset(preset_payload);
-         _fix_fixNullConfigForAll();
-      }
-
-      return presets;
+      return await response.json();
    }
 
    return {
