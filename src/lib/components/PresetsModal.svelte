@@ -41,7 +41,9 @@
             PAYLOAD._fix_fixNullConfig();
         }
 
+        console.log($PAYLOAD);
         dispatch('preset_loaded', { presetName: _preset_name });
+        // console.log($FLOW_PRESETS[_preset_name]);
         presetsModal.close();
     }
 
@@ -93,6 +95,16 @@
     onMount(async () => {
         // ALL_PRESETS = await FLOW_PRESETS.loadPresetFromLibrary('preset_01.json');
         ALL_PRESETS = await FLOW_PRESETS.loadAllPresetsFromLibrary();
+        console.log($FLOW_PRESETS);
+
+        for(const [preset_name, preset_payload] of Object.entries(ALL_PRESETS)) {
+            console.log();
+            FLOW_PRESETS.savePreset({ [preset_name]: { ...preset_payload }});
+            // FLOW_PRESETS.savePreset({ [inputPresetName || 'New Preset']: { ...$PAYLOAD } });
+            // console.log(preset_name, preset_payload);
+        }
+
+        // console.log($FLOW_PRESETS);
         // console.log(ALL_PRESETS);
     })
 </script>
@@ -110,8 +122,8 @@
     let:openDangerModal 
 >
    <div class="btn-bar mb-3 overflow-y-auto max-h-[30rem] p-3 border-2 border-neutral-800 bg-neutral-950 rounded-lg">
-       <!-- {#each Object.keys($FLOW_PRESETS) as preset_name} -->
-       {#each Object.keys(ALL_PRESETS) as preset_name}
+       {#each Object.keys($FLOW_PRESETS) as preset_name}
+       <!-- {#each Object.keys(ALL_PRESETS) as preset_name} -->
            <div class="flex flex-nowrap col-span-full gap-x-3">
                 {#if isPresetNameEditable === preset_name}
                     <input data-guide-id="edit_preset_name_input" class="btn-md col-span-full w-full outline-offset-1" type="text" bind:value={ presetNameEdit }>

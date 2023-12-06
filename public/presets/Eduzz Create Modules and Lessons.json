@@ -1,0 +1,157 @@
+{
+    "env": {
+        "edit_modules_url": "https://my.nutror.com/cursos/423552/editar/modulos",
+        "modules": [
+            {
+                "module_title": "Vídeo de Vendas",
+                "module_lessons": [
+                    {
+                        "lesson_title": "Vídeo de Vendas",
+                        "lesson_link": "https://www.youtube.com/watch?v=5vybEtDCdm4&list=PL5V5SVdyKUbdyhLcdFfuL6iOguFnL-dok&index=52"
+                    }
+                ],
+                "module_days_locked": ""
+            },
+            {
+                "module_title": "Boas-vindas",
+                "module_lessons": [
+                    {
+                        "lesson_title": "Boas-vindas",
+                        "lesson_link": "https://www.youtube.com/watch?v=NRBsx9cDIxU&list=PL5V5SVdyKUbfGigq2StwG5Au_1CmiDUS3&index=6"
+                    }
+                ],
+                "module_days_locked": ""
+            }
+        ]
+    },
+    "flows": {
+        "main_flow": {
+            "6973808969121402": {
+                "command": "goto",
+                "label": "Goto",
+                "icon": "ti-send",
+                "input_fields": {
+                    "target": {
+                        "type": "text",
+                        "name": "",
+                        "label": "Target",
+                        "placeholder": "URL",
+                        "value": "%edit_modules_url%"
+                    }
+                },
+                "id": "6973808969121402"
+            },
+            "5870112385683619": {
+                "command": "run_flow_for_each",
+                "label": "Run Flow For Each",
+                "icon": "ti-zoom-scan",
+                "input_fields": {
+                    "flow": {
+                        "type": "dropdown",
+                        "label": "Flow",
+                        "options": [],
+                        "value": "create_module"
+                    },
+                    "env_var": {
+                        "type": "text",
+                        "label": "Env variable",
+                        "placeholder": "%variable%",
+                        "value": "%modules%"
+                    }
+                },
+                "id": "5870112385683619"
+            }
+        },
+        "create_module": {
+            "24794937470936307": {
+                "command": "wait_seconds",
+                "label": "Wait Seconds",
+                "icon": "ti-clock",
+                "input_fields": {
+                    "time": {
+                        "type": "text",
+                        "label": "Timeout time (ms)",
+                        "placeholder": "15000",
+                        "value": "2000"
+                    }
+                },
+                "id": "24794937470936307"
+            },
+            "8318106521876132": {
+                "command": "user_click",
+                "label": "User click",
+                "icon": "ti-hand-click",
+                "input_fields": {
+                    "target": {
+                        "type": "text",
+                        "name": "",
+                        "label": "Target",
+                        "placeholder": "URL",
+                        "value": "//*/button/span[text()='Adicionar módulos']"
+                    }
+                },
+                "id": "8318106521876132"
+            },
+            "5355394345560851": {
+                "command": "type",
+                "label": "Type",
+                "icon": "ti-keyboard",
+                "input_fields": {
+                    "target": {
+                        "type": "text",
+                        "label": "Target",
+                        "placeholder": "XPath",
+                        "value": "//*/input[@id='module_title']"
+                    },
+                    "value": {
+                        "type": "text",
+                        "label": "Value",
+                        "placeholder": "Value",
+                        "value": "%module_title%"
+                    }
+                },
+                "id": "5355394345560851"
+            },
+            "060299077317681915": {
+                "command": "type",
+                "label": "Type",
+                "icon": "ti-keyboard",
+                "input_fields": {
+                    "target": {
+                        "type": "text",
+                        "label": "Target",
+                        "placeholder": "XPath",
+                        "value": "//*/input[@id='module_days_locked']"
+                    },
+                    "value": {
+                        "type": "text",
+                        "label": "Value",
+                        "placeholder": "Value",
+                        "value": "%module_days_locked%"
+                    }
+                },
+                "id": "060299077317681915"
+            },
+            "8042749518397996": {
+                "command": "user_click",
+                "label": "User click",
+                "icon": "ti-hand-click",
+                "input_fields": {
+                    "target": {
+                        "type": "text",
+                        "name": "",
+                        "label": "Target",
+                        "placeholder": "URL",
+                        "value": "//*/button[@id='module_save']"
+                    }
+                },
+                "id": "8042749518397996"
+            }
+        },
+        "create_lesson": []
+    },
+    "config": {
+        "ws_endpoint": "",
+        "close_browser_on_finish": false
+    }
+}

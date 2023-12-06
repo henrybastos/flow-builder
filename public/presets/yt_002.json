@@ -1,0 +1,148 @@
+{
+   "env": {
+       "edit_modules_url": "https://my.nutror.com/cursos/423552/editar/modulos",
+       "modules": [
+           {
+               "module_title": "Módulo 1- Introdução",
+               "module_days_locked": ""
+           },
+           {
+               "module_title": "Módulo 2 - Desossa bovina",
+               "module_days_locked": ""
+           },
+           {
+               "module_title": "Módulo 3 - Desossa suína",
+               "module_days_locked": ""
+           }
+       ]
+   },
+   "flows": {
+       "main_flow": {
+           "6215985608172823": {
+               "command": "goto",
+               "label": "Goto",
+               "icon": "ti-send",
+               "input_fields": {
+                   "target": {
+                       "type": "text",
+                       "name": "",
+                       "label": "Target",
+                       "placeholder": "URL",
+                       "value": "%edit_modules_url%"
+                   }
+               },
+               "id": "6215985608172823"
+           },
+           "5967396024047389": {
+               "command": "run_flow_for_each",
+               "label": "Run Flow For Each",
+               "icon": "ti-zoom-scan",
+               "input_fields": {
+                   "flow": {
+                       "type": "dropdown",
+                       "label": "Flow",
+                       "options": [],
+                       "value": "create_module"
+                   },
+                   "env_var": {
+                       "type": "text",
+                       "label": "Env variable",
+                       "placeholder": "%variable%",
+                       "value": "%modules%"
+                   }
+               },
+               "id": "5967396024047389"
+           }
+       },
+       "create_module": {
+           "24017551290830674": {
+               "command": "wait_seconds",
+               "label": "Wait Seconds",
+               "icon": "ti-clock",
+               "input_fields": {
+                   "time": {
+                       "type": "text",
+                       "label": "Timeout time (ms)",
+                       "placeholder": "15000",
+                       "value": "2000"
+                   }
+               },
+               "id": "24017551290830674"
+           },
+           "9364335881646682": {
+               "command": "user_click",
+               "label": "User click",
+               "icon": "ti-hand-click",
+               "input_fields": {
+                   "target": {
+                       "type": "text",
+                       "name": "",
+                       "label": "Target",
+                       "placeholder": "URL",
+                       "value": "//*/button/span[text()='Adicionar módulos']"
+                   }
+               },
+               "id": "9364335881646682"
+           },
+           "5954611649330357": {
+               "command": "type",
+               "label": "Type",
+               "icon": "ti-keyboard",
+               "input_fields": {
+                   "target": {
+                       "type": "text",
+                       "label": "Target",
+                       "placeholder": "XPath",
+                       "value": "//*/input[@id='module_title']"
+                   },
+                   "value": {
+                       "type": "text",
+                       "label": "Value",
+                       "placeholder": "Value",
+                       "value": "%module_title%"
+                   }
+               },
+               "id": "5954611649330357"
+           },
+           "5165294352650998": {
+               "command": "type",
+               "label": "Type",
+               "icon": "ti-keyboard",
+               "input_fields": {
+                   "target": {
+                       "type": "text",
+                       "label": "Target",
+                       "placeholder": "XPath",
+                       "value": "//*/input[@id='module_days_locked']"
+                   },
+                   "value": {
+                       "type": "text",
+                       "label": "Value",
+                       "placeholder": "Value",
+                       "value": "%module_days_locked%"
+                   }
+               },
+               "id": "5165294352650998"
+           },
+           "7316461387204514": {
+               "command": "user_click",
+               "label": "User click",
+               "icon": "ti-hand-click",
+               "input_fields": {
+                   "target": {
+                       "type": "text",
+                       "name": "",
+                       "label": "Target",
+                       "placeholder": "URL",
+                       "value": "//*/button[@id='module_save']"
+                   }
+               },
+               "id": "7316461387204514"
+           }
+       }
+   },
+   "config": {
+       "ws_endpoint": "",
+       "close_browser_on_finish": false
+   }
+}
