@@ -145,6 +145,7 @@ export async function POST ({ request }) {
             default:
                 if (_operation?.response_slot) {
                     responsePayload[_operation.response_slot] = await Operations[_operation.command](_operation);
+                    EnvHandler.setResponsePayload(responsePayload);
                 } else {
                     await Operations[_operation.command](_operation);
                 }

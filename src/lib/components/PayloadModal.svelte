@@ -208,7 +208,6 @@
                     operationBody.enabled = operation.enabled;
                     
                     if (operationBody?.input_fields) {
-
                         Object.entries(operationBody.input_fields).forEach(([key, value]) => {
                             value.value = operation[key];
                         });

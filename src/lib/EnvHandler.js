@@ -1,8 +1,12 @@
 export class EnvHandler {
-   static log_events = false;
+   static log_events = true;
 
    static setGlobalEnv (_env) {
       this.env = _env;
+   }
+
+   static setResponsePayload (_response_payload) {
+      this.response_payload = _response_payload;
    }
 
    static checkPlaceholders (_str, _env) {
@@ -13,8 +17,12 @@ export class EnvHandler {
          let rawEnvVar = this.hasEnvPlaceholder(_str);
          
          this._LOG_EVENT_('[IS GLOBAL]', _str, this.isEnvGlobal(_str), rawEnvVar);
+         this._LOG_EVENT_('[IS RESPONSE PAYLOAD]', _str, this.isResponsePayload(_str), rawEnvVar);
 
-         const envVar = this.resolveDotNotation(rawEnvVar, this.isEnvGlobal(_str) ? this.env : _env);
+         const envVar = this.resolveDotNotation(rawEnvVar, this.isEnvGlobal(_str) ? this.env : this.isResponsePayload(_str) ? this.response_payload : _env);
+         this._LOG_EVENT_('[RAW ENV VAR]', rawEnvVar);
+         this._LOG_EVENT_('[LOCA ENV]', _env);
+         this._LOG_EVENT_('[RES PAYLOAD]', this.response_payload);
          this._LOG_EVENT_('[ENV VAR]', envVar);
 
          if (typeof envVar === 'string') {
@@ -54,14 +62,19 @@ export class EnvHandler {
    }
 
    static hasEnvPlaceholder (_str) {
-      return _str.match(/(?<=%).*(?=%)/g)?.[0].replace(/\$\$env\./g, '');
+      return _str.match(/(?<=%).*(?=%)/g)?.[0].replace(/\$\$(env|res)\./g, '');
    }
    
    static isEnvGlobal (_str) {
       return _str.match(/\$\$env\./g) !== null;
    }
+
+   static isResponsePayload (_str) {
+      return _str.match(/\$\$res\./g) !== null;
+   }
    
    static resolveDotNotation (_str, _env) {
+      console.log(_env);
       return [_env, ..._str.split('.')]?.reduce((a,b) => a?.[b]) || 'invalid_env_var';
    }
 }

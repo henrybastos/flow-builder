@@ -76,6 +76,12 @@ export const FLOW_BUILDER_INPUT_FIELD_TEMPLATES = {
         placeholder: 'innerText',
         value: ''
     },
+    param: {
+        type: 'text',
+        label: 'Parameter',
+        placeholder: 'list',
+        value: ''
+    },
     response_slot: {
         type: 'text',
         label: 'Response Slot',
@@ -291,6 +297,16 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = {
         enabled: true,
         label: 'Close browser',
         icon: 'ti-clock'
+    },
+    extract_param_from_url: {
+        command: 'extract_param_from_url',
+        enabled: true,
+        label: 'Extract parameter from URL',
+        icon: 'ti-cut',
+        input_fields: {
+            param: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.param,
+            response_slot: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.response_slot
+        }
     },
     press_key: {
         command: 'press_key',

@@ -146,7 +146,18 @@ export default class Operations {
     }    
 
     static async wait_navigation () {
-        await this.page.waitForNavigation();
+        try {
+            ServerLogger.logEvent('operation_log', {
+                message: `Waiting for navigation...`,
+                status_message: 'info'
+            });
+            await this.page.waitForNavigation();
+        } catch (err) {
+            ServerLogger.logEvent('operation_log', {
+                message: `Failed to wait for navigation`,
+                status_message: 'error'
+            });
+        }
     }
 
     static async reload () {
@@ -207,5 +218,17 @@ export default class Operations {
         });
 
         await this.browser.close();
+    }
+
+    static async extract_param_from_url ({ param }) {
+        // await this.wait_navigation();
+
+        ServerLogger.logEvent('operation_log', {
+            message: `Retrieving parameter  ${ param }...`,
+            status_message: 'info'
+        });
+        
+        const urlSearchParams = new URLSearchParams(await this.page.evaluate(() => window.location.search));
+        return urlSearchParams.get(param);
     }
 }
