@@ -1,0 +1,106 @@
+{
+    "env": {
+        "response_slot": "lethamyr",
+        "video_url": "https://www.youtube.com/watch?v=vZDbybxRLRk",
+        "website_urls": [
+            {
+                "response_slot": "squishy",
+                "video_url": "https://www.youtube.com/watch?v=RFWGwNq_8_4"
+            },
+            {
+                "response_slot": "sunless",
+                "video_url": "https://www.youtube.com/watch?v=qohBbkwGkZc"
+            },
+            {
+                "response_slot": "retals",
+                "video_url": "https://www.youtube.com/watch?v=B77k6zqytzg"
+            }
+        ]
+    },
+    "flows": {
+        "main_flow": {
+            "5561963483466654": {
+                "command": "run_flow",
+                "label": "Run Flow",
+                "icon": "ti-arrow-bear-right-2",
+                "input_fields": {
+                    "flow": {
+                        "type": "dropdown",
+                        "label": "Flow",
+                        "options": [],
+                        "value": "scrape_video_title"
+                    }
+                },
+                "id": "5561963483466654"
+            },
+            "9069334860247273": {
+                "command": "run_flow_for_each",
+                "label": "Run Flow For Each",
+                "icon": "ti-zoom-scan",
+                "input_fields": {
+                    "flow": {
+                        "type": "dropdown",
+                        "label": "Flow",
+                        "options": [],
+                        "value": "scrape_video_title"
+                    },
+                    "env_var": {
+                        "type": "text",
+                        "label": "Env variable",
+                        "placeholder": "%variable%",
+                        "value": "%website_urls%"
+                    }
+                },
+                "id": "9069334860247273"
+            }
+        },
+        "scrape_video_title": {
+            "8548888846269509": {
+                "command": "goto",
+                "label": "Goto",
+                "icon": "ti-send",
+                "input_fields": {
+                    "target": {
+                        "type": "text",
+                        "name": "",
+                        "label": "Target",
+                        "placeholder": "URL",
+                        "value": "%video_url%"
+                    }
+                },
+                "id": "8548888846269509"
+            },
+            "6272932972704546": {
+                "command": "scrape_attr",
+                "label": "Scrape Attribute",
+                "icon": "ti-brackets-angle",
+                "input_fields": {
+                    "target": {
+                        "type": "text",
+                        "label": "Target",
+                        "placeholder": "XPath",
+                        "value": "//*/h1[contains(@class, 'ytd-watch-metadata')]"
+                    },
+                    "attr": {
+                        "type": "text",
+                        "label": "Attribute",
+                        "placeholder": "innerText",
+                        "value": "innerText"
+                    },
+                    "response_slot": {
+                        "type": "text",
+                        "label": "Response Slot",
+                        "placeholder": "response.attr",
+                        "value": "%response_slot%"
+                    }
+                },
+                "id": "6272932972704546"
+            }
+        }
+    },
+    "config": {
+        "ws_endpoint": false,
+        "close_browser_on_finish": false,
+        "close_browser_on_cancel_request": false
+    }
+}

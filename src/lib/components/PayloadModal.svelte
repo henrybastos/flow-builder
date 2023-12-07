@@ -8,10 +8,14 @@
     import { onMount } from "svelte";
     import { FLOW_PRESETS, CURRENT_PRESET_NAME } from "$lib/PresetsStore";
     import GraphicalJson from "./GraphicalJSON.svelte";
+    import { slide } from "svelte/transition";
 
     const controller = new AbortController();
     $: payloadToURI = `data:text/json;charset=utf-8,${ encodeURIComponent(payloadModalTextearea) }`;
     $: payloadURIPresetName = `${ $CURRENT_PRESET_NAME?.match(/[A-z,0-9]*[^\s:_,.]/gi)?.join('_')?.toLowerCase() || 'preset' }.json`;
+    
+    $: rawPayloadToURI = `data:text/json;charset=utf-8,${ encodeURIComponent(JSON.stringify($PAYLOAD)) }`;
+    $: rawPayloadURIPresetName = `raw_${ $CURRENT_PRESET_NAME?.match(/\w*[^\s:_,.]/gi)?.join('_')?.toLowerCase() || 'preset' }.json`;
 
     let responsePayload = JSON.stringify({ response: 'Nothing to display :D' });
 
@@ -62,6 +66,8 @@
         _payload_list_json = Object.entries(_payload_list_json).map(([ preset_name, preset_payload ]) => {
             return [preset_name, JSON.parse(transformToJSON(preset_payload))]
         })
+
+        console.log(_payload_list_json);
         
         return encodeURIComponent(
             JSON.stringify(Object.fromEntries(_payload_list_json), null, 3)
@@ -233,79 +239,90 @@
 <Modal let:appendModalToast let:openDangerModal on:open={onPayloadModalOpenHandler} on:close={onPayloadModalCloseHandler} bind:this={payloadModal} title="Payload" class="w-[90vw]">
     <TabsBar let:activeTab modalTabs={tabs}>
         {#if activeTab === 'payload'}
-
-            <div class="inline-flex justify-start">
-                <a class="clear-btn mb-2" 
-                    href={payloadToURI} 
-                    download={payloadURIPresetName}>
-                    Download payload
-                </a>
-
-                <a class="clear-btn mb-2" 
-                    href={`data:text/json;charset=utf-8,${ encodePresetsToURI() }`} 
-                    download={'all_presets.json'}>
-                    Download raw full payload
-                </a>
-            </div>
-
-            <textarea class="font-code bg-neutral-950 hover:bg-neutral-950" bind:value={payloadModalTextearea} name="" id="" cols="30" rows="16"></textarea>
-            
-            {#if runFlowMessage.message !== ''}
-                <span class={`${ runFlowMessage.type === 'error' ? 'text-red-600' : 'text-green-600' } mt-4`}>
-                        <i class="ti ti-exclamation-circle text-lg mr-2 align-middle"></i>
-                        { runFlowMessage.message }
-                </span>
-            {/if}
-
-            
-            <div class="console_screen mt-4 items-center overflow-hidden">
-                {#if Object.values($LOGGER.messages).length > 0}
-                    <span class="whitespace-nowrap mr-1 font-code">Last message:</span>
-                    <LogMessage data={Object.values($LOGGER.messages).slice(-1)[0]} />
-                {:else}
-                    <span class="text-neutral-500">Nothing to see here =)</span>
+            <section transition:slide={{ duration: 400 }}>
+                <div class="inline-flex justify-start">
+                    <a class="clear-btn mb-2" 
+                        href={payloadToURI} 
+                        download={payloadURIPresetName}>
+                        Download payload
+                    </a>
+    
+                    <a class="clear-btn mb-2" 
+                        href={rawPayloadToURI} 
+                        download={rawPayloadURIPresetName}>
+                        Download raw payload
+                    </a>
+    
+                    <!-- <a class="clear-btn mb-2" 
+                        href={`data:text/json;charset=utf-8,${ encodePresetsToURI() }`} 
+                        download={'all_presets.json'}>
+                        Download raw full payload
+                    </a> -->
+                </div>
+    
+                <textarea class="font-code bg-neutral-950 hover:bg-neutral-950" bind:value={payloadModalTextearea} name="" id="" cols="30" rows="16"></textarea>
+                
+                {#if runFlowMessage.message !== ''}
+                    <span class={`${ runFlowMessage.type === 'error' ? 'text-red-600' : 'text-green-600' } mt-4`}>
+                            <i class="ti ti-exclamation-circle text-lg mr-2 align-middle"></i>
+                            { runFlowMessage.message }
+                    </span>
                 {/if}
-            </div>
-        
-            <div class="btn-bar">
-                {#if isFLowAPILoading}
-                    <button disabled={cancelRequest} on:click={() => cancelRequest = true} class="btn-md w-full mt-4">
-                        <span class="w-full inline-flex justify-center">
-                            {#if cancelRequest}
-                                <i class="ti ti-loader-2 text-neutral-400 animate-spin-icon mr-2"></i>
-                                Canceling request
-                            {:else}
-                                <i class="ti ti-loader-2 text-neutral-400 animate-spin-icon mr-2"></i>
-                                Cancel
-                            {/if}
-                        </span>
+    
+                
+                <div class="console_screen mt-4 items-center overflow-hidden">
+                    {#if Object.values($LOGGER.messages).length > 0}
+                        <span class="whitespace-nowrap mr-1 font-code">Last message:</span>
+                        <LogMessage data={Object.values($LOGGER.messages).slice(-1)[0]} />
+                    {:else}
+                        <span class="text-neutral-500">Nothing to see here =)</span>
+                    {/if}
+                </div>
+            
+                <div class="btn-bar">
+                    {#if isFLowAPILoading}
+                        <button disabled={cancelRequest} on:click={() => cancelRequest = true} class="btn-md w-full mt-4">
+                            <span class="w-full inline-flex justify-center">
+                                {#if cancelRequest}
+                                    <i class="ti ti-loader-2 text-neutral-400 animate-spin-icon mr-2"></i>
+                                    Canceling request
+                                {:else}
+                                    <i class="ti ti-loader-2 text-neutral-400 animate-spin-icon mr-2"></i>
+                                    Cancel
+                                {/if}
+                            </span>
+                        </button>
+                    {:else }
+                        <button on:click={async () => await sendFlowPayload(JSON.parse(payloadModalTextearea))} class="btn-md w-full mt-4">
+                            <i class="ti ti-arrows-split-2 text-blue-500 mr-2"></i>
+                            Run flow
+                        </button>
+                    {/if}
+    
+            
+                    <button on:click={loadPayload} class="btn-md w-full mt-4">
+                        <i class="ti ti-file-upload text-blue-500"></i>
+                        Update UI
                     </button>
-                {:else }
-                    <button on:click={async () => await sendFlowPayload(JSON.parse(payloadModalTextearea))} class="btn-md w-full mt-4">
-                        <i class="ti ti-arrows-split-2 text-blue-500 mr-2"></i>
-                        Run flow
-                    </button>
-                {/if}
-
-        
-                <button on:click={loadPayload} class="btn-md w-full mt-4">
-                    <i class="ti ti-file-upload text-blue-500"></i>
-                    Update UI
-                </button>
-            </div>
+                </div>
+            </section>
         {:else if activeTab === 'console'}
-            <button class="clear-btn mb-2" on:click={() => openDangerModal(LOGGER.clearLogs, { danger_modal_title: 'Clear logs from Local Storage?', danger_confirm: 'Clear' })}>Clear logs</button>
-            <div class="console_screen flex-col overflow-y-auto overflow-x-clip max-h-[36rem]">
-                {#each Object.entries($LOGGER.messages) as [msg_key, msg], _ (msg_key)}
-                    <!-- <span>{ JSON.stringify(msg, null, 3) }</span> -->
-                    <LogMessage on:clipboard_copy={() => appendModalToast('Copied to clipboard!', 'success')} data={msg} />
-                {/each}
-            </div>
+            <section transition:slide={{ duration: 400 }}>
+                <button class="clear-btn mb-2" on:click={() => openDangerModal(LOGGER.clearLogs, { danger_modal_title: 'Clear logs from Local Storage?', danger_confirm: 'Clear' })}>Clear logs</button>
+                <div class="console_screen flex-col overflow-y-auto overflow-x-clip max-h-[36rem]">
+                    {#each Object.entries($LOGGER.messages) as [msg_key, msg], _ (msg_key)}
+                        <!-- <span>{ JSON.stringify(msg, null, 3) }</span> -->
+                        <LogMessage on:clipboard_copy={() => appendModalToast('Copied to clipboard!', 'success')} data={msg} />
+                    {/each}
+                </div>
+            </section>
         {:else if activeTab === 'response payload'}
-            <div class="max-h-[36rem] overflow-y-auto rounded-md">
-                <GraphicalJson key="response_payload" values={ JSON.parse(responsePayload) }/>
-            </div>
-            <!-- <textarea class="font-code bg-neutral-950 hover:bg-neutral-950" bind:value={responsePayload} name="" id="" cols="30" rows="20"></textarea> -->
+            <section transition:slide={{ duration: 400 }}>
+                <div class="max-h-[36rem] overflow-y-auto rounded-md">
+                    <GraphicalJson key="response_payload" values={ JSON.parse(responsePayload) }/>
+                </div>
+                <!-- <textarea class="font-code bg-neutral-950 hover:bg-neutral-950" bind:value={responsePayload} name="" id="" cols="30" rows="20"></textarea> -->
+            </section>
         {/if}
     </TabsBar>
 </Modal>

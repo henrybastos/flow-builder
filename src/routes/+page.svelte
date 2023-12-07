@@ -26,7 +26,7 @@
     function checkAndLoadPresets () {
         if (localStorage?.getItem('presets')) {
             try {
-                FLOW_PRESETS.loadPresets(JSON.parse(localStorage.getItem('presets')));
+                // FLOW_PRESETS.loadPresets(JSON.parse(localStorage.getItem('presets')));
                 appendToast('Presets loaded successfully!', 'success');
             } catch (err) {
                 console.error(err);
@@ -72,12 +72,13 @@
             <PayloadModal />
 
             <!-- <button class="bg-transparent border-none p-3" on:click={async () => await FLOW_PRESETS.savePresetToLibrary({ name: "preset_01", body: $PAYLOAD })}>Save to library</button> -->
-            <button 
+            
+            <!-- <button 
                 class="bg-transparent border-none p-3" 
                 on:click={async () => await FLOW_PRESETS.loadAllPresetsFromLibrary()}
             >
                 Load all presets
-            </button>
+            </button> -->
         </div>
     </div>
 
