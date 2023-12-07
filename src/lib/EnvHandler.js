@@ -1,5 +1,5 @@
 export class EnvHandler {
-   static log_events = true;
+   static log_events = false;
 
    static setGlobalEnv (_env) {
       this.env = _env;
@@ -18,10 +18,10 @@ export class EnvHandler {
          this._LOG_EVENT_('[RAW ENV VARS]', rawEnvVars);
 
          const result = rawEnvVars?.map(raw_env_var => {
-            this._LOG_EVENT_('[IS GLOBAL]', _str, this.isEnvGlobal(_str), raw_env_var);
-            this._LOG_EVENT_('[IS RESPONSE PAYLOAD]', _str, this.isResponsePayload(_str), raw_env_var);
+            this._LOG_EVENT_('[IS GLOBAL]', this.isEnvGlobal(_str));
+            this._LOG_EVENT_('[IS RESPONSE PAYLOAD]', this.isResponsePayload(_str));
    
-            const envVar = this.resolveDotNotation(raw_env_var, this.isEnvGlobal(_str) ? this.env : this.isResponsePayload(_str) ? this.response_payload : _env);
+            const envVar = this.resolveDotNotation(this.trimAbsolutePlaceholders(raw_env_var), this.chooseEnv(raw_env_var, _env));
             this._LOG_EVENT_('[ENV VAR]', envVar);
    
             if (typeof envVar === 'string') {
@@ -29,7 +29,8 @@ export class EnvHandler {
                   this._LOG_EVENT_('[RUN AGAIN]', envVar);
                   return this.checkPlaceholders(envVar, _env);
                } else if (_str.split(/%.*%/g).filter(v => v).length > 0) {
-                  const newPlaceholder = new RegExp(`%${ raw_env_var }%`, 'g');
+                  const newPlaceholder = new RegExp(`(%|%\\$\\$(env|res)\.)${ this.trimAbsolutePlaceholders(raw_env_var) }%`, 'g');
+                  this._LOG_EVENT_('[REPLACE ALL]', _str.replaceAll(newPlaceholder, envVar), newPlaceholder, envVar);
                   return _str = _str.replaceAll(newPlaceholder, envVar);
                }
             }
@@ -41,6 +42,21 @@ export class EnvHandler {
          this._END_LOG_EVENT_('[RETURN RAW]', _str);
          return _str;
       }
+   }
+
+   static chooseEnv(_str, _relative_env) {
+      if (this.isEnvGlobal(_str)) {
+         this._LOG_EVENT_('[GLOBAL ENV]', _str, this.env);
+         return this.env;
+      } 
+
+      if (this.isResponsePayload(_str)) {
+         this._LOG_EVENT_('[RESPONSE ENV]', _str, this.response_payload);
+         return this.response_payload;
+      }
+
+      this._LOG_EVENT_('[RELATIVE ENV]', _str, _relative_env);
+      return _relative_env;
    }
 
    static _LOG_EVENT_ (..._items) {
@@ -71,7 +87,11 @@ export class EnvHandler {
       console.log('evenPlaceholders', evenPlaceholders);
 
       // Removes the "$$env" and "$$res"
-      return evenPlaceholders?.map(placeholder => placeholder.replace(/\$\$(env|res)\./g, ''));
+      return evenPlaceholders;
+   }
+
+   static trimAbsolutePlaceholders (_str) {
+      return _str.replace(/\$\$(env|res)\./g, '');
    }
    
    static isEnvGlobal (_str) {

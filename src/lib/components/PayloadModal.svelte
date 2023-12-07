@@ -316,8 +316,8 @@
         {:else if activeTab === 'console'}
             <section transition:slide={{ duration: 400 }}>
                 <button class="clear-btn mb-2" on:click={() => openDangerModal(LOGGER.clearLogs, { danger_modal_title: 'Clear logs from Local Storage?', danger_confirm: 'Clear' })}>Clear logs</button>
-                <div class="console_screen flex-col overflow-y-auto overflow-x-clip max-h-[36rem]">
-                    {#each Object.entries($LOGGER.messages) as [msg_key, msg], _ (msg_key)}
+                <div class="console_screen flex-col-reverse overflow-y-auto overflow-x-clip max-h-[36rem]">
+                    {#each Object.entries($LOGGER.messages).reverse() as [msg_key, msg], _ (msg_key)}
                         <!-- <span>{ JSON.stringify(msg, null, 3) }</span> -->
                         <LogMessage on:clipboard_copy={() => appendModalToast('Copied to clipboard!', 'success')} data={msg} />
                     {/each}
