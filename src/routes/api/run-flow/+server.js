@@ -142,6 +142,9 @@ export async function POST ({ request }) {
             case 'run_flow_for_each':
                 await _runFlowForEach(_operation, _env)
                 break;
+            case 'set_env':
+                Operations.set_env(_operation, _env);
+                break;
             default:
                 if (_operation?.response_slot) {
                     responsePayload[_operation.response_slot] = await Operations[_operation.command](_operation);
