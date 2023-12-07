@@ -112,6 +112,6 @@
     }
 
     .code_font {
-        @apply font-code;
+        @apply font-code text-orange-500;
     }
 </style>
