@@ -6,12 +6,14 @@ import fs from 'fs';
  * @returns 
  */
 export async function POST ({ request }) {
-    const { name, body } = await request.json();
-    fs.writeFileSync(`public/presets/${ name }.json`, JSON.stringify({ preset: body }));
+    const [_preset] = Object.entries(await request.json());
+    console.log(_preset);
+    fs.writeFileSync(`public/presets/${ _preset[0] }.json`, JSON.stringify({ ..._preset[1] }));
 
     return new Response(JSON.stringify({ 
         status: 200,
-        message: 'File written!'
+        message: 'File written!',
+        [_preset[0]]: _preset[1]
     }));
 }
 

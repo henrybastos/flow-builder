@@ -6,7 +6,7 @@
     let openDangerModalFunction;
 
     function updatePreset () {
-        FLOW_PRESETS.savePreset({ [$CURRENT_PRESET_NAME]: { ...$PAYLOAD } });
+        FLOW_PRESETS.savePresetToLibrary({ [$CURRENT_PRESET_NAME]: { ...$PAYLOAD } });
         console.log('Preset updated!');
     }
 </script>

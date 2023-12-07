@@ -6,7 +6,6 @@
     import { FLOW_BUILDER_OPERATION_TEMPLATES } from "$lib/store";
 
     import { snakeCaseToPascalCase } from "$lib/utils";
-    import { onMount } from "svelte";
 
     let addOperationsModal;
     let openDangerModal;
@@ -33,10 +32,6 @@
     }
 
     $: hasFieldsetReachedOperationsLimit = Object.values($PAYLOAD.flows[flowName]).length > operationsLimit;
-
-    onMount(() => {
-        console.log($PAYLOAD.flows);
-    })
 </script>
 
 <!-- isFieldsetCollapsed is set to true (collapsed) only if the flow is not the Main Flow and the flow is not empty. -->

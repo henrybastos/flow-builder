@@ -15,8 +15,22 @@
 
    const dispatch = createEventDispatcher();
 
-   function savePreset () {
-        FLOW_PRESETS.savePreset({ [inputPresetName || 'New Preset']: { ...$PAYLOAD } });
+    onMount(async () => {
+        await loadAllPresetsFromLibrary();
+    })
+
+    async function loadAllPresetsFromLibrary () {
+        ALL_PRESETS = await FLOW_PRESETS.loadAllPresetsFromLibrary();
+
+        for(const [preset_name, preset_payload] of Object.entries(ALL_PRESETS)) {
+            FLOW_PRESETS.savePreset({ [preset_name.match(/[^\s].*(?=\.json)/g)]: { ...preset_payload }});
+        }
+    }
+
+   async function savePreset () {
+        console.log(inputPresetName, $PAYLOAD);
+        FLOW_PRESETS.savePresetToLibrary({ [inputPresetName || 'New Preset']: { ...$PAYLOAD } });
+        await loadAllPresetsFromLibrary();
         $CURRENT_PRESET_NAME = inputPresetName;
         console.log('Preset saved!');
         inputPresetName = '';
@@ -41,19 +55,20 @@
             PAYLOAD._fix_fixNullConfig();
         }
 
-        console.log($PAYLOAD);
         dispatch('preset_loaded', { presetName: _preset_name });
         // console.log($FLOW_PRESETS[_preset_name]);
         presetsModal.close();
     }
 
     function updatePreset (_preset_name) {
-        FLOW_PRESETS.savePreset({ [_preset_name]: { ...$PAYLOAD } });
+        console.log($PAYLOAD);
+        FLOW_PRESETS.savePresetToLibrary({ [_preset_name]: { ...$PAYLOAD } });
         console.log('Preset updated!');
     }
 
     function renamePreset (_old_preset_name, _new_preset_name) {
-        FLOW_PRESETS.renamePreset(_old_preset_name, _new_preset_name);
+        FLOW_PRESETS.savePresetToLibrary({ [_preset_name]: { ...$PAYLOAD } });
+        // FLOW_PRESETS.renamePreset(_old_preset_name, _new_preset_name);
         if ($CURRENT_PRESET_NAME === _old_preset_name) {
             $CURRENT_PRESET_NAME = _new_preset_name;
         }
@@ -91,21 +106,6 @@
     function _window_handleClicks (_event) {
         _window_checkEditPresetNameClick(_event.target);
     }
-
-    onMount(async () => {
-        ALL_PRESETS = await FLOW_PRESETS.loadAllPresetsFromLibrary();
-        console.log($FLOW_PRESETS);
-
-        for(const [preset_name, preset_payload] of Object.entries(ALL_PRESETS)) {
-            console.log();
-            FLOW_PRESETS.savePreset({ [preset_name]: { ...preset_payload }});
-            // FLOW_PRESETS.savePreset({ [inputPresetName || 'New Preset']: { ...$PAYLOAD } });
-            // console.log(preset_name, preset_payload);
-        }
-
-        // console.log($FLOW_PRESETS);
-        // console.log(ALL_PRESETS);
-    })
 </script>
 
 <svelte:window on:click={_window_handleClicks} />

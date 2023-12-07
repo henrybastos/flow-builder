@@ -11,6 +11,7 @@
 
     onMount(() => {
         if (localStorage.getItem('last_ws_endpoint')) {
+            console.log('[LOCAL STORAGE]', localStorage.getItem('last_ws_endpoint'));
             lastWSEndpoint = localStorage.getItem('last_ws_endpoint');
             console.log('[WS_ENDPOINT]', lastWSEndpoint, wsEndpoint);
             wsEndpoint = lastWSEndpoint;
