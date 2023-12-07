@@ -28,7 +28,8 @@ export class EnvHandler {
                if (this.hasEnvPlaceholder(envVar)) {
                   this._LOG_EVENT_('[RUN AGAIN]', envVar);
                   return this.checkPlaceholders(envVar, _env);
-               } else if (_str.split(/%.*%/g).filter(v => v).length > 0) {
+               } else if (this.needsStringReplacement(_str)) {
+                  // eslint-disable-next-line no-useless-escape
                   const newPlaceholder = new RegExp(`(%|%\\$\\$(env|res)\.)${ this.trimAbsolutePlaceholders(raw_env_var) }%`, 'g');
                   this._LOG_EVENT_('[REPLACE ALL]', _str.replaceAll(newPlaceholder, envVar), newPlaceholder, envVar);
                   return _str = _str.replaceAll(newPlaceholder, envVar);
@@ -100,6 +101,10 @@ export class EnvHandler {
 
    static isResponsePayload (_str) {
       return _str.match(/\$\$res\./g) !== null;
+   }
+
+   static needsStringReplacement (_str) {
+      return _str.split(/%.*%/g).filter(v => v).length > 0;
    }
    
    static resolveDotNotation (_str, _env) {

@@ -82,6 +82,13 @@ export const FLOW_BUILDER_INPUT_FIELD_TEMPLATES = {
         placeholder: 'innerText',
         value: ''
     },
+    regex: {
+        code_font: true,
+        type: 'text',
+        label: 'Regex',
+        placeholder: '(?<=%).[^%]*(?=%)',
+        value: ''
+    },
     param: {
         type: 'text',
         label: 'Parameter',
@@ -317,6 +324,16 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = {
         icon: 'ti-cut',
         input_fields: {
             param: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.param,
+            response_slot: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.response_slot
+        }
+    },
+    extract_route_from_url: {
+        command: 'extract_route_from_url',
+        enabled: true,
+        label: 'Extract route',
+        icon: 'ti-regex',
+        input_fields: {
+            regex: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.regex,
             response_slot: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.response_slot
         }
     },
