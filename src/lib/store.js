@@ -116,6 +116,7 @@ export const FLOW_BUILDER_INPUT_FIELD_TEMPLATES = {
 export const FLOW_BUILDER_OPERATION_TEMPLATES = {
     goto: {
         command: 'goto',
+        enabled: true,
         label: 'Goto',
         icon: 'ti-send',
         input_fields: {
@@ -124,11 +125,13 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = {
     },
     reload: {
         command: 'reload',
+        enabled: true,
         label: 'Reload',
         icon: 'ti-refresh'
     },
     click: {
         command: 'click',
+        enabled: true,
         label: 'Click',
         icon: 'ti-pointer',
         input_fields: {
@@ -137,6 +140,7 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = {
     },
     user_click: {
         command: 'user_click',
+        enabled: true,
         label: 'User click',
         icon: 'ti-hand-click',
         input_fields: {
@@ -145,6 +149,7 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = {
     },
     scrape_attr: {
         command: 'scrape_attr',
+        enabled: true,
         label: 'Scrape Attribute',
         icon: 'ti-brackets-angle',
         input_fields: {
@@ -155,6 +160,7 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = {
     },
     scrape_multiple_attr: {
         command: 'scrape_multiple_attr',
+        enabled: true,
         label: 'Scrape Multiple Values',
         icon: 'ti-brackets',
         input_fields: {
@@ -165,6 +171,7 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = {
     },
     type: {
         command: 'type',
+        enabled: true,
         label: 'Type',
         icon: 'ti-keyboard',
         input_fields: {
@@ -174,6 +181,7 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = {
     },
     check_element: {
         command: 'check_element',
+        enabled: true,
         label: 'Check Element',
         icon: 'ti-zoom-scan',
         input_fields: {
@@ -184,6 +192,7 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = {
     },
     run_flow: {
         command: 'run_flow',
+        enabled: true,
         label: 'Run Flow',
         icon: 'ti-arrow-bear-right-2',
         input_fields: {
@@ -192,6 +201,7 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = {
     },
     run_flow_for_each: {
         command: 'run_flow_for_each',
+        enabled: true,
         label: 'Run Flow For Each',
         icon: 'ti-zoom-scan',
         input_fields: {
@@ -201,6 +211,7 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = {
     },
     set_payload_slot: {
         command: 'set_payload_slot',
+        enabled: true,
         label: 'Set Payload Slot',
         icon: 'ti-zoom-scan',
         input_fields: {
@@ -211,6 +222,7 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = {
     repeat_flow: {
         disabled: true,
         command: 'repeat_flow',
+        enabled: true,
         label: 'WIP Repeat Flow',
         icon: 'ti-repeat',
         input_fields: {
@@ -224,6 +236,7 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = {
     repeater: {
         disabled: true,
         command: 'repeater',
+        enabled: true,
         label: 'WIP Repeater',
         icon: 'ti-zoom-scan',
         input_fields: {
@@ -236,6 +249,7 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = {
     },
     chrome_picker_set_color: {
         command: 'chrome_picker_set_color',
+        enabled: true,
         label: 'Chrome Picker Set Color',
         input_fields: {
             color: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.color,
@@ -245,6 +259,7 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = {
     },
     wait_for_selector: {
         command: 'wait_for_selector',
+        enabled: true,
         label: 'Wait For Selector',
         icon: 'ti-clock-search',
         input_fields: {
@@ -259,6 +274,7 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = {
     },
     wait_seconds: {
         command: 'wait_seconds',
+        enabled: true,
         label: 'Wait Seconds',
         icon: 'ti-clock',
         input_fields: {
@@ -272,11 +288,13 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = {
     },
     close_browser: {
         command: 'close_browser',
+        enabled: true,
         label: 'Close browser',
         icon: 'ti-clock'
     },
     press_key: {
         command: 'press_key',
+        enabled: true,
         label: 'Press key',
         icon: 'ti-command',
         input_fields: {

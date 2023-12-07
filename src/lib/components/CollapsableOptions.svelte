@@ -6,9 +6,9 @@
 
     function toggleAction ({state, action}) {
         if (state) {
-            action.on();
-        } else {
             action.off();
+        } else {
+            action.on();
         }
     }
 </script>

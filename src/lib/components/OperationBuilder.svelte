@@ -3,11 +3,18 @@
     import CollapsableOptions from "./CollapsableOptions.svelte";
     import { PAYLOAD } from "$lib/PayloadStore";
     import { placeholderMatchRegExp } from "$lib/utils";
+    import { onMount } from "svelte";
 
     export let flowName;
 
     export let operation;
-    let disabled = false;
+
+    onMount(() => {
+        // Fixes null enabled prop
+        if (operation.enabled == undefined) {
+            operation.enabled = true;
+        }
+    })
 
     const OPERATION_CONFIG_OPTIONS = [
         {
@@ -29,14 +36,14 @@
         {
             name: 'toggle_active',
             type: 'toggle',
-            state: false,
+            state: operation.enabled,
             icon: {
                 on: 'ti-toggle-right',
                 off: 'ti-toggle-left'
             },
             action: {
-                on: () => console.log('On!'),
-                off: () => console.log('Off...'),
+                on: () => operation.enabled = true,
+                off: () => operation.enabled = false,
             }
         }
     ];
@@ -48,6 +55,9 @@
             <i class={`ti ${ operation.icon || 'ti-topology-ring-2' } text-blue-500 mr-1 text-2xl`}></i>
             { operation.label }
         </h5>
+        {#if !operation.enabled}
+            <p class="border-red-900 border text-red-700 mb-4 px-2 py-1 text-sm rounded">Operation disabled</p>
+        {/if}
 
         <CollapsableOptions options={OPERATION_CONFIG_OPTIONS} />
     </div>
@@ -84,9 +94,8 @@
                         selectedOptionLabel={ field.value }
                         capitalizeOptionLabel={true}
                     />
-                {:else if field.type === 'dropdown'}
                 {:else if field.type === 'btn'}
-                    <button class="btn-sm col-span-full w-full">{ field.label }</button>
+                    <button  class="btn-sm col-span-full w-full">{ field.label }</button>
                 {/if}
 
             {/each}
@@ -98,7 +107,7 @@
 </div>
 
 <style lang="postcss">
-    .disabled {
+    .op_disabled {
         @apply text-neutral-600;
     }
 </style>
