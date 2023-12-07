@@ -116,6 +116,13 @@ export default class Operations {
         return await element.evaluate((dom_el, _attr, _value) => dom_el[_attr] = _value, attr, value);
     }
 
+    // Disabled because of eval
+    // eslint-disable-next-line no-unused-vars
+    static async set_env ({ env_var, value }, _env) {
+        eval(`_env.${ env_var } = value`);
+        return _env;
+    }
+
     static async eval_regex ({ target, regex }) {
         const [element] = await this.getElement(target);
         return await element.evaluate((dom_el, _regex) => dom_el.value.match(new RegExp(_regex, 'g')), regex);
@@ -145,7 +152,7 @@ export default class Operations {
         await this.type({ target: picker_target, value: color });
     }    
 
-    static async wait_navigation () {
+    static async wait_for_navigation () {
         try {
             ServerLogger.logEvent('operation_log', {
                 message: `Waiting for navigation...`,

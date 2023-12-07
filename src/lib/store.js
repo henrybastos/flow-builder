@@ -39,6 +39,12 @@ export const FLOW_BUILDER_INPUT_FIELD_TEMPLATES = {
         placeholder: '%variable%',
         value: ''
     },
+    env_query: {
+        type: 'text',
+        label: 'Env query',
+        placeholder: 'var1.var2.var3',
+        value: ''
+    },
     target_url: {
         type: 'text',
         name: '',
@@ -292,6 +298,12 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = {
             }
         }
     },
+    wait_for_navigation: {
+        command: 'wait_for_navigation',
+        enabled: true,
+        label: 'Wait For Navigation',
+        icon: 'ti-speedboat'
+    },
     close_browser: {
         command: 'close_browser',
         enabled: true,
@@ -306,6 +318,16 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = {
         input_fields: {
             param: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.param,
             response_slot: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.response_slot
+        }
+    },
+    set_env: {
+        command: 'set_env',
+        enabled: true,
+        label: 'Set Env var',
+        icon: 'ti-database-edit',
+        input_fields: {
+            env_query: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.env_query,
+            value: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.value
         }
     },
     press_key: {
