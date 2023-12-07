@@ -1,7 +1,7 @@
 import { writable } from "svelte/store";
 import { initStruct } from "./PayloadStore";
 
-let _flag_saveToLocalStorage = true;
+let _flag_saveToLocalStorage = false;
 
 function createPresetsStore () {
    const { subscribe, update, set } = writable({});

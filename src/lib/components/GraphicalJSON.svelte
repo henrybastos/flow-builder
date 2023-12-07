@@ -11,7 +11,7 @@
 </button>
 
 {#if !isCollapsed}    
-    <div class="gui_object">
+    <div transition:slide={{ duration: 400 }} class="gui_object">
         {#each Object.entries(values) as [key, value], index}
             {#if typeof value === 'string'}
                 <span class="gui_object_value">
