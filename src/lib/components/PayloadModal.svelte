@@ -49,6 +49,7 @@
                 let operationBody = {};
                 operationBody.command = operation.command;
                 operationBody.enabled = operation.enabled;
+                
 
                 if (operation?.input_fields) {
                     Object.entries(operation.input_fields).forEach(([field_name, field]) => {
@@ -204,6 +205,7 @@
             Object.values(_flow_body).forEach((operation) => {
                 if ( FLOW_BUILDER_OPERATION_TEMPLATES[operation.command] ) {
                     const operationBody = structuredClone( FLOW_BUILDER_OPERATION_TEMPLATES[operation.command] );
+                    operationBody.enabled = operation.enabled;
                     
                     if (operationBody?.input_fields) {
 
@@ -223,6 +225,7 @@
             PAYLOAD._fix_fixNullConfig();
         }
 
+        console.log($PAYLOAD);
         payloadModal.close();
     }
 
