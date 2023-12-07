@@ -1,5 +1,5 @@
 export class EnvHandler {
-   static log_events = true;
+   static log_events = false;
 
    static setGlobalEnv (_env) {
       this.env = _env;

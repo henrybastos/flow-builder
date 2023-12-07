@@ -36,6 +36,10 @@
         }
     })
 
+    /**
+     * Transforms/filters the raw payload to a "readable" one.
+     * @param _payload The object to transform.
+     */
     function transformToJSON (_payload) {
         let payloadBuffer = structuredClone(_payload);
         Object.entries(payloadBuffer.flows).forEach(([flow_name, flow_body]) => {
@@ -44,6 +48,7 @@
             for (let operation of Object.values(flow_body)) {
                 let operationBody = {};
                 operationBody.command = operation.command;
+                operationBody.enabled = operation.enabled;
 
                 if (operation?.input_fields) {
                     Object.entries(operation.input_fields).forEach(([field_name, field]) => {

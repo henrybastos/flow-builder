@@ -114,6 +114,10 @@ export async function POST ({ request }) {
     }
 
     async function evalOperation (_operation, _env) {
+        if (!_operation.enabled) {
+            return;
+        }
+        
         if (logCommands) {
             console.log(_operation);
         }
@@ -130,7 +134,6 @@ export async function POST ({ request }) {
         // Calls the operation
         switch (_operation.command) {
             case 'check_element':
-
                 await runFlow(payload.flows[await Operations.checkElement(_operation)], _env);
                 break;
             case 'run_flow':
