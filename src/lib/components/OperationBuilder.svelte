@@ -6,7 +6,6 @@
     import { onMount } from "svelte";
 
     export let flowName;
-
     export let operation;
 
     onMount(() => {
@@ -77,7 +76,8 @@
                 <!-- Determines which kind of Input Field it its -->
                 {#if field.type === 'text'}
                     <input 
-                         class={`col-start-2 input-md ${ field.value.match(placeholderMatchRegExp) ? 'font-code text-green-600' : 'font-sans' }`}
+                        class:code_font={field.code_font}
+                        class={`col-start-2 input-md ${ field.value.match(placeholderMatchRegExp) ? 'font-code text-green-600' : 'font-sans' }`}
                         bind:value={ field.value } 
                         id={ field_name } 
                         type="text" 
@@ -109,5 +109,9 @@
 <style lang="postcss">
     .op_disabled {
         @apply text-neutral-600;
+    }
+
+    .code_font {
+        @apply font-code;
     }
 </style>

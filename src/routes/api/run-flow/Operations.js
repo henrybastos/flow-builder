@@ -228,8 +228,6 @@ export default class Operations {
     }
 
     static async extract_param_from_url ({ param }) {
-        // await this.wait_navigation();
-
         ServerLogger.logEvent('operation_log', {
             message: `Retrieving parameter  ${ param }...`,
             status_message: 'info'
@@ -238,4 +236,17 @@ export default class Operations {
         const urlSearchParams = new URLSearchParams(await this.page.evaluate(() => window.location.search));
         return urlSearchParams.get(param);
     }
+
+    static async extract_route_from_url ({ regex }) {
+        ServerLogger.logEvent('operation_log', {
+            message: `Retrieving route  ${ regex }...`,
+            status_message: 'info'
+        });
+
+        // const pathnameRegex = new RegExp('(?<=/cursos/[0-9]*/editar/modulos/).*(?=/aula/)', 'g')
+        const pathnameRegex = new RegExp(regex, 'g');
+        const urlPathname = await this.page.evaluate(() => window.location.pathname)
+        return urlPathname.match(pathnameRegex);
+    }
+
 }
