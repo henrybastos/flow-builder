@@ -28,11 +28,14 @@ function createPayload () {
                 let initConfig = structuredClone(initStruct.config);
                 
                 Object.keys(initConfig).forEach(config_name => {
-                    if (!_payload.config?.[config_name]) {
+                    if (!_payload?.config?.[config_name]) {
                         console.log(`[UNDEFINED CONFIG] Overwriting undefined preset config <${ config_name }> to <${ initConfig[config_name] }>`);
-                        _payload.config = {
-                            ..._payload.config,
-                            [config_name]: initConfig[config_name]
+                        _payload = {
+                            ..._payload,
+                            config: {
+                                ...(_payload?.config || []),
+                                [config_name]: initConfig[config_name]
+                            }
                         };
                     }
                 })

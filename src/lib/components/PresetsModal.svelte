@@ -30,10 +30,11 @@
     }
 
    async function savePreset () {
+        PAYLOAD._fix_fixNullConfig();
         FLOW_PRESETS.savePresetToLibrary({ [inputPresetName || 'New Preset']: { ...$PAYLOAD } });
         await loadAllPresetsFromLibrary();
         $CURRENT_PRESET_NAME = inputPresetName;
-        loadPreset(inputPresetName);
+        dispatch('preset_loaded', { presetName: inputPresetName });
         console.log('Preset saved!');
         inputPresetName = '';
     }
