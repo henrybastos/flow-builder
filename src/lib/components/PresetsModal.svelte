@@ -25,13 +25,15 @@
         for(const [preset_name, preset_payload] of Object.entries(ALL_PRESETS)) {
             FLOW_PRESETS.savePreset({ [preset_name.match(/[^\s].*(?=\.json)/g)]: { ...preset_payload }});
         }
+
+        $FLOW_PRESETS = $FLOW_PRESETS;
     }
 
    async function savePreset () {
-        console.log(inputPresetName, $PAYLOAD);
         FLOW_PRESETS.savePresetToLibrary({ [inputPresetName || 'New Preset']: { ...$PAYLOAD } });
         await loadAllPresetsFromLibrary();
         $CURRENT_PRESET_NAME = inputPresetName;
+        loadPreset(inputPresetName);
         console.log('Preset saved!');
         inputPresetName = '';
     }

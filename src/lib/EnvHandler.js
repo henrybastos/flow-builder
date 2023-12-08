@@ -1,5 +1,5 @@
 export class EnvHandler {
-   static log_events = false;
+   static log_events = true;
 
    static setGlobalEnv (_env) {
       this.env = _env;
@@ -35,6 +35,8 @@ export class EnvHandler {
                   return _str = _str.replaceAll(newPlaceholder, envVar);
                }
             }
+
+            return envVar;
          });
 
          this._END_LOG_EVENT_('[RETURN ENV VARS]', result.slice(-1)[0]);
@@ -81,6 +83,11 @@ export class EnvHandler {
    static hasEnvPlaceholder (_str) {
       // Gets all placeholders
       const placeholders = _str.match(/(?<=%).[^%]*(?=%)/g);
+
+      if (!placeholders) {
+         console.log('No placeholders placeholders found.', placeholders);
+         return;
+      }
 
       // Gets all even placeholders 
       // e.g.: In "%var_1%/%var_2%" it would return ["%var_1%", "/", "%var_2%"], and the "/" its not desired, its a subproduct.
