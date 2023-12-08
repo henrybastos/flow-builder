@@ -21,19 +21,22 @@ export class EnvHandler {
             this._LOG_EVENT_('[IS GLOBAL]', this.isEnvGlobal(_str));
             this._LOG_EVENT_('[IS RESPONSE PAYLOAD]', this.isResponsePayload(_str));
    
-            const envVar = this.resolveDotNotation(this.trimAbsolutePlaceholders(raw_env_var), this.chooseEnv(raw_env_var, _env));
+            let envVar = this.resolveDotNotation(this.trimAbsolutePlaceholders(raw_env_var), this.chooseEnv(raw_env_var, _env));
             this._LOG_EVENT_('[ENV VAR]', envVar);
    
             if (typeof envVar === 'string') {
                if (this.hasEnvPlaceholder(envVar)) {
                   this._LOG_EVENT_('[RUN AGAIN]', envVar);
-                  return this.checkPlaceholders(envVar, _env);
-               } else if (this.needsStringReplacement(_str)) {
-                  // eslint-disable-next-line no-useless-escape
-                  const newPlaceholder = new RegExp(`(%|%\\$\\$(env|res)\.)${ this.trimAbsolutePlaceholders(raw_env_var) }%`, 'g');
-                  this._LOG_EVENT_('[REPLACE ALL]', _str.replaceAll(newPlaceholder, envVar), newPlaceholder, envVar);
-                  return _str = _str.replaceAll(newPlaceholder, envVar);
-               }
+                  envVar = this.checkPlaceholders(envVar, _env);
+               } 
+            }
+            this._LOG_EVENT_('[STR]', _str, this.needsStringReplacement(_str));
+
+            if (this.needsStringReplacement(_str) && typeof envVar === 'string') {
+               // eslint-disable-next-line no-useless-escape
+               const newPlaceholder = new RegExp(`(%|%\\$\\$(env|res)\.)${ this.trimAbsolutePlaceholders(raw_env_var) }%`, 'g');
+               this._LOG_EVENT_('[REPLACE ALL]', _str.replaceAll(newPlaceholder, envVar), newPlaceholder, envVar);
+               return _str = _str.replaceAll(newPlaceholder, envVar);
             }
 
             return envVar;
@@ -82,16 +85,16 @@ export class EnvHandler {
 
    static hasEnvPlaceholder (_str) {
       // Gets all placeholders
-      const placeholders = _str.match(/(?<=%).[^%]*(?=%)/g);
+      const placeholders = _str.match(/(?<=%)(.*?)(?=%)/g);
 
       if (!placeholders) {
-         console.log('No placeholders placeholders found.', placeholders);
-         return;
+         console.log('No placeholders placeholders found.', _str, placeholders);
+         return null;
       }
 
       // Gets all even placeholders 
       // e.g.: In "%var_1%/%var_2%" it would return ["%var_1%", "/", "%var_2%"], and the "/" its not desired, its a subproduct.
-      let evenPlaceholders = placeholders?.filter((v,i) => i % 2 == 0 && v);
+      let evenPlaceholders = placeholders?.filter((w,i) => i % 2 == 0 && w);
       console.log('evenPlaceholders', evenPlaceholders);
 
       // Removes the "$$env" and "$$res"
@@ -111,7 +114,7 @@ export class EnvHandler {
    }
 
    static needsStringReplacement (_str) {
-      return _str.split(/%.*%/g).filter(v => v).length > 0;
+      return _str.match(/(?<=%)(.*?)(?=%)/g).filter((w, i) => i % 2 == 0 && w).length > 0;
    }
    
    static resolveDotNotation (_str, _env) {

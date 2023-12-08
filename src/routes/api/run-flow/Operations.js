@@ -51,7 +51,6 @@ export default class Operations {
     }
 
     static async click ({ target }) {
-        console.log('[_INTERNAL_SYS]', target, this.payload);
         const [element] = await this.getElement(target);
 
         ServerLogger.logEvent('operation_log', {
@@ -246,7 +245,14 @@ export default class Operations {
         // const pathnameRegex = new RegExp('(?<=/cursos/[0-9]*/editar/modulos/).*(?=/aula/)', 'g')
         const pathnameRegex = new RegExp(regex, 'g');
         const urlPathname = await this.page.evaluate(() => window.location.pathname)
-        return urlPathname.match(pathnameRegex);
+        const [urlRoute] = urlPathname.match(pathnameRegex);
+
+        ServerLogger.logEvent('operation_log', {
+            message: `Route retrieved: ${ urlRoute }...`,
+            status_message: 'info'
+        });
+
+        return urlRoute;
     }
 
 }

@@ -118,6 +118,10 @@ export const FLOW_BUILDER_INPUT_FIELD_TEMPLATES = {
             {
                 label: 'Esc',
                 value: 'Escape'
+            },
+            {
+                label: 'End',
+                value: 'End'
             }
         ],
         value: ''
