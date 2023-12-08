@@ -30,3 +30,7 @@ export function genUUID () {
 export function checkClickOnGuideIDs (_guides, _target) {
     return _guides.includes(_target.dataset.guideId);
 }
+
+export function copyToClipboard (_text) {
+    window.navigator.clipboard.writeText(_text);
+}
