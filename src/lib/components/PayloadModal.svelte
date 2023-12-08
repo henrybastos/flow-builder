@@ -9,6 +9,7 @@
     import { FLOW_PRESETS, CURRENT_PRESET_NAME } from "$lib/PresetsStore";
     import GraphicalJson from "./GraphicalJSON.svelte";
     import { slide } from "svelte/transition";
+    import { copyToClipboard } from "$lib/utils";
 
     const controller = new AbortController();
     $: payloadToURI = `data:text/json;charset=utf-8,${ encodeURIComponent(payloadModalTextearea) }`;
@@ -18,7 +19,6 @@
     $: rawPayloadURIPresetName = `raw_${ $CURRENT_PRESET_NAME?.match(/\w*[^\s:_,.]/gi)?.join('_')?.toLowerCase() || 'preset' }.json`;
 
     let responsePayload = JSON.stringify({ response: 'Nothing to display :D' });
-
     let payloadModal;
     let isFLowAPILoading;
     let payloadModalTextearea;
@@ -101,6 +101,7 @@
         for (let sse_event of SSEData) {
             switch (sse_event.event) {
                 case 'response':
+                    responsePayload = Object.values(responsePayload).map(val => val.trim());
                     responsePayload = JSON.stringify(sse_event.data.payload, null, 3);
                     console.dir(responsePayload, { depth: null });
                     LOGGER.logMessage(sse_event.data.message, TAGS[sse_event.data.status_message]);
@@ -326,6 +327,7 @@
         {:else if activeTab === 'response payload'}
             <section transition:slide={{ duration: 400 }}>
                 <div class="max-h-[36rem] overflow-y-auto rounded-md">
+                    <button class="clear-btn mb-2" on:click={() => copyToClipboard(responsePayload)}>Copy JSON</button>
                     <GraphicalJson key="response_payload" values={ JSON.parse(responsePayload) }/>
                 </div>
                 <!-- <textarea class="font-code bg-neutral-950 hover:bg-neutral-950" bind:value={responsePayload} name="" id="" cols="30" rows="20"></textarea> -->
