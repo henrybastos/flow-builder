@@ -106,6 +106,7 @@ function createPresetsStore () {
    }
 
    return {
+      set,
       subscribe,
       _fix_fixNullConfigForAll,
       loadPresets: (_presets) => set(_presets),
