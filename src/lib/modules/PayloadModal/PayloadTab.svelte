@@ -10,6 +10,9 @@
     import LogMessage from "$lib/components/LogMessage.svelte";
     import { transformToJSON } from "$lib/utils";
 
+    export let showToast;
+
+    let isUserDragginFileOver;
     let payloadModalTextearea;    
 
     $: payloadToURI = `data:text/json;charset=utf-8,${ encodeURIComponent(payloadModalTextearea) }`;
@@ -25,19 +28,6 @@
         PAYLOAD._fix_fixNullConfig();
         payloadModalTextearea = transformToJSON($PAYLOAD);
     });
-
-    function encodePresetsToURI () {
-        FLOW_PRESETS._fix_fixNullConfigForAll()
-        let _payload_list_json = structuredClone($FLOW_PRESETS);
-        
-        _payload_list_json = Object.entries(_payload_list_json).map(([ preset_name, preset_payload ]) => {
-            return [preset_name, JSON.parse(transformToJSON(preset_payload))]
-        })
-
-        console.log(_payload_list_json);
-        
-        return encodeURIComponent(JSON.stringify(Object.fromEntries(_payload_list_json), null, 3));
-    }
 
     function loadPayload () {
         const payloadJSON = JSON.parse(payloadModalTextearea);
@@ -72,6 +62,24 @@
 
         payloadModal.close();
     }
+
+    function onFileDropped (_evt) {
+        const [file] = _evt.dataTransfer.files;
+
+        if (file?.type.match('application/json')) {
+            let reader = new FileReader();
+            reader.onloadend = function() {
+                // Trick to adjust tab identation size to always 3 spaces.
+                payloadModalTextearea = JSON.stringify(JSON.parse(this.result), null, 3);
+                showToast(`File ${ file.name } loaded!`, 'success');
+            };
+            reader.readAsText(file);
+        } else {
+            showToast('Not a JSON file.', 'error');
+        }
+
+        isUserDragginFileOver = false;
+    }
 </script>
 
 <section transition:slide={{ duration: 400 }}>
@@ -83,16 +91,27 @@
         <a class="clear-btn mb-2" href={rawPayloadToURI} download={rawPayloadURIPresetName}>
             Download raw payload
         </a>
-
-        <!-- <a class="clear-btn mb-2" 
-            href={`data:text/json;charset=utf-8,${ encodePresetsToURI() }`} 
-            download={'all_presets.json'}>
-            Download raw full payload
-        </a> -->
     </div>
 
-    <textarea class="font-code bg-neutral-950 hover:bg-neutral-950" bind:value={payloadModalTextearea} name="" id="" cols="30" rows="16"></textarea>
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <div
+        class="h-fit relative w-full overflow-clip border-neutral-700 border-2 rounded-md"
+        class:wrapperOnDragOver={isUserDragginFileOver}
+        on:drop|preventDefault={onFileDropped} 
+        on:dragover|preventDefault={() => isUserDragginFileOver = true} 
+        on:dragleave={() => isUserDragginFileOver = false}
+    >
+        <div class="absolute invisible grid place-items-center bg-black bg-opacity-75 -inset-2" class:onDragOver={isUserDragginFileOver} on:dragleave={() => isUserDragginFileOver = false}>
+            <h4>Drop file in here</h4>
+        </div>
+        <textarea 
+            class="font-code border-none bg-neutral-950 hover:bg-neutral-950 w-[110rem] h-full" 
+            bind:value={payloadModalTextearea} 
+            cols="30" rows="16"
+        ></textarea>
+    </div>
     
+
     <div class="console_screen mt-4 items-center overflow-hidden">
         {#if Object.values($LOGGER.messages).length > 0}
             <span class="whitespace-nowrap mr-1 font-code">Last message:</span>
@@ -129,3 +148,13 @@
         </button>
     </div>
 </section>
+
+<style lang="postcss">
+    .onDragOver {
+        @apply visible pointer-events-none;
+    }
+
+    .wrapperOnDragOver {
+        @apply border-blue-500 border-dashed;
+    }
+</style>

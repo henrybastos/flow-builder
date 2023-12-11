@@ -80,6 +80,21 @@ The `env` object receives all the environment variables. They are used internall
 }
 ```
 
+Obs.: Absolute environments can be used through `$$env.` (for the env root) and `$$res` (for the response payload). This is useful when using relative environment variables within operations like `Run Flow For Each`, where a variable is specified as the environment.
+
+Nested environment variables can be used through dot notation:
+
+```json
+{
+   "var1": {
+      "var1_1": "Var 1.1"
+   }
+}
+```
+
+`var1_1` can be accessed through `%var1.var1_1%` (or `%$$env.var1.var1_1%` for the absolute path).
+
+
 ```bash
 # a cute cat fo u :)
 ⣠⠀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⡄⣄⠀⠀⠀⠀

@@ -16,7 +16,7 @@
    const dispatch = createEventDispatcher();
 
     onMount(async () => {
-        await loadAllPresetsFromLibrary();
+        loadedPreset = await loadAllPresetsFromLibrary();
     })
 
     async function loadAllPresetsFromLibrary () {
