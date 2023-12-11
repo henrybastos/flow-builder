@@ -95,7 +95,7 @@
 
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
-        class="h-fit relative w-full overflow-clip border-neutral-700 border-2 rounded-md"
+        class="h-fit relative w-full overflow-clip border-neutral-800 border-2 rounded-md"
         class:wrapperOnDragOver={isUserDragginFileOver}
         on:drop|preventDefault={onFileDropped} 
         on:dragover|preventDefault={() => isUserDragginFileOver = true} 
@@ -105,7 +105,7 @@
             <h4>Drop file in here</h4>
         </div>
         <textarea 
-            class="font-code border-none bg-neutral-950 hover:bg-neutral-950 w-[110rem] h-full" 
+            class="font-code border-none rounded-none -mb-2 bg-neutral-950 w-[105%] h-full" 
             bind:value={payloadModalTextearea} 
             cols="30" rows="16"
         ></textarea>
