@@ -1,5 +1,5 @@
 <script>
-   import Modal from "./Modal.svelte";
+   import Modal from "../components/Modal.svelte";
    import { FLOW_PRESETS, CURRENT_PRESET_NAME } from "$lib/PresetsStore";
    import { PAYLOAD } from "$lib/PayloadStore";
    import { createEventDispatcher, onMount } from "svelte";
@@ -121,7 +121,7 @@
 <Modal 
     bind:this={presetsModal} 
     title="Presets" 
-    let:openDangerModal 
+    let:showDanger 
 >
    <div class="btn-bar mb-3 overflow-y-auto max-h-[30rem] p-3 border-2 border-neutral-800 bg-neutral-950 rounded-lg">
        {#each Object.keys($FLOW_PRESETS) as preset_name}
@@ -148,12 +148,12 @@
                </button>
 
                <!-- Update preset -->
-               <button class="btn-md" on:click={() => openDangerModal(() => updatePreset(preset_name), { danger_modal_title: `Update preset ${ preset_name }?` })}>
+               <button class="btn-md" on:click={() => showDanger(() => updatePreset(preset_name), { danger_modal_title: `Update preset ${ preset_name }?` })}>
                    <i class="ti ti-arrows-transfer-up"></i>
                </button>
 
                <!-- Delete preset -->
-               <button class="btn-md btn-danger" on:click={() => openDangerModal(() => removePreset(preset_name), { danger_modal_title: `Delete preset ${ preset_name }?` })}>
+               <button class="btn-md btn-danger" on:click={() => showDanger(() => removePreset(preset_name), { danger_modal_title: `Delete preset ${ preset_name }?` })}>
                    <i class="ti ti-trash-x"></i>
                </button>
            </div>

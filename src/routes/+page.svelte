@@ -2,13 +2,13 @@
     import '../app.postcss';
     import { PAYLOAD } from "$lib/PayloadStore";
 
-    import PageSettings from '$lib/components/PageSettings.svelte';
-    import PresetsModal from '$lib/components/PresetsModal.svelte';
-    import PayloadModal from '$lib/components/PayloadModal.svelte';
-    import AddFlowModal from '$lib/components/AddFlowModal.svelte';
+    import PageSettings from '$lib/modules/PageSettings.svelte';
+    import PresetsModal from '$lib/modules/PresetsModal.svelte';
+    import PayloadModal from '$lib/modules/PayloadModal/PayloadModal.svelte';
+    import AddFlowModal from '$lib/modules/AddFlowModal.svelte';
     import ToastsWrapper from "$lib/components/ToastsWrapper.svelte";
-    import UpdateCurrentPresetModal from '$lib/components/UpdateCurrentPresetModal.svelte';
-    import Flow from '$lib/components/Flow.svelte';
+    import UpdateCurrentPresetModal from '$lib/modules/UpdateCurrentPresetModal.svelte';
+    import Flow from '$lib/modules/Flow.svelte';
 
     import { onMount } from 'svelte';
     import { FLOW_PRESETS, CURRENT_PRESET_NAME } from '$lib/PresetsStore';

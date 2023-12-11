@@ -1,7 +1,24 @@
 <script>
-    import { createEventDispatcher } from "svelte";
+   import { createEventDispatcher, onMount } from "svelte";
 
-   export let data;
+   /**
+    * @typedef {Object} Data
+    * @property {string} message
+    * @property {string} date
+    * @property {string} time
+    * @property {{ label: string, type: 'success' | 'info' | 'error' | 'warning' }} tag
+    */
+
+   /** @type {Data} */
+   export let data = {
+      date: '00/00/0000',
+      time: '00:00',
+      message: 'Yay',
+      tag: {
+         label: 'Tag',
+         type: 'info'
+      }
+   };
    let dispatch = createEventDispatcher();
    let httpRegex = 'https?:\/\/[^\\s]*';
    let wsRegex = 'wss?:\/\/[^\\s]*';
@@ -11,6 +28,8 @@
       window.navigator.clipboard.writeText(_text);
       dispatch('clipboard_copy');
    }
+
+   $: console.log(data);
 </script>
 
 <div class="font-code w-full">

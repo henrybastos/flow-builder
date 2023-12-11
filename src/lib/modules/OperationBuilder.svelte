@@ -1,6 +1,6 @@
 <script>
-    import Dropdown from "./Dropdown.svelte";
-    import CollapsableOptions from "./CollapsableOptions.svelte";
+    import Dropdown from "../components/Dropdown.svelte";
+    import CollapsableOptions from "../components/CollapsableOptions.svelte";
     import { PAYLOAD } from "$lib/PayloadStore";
     import { placeholderMatchRegExp } from "$lib/utils";
     import { onMount } from "svelte";
