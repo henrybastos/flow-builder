@@ -5,7 +5,7 @@
     import TabsBar from "../../components/TabsBar.svelte";
     import PayloadTab from "./PayloadTab.svelte";
     import ConsoleTab from "./ConsoleTab.svelte";
-    import ResponsePayloadTab from "./ResponsePayloadTab.svelte";
+    import ResponsePayloadTab from "./ResponseTab.svelte";
 
     const tabs = ['payload', 'console', 'response payload'];
     let payloadModal;
@@ -36,7 +36,7 @@
 >
     <TabsBar let:activeTab modalTabs={tabs}>
         {#if activeTab === 'payload'}
-            <PayloadTab />
+            <PayloadTab {showToast} />
         {:else if activeTab === 'console'}
             <ConsoleTab {showDanger} {showToast} />
         {:else if activeTab === 'response payload'}

@@ -1,7 +1,7 @@
 <script>
     import '../app.postcss';
+    import { onMount } from 'svelte';
     import { PAYLOAD } from "$lib/PayloadStore";
-
     import PageSettings from '$lib/modules/PageSettings.svelte';
     import PresetsModal from '$lib/modules/PresetsModal.svelte';
     import PayloadModal from '$lib/modules/PayloadModal/PayloadModal.svelte';
@@ -9,9 +9,7 @@
     import ToastsWrapper from "$lib/components/ToastsWrapper.svelte";
     import UpdateCurrentPresetModal from '$lib/modules/UpdateCurrentPresetModal.svelte';
     import Flow from '$lib/modules/Flow.svelte';
-
-    import { onMount } from 'svelte';
-    import { FLOW_PRESETS, CURRENT_PRESET_NAME } from '$lib/PresetsStore';
+    import { CURRENT_PRESET_NAME } from '$lib/PresetsStore';
 
     let appendToast;
     let loadedPresetName = '';
@@ -71,8 +69,6 @@
     
             <PayloadModal />
 
-            <!-- <button class="bg-transparent border-none p-3" on:click={async () => await FLOW_PRESETS.savePresetToLibrary({ name: "preset_01", body: $PAYLOAD })}>Save to library</button> -->
-            
             <!-- <button 
                 class="bg-transparent border-none p-3" 
                 on:click={async () => await FLOW_PRESETS.loadAllPresetsFromLibrary()}

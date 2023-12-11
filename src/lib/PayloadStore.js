@@ -29,7 +29,7 @@ function createPayload () {
                 
                 Object.keys(initConfig).forEach(config_name => {
                     if (!_payload?.config?.[config_name]) {
-                        console.log(`[UNDEFINED CONFIG] Overwriting undefined preset config <${ config_name }> to <${ initConfig[config_name] }>`);
+                        // console.log(`[UNDEFINED CONFIG] Overwriting undefined preset config <${ config_name }> to <${ initConfig[config_name] }>`);
                         _payload = {
                             ..._payload,
                             config: {
