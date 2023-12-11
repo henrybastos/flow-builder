@@ -1,9 +1,3 @@
-<!-- 
-@component 
-
-@param {Object[]} fields - Multiple fields.
--->
-
 <script>
     import Fieldset from "$lib/components/Fieldset.svelte";
     import LabeledInput from "$lib/components/LabeledInput.svelte";

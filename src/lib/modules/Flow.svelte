@@ -1,14 +1,14 @@
 <script>
-    import Fieldset from "./Fieldset.svelte";
+    import Fieldset from "../components/Fieldset.svelte";
     import OperationBuilder from "./OperationBuilder.svelte";
-    import Modal from "./Modal.svelte";
+    import Modal from "../components/Modal.svelte";
     import { PAYLOAD } from "$lib/PayloadStore";
     import { FLOW_BUILDER_OPERATION_TEMPLATES } from "$lib/store";
 
     import { snakeCaseToPascalCase } from "$lib/utils";
 
     let addOperationsModal;
-    let openDangerModal;
+    let showDanger;
     let operationsLimit = 5;
 
     export let flowName;
@@ -28,7 +28,7 @@
     const removeFieldset = {
         icon: 'ti-trash',
         danger: true,
-        action: () => openDangerModal(() => PAYLOAD.removeFlow(flowName), { danger_modal_title: `Remove flow ${ flowName }?` })
+        action: () => showDanger(() => PAYLOAD.removeFlow(flowName), { danger_modal_title: `Remove flow ${ flowName }?` })
     }
 
     $: hasFieldsetReachedOperationsLimit = Object.values($PAYLOAD.flows[flowName]).length > operationsLimit;
@@ -54,7 +54,7 @@
     </button>
 </Fieldset>
 
-<Modal bind:this={addOperationsModal} title="Add operation" bind:openDangerModal>
+<Modal bind:this={addOperationsModal} title="Add operation" bind:showDanger>
     <div class="grid grid-cols-2 gap-x-4 gap-y-2 h-fit">
         {#each Object.values(FLOW_BUILDER_OPERATION_TEMPLATES) as operationTemplate}
             {#if !operationTemplate.disabled}                

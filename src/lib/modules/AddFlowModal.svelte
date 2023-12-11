@@ -1,5 +1,5 @@
 <script>
-    import Modal from "./Modal.svelte";
+    import Modal from "../components/Modal.svelte";
     import { PAYLOAD } from "$lib/PayloadStore";
     import { convertToSnakeCase } from "$lib/utils";
 

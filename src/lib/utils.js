@@ -3,6 +3,35 @@ const envPlaceholder = {
     end: '%'
 }
 
+/**
+     * Transforms/filters the raw payload to a "readable" one.
+     * @param _payload The object to transform.
+     */
+export function transformToJSON (_payload) {
+    let payloadBuffer = structuredClone(_payload);
+    Object.entries(payloadBuffer.flows).forEach(([flow_name, flow_body]) => {
+        let flowBuffer = [];
+
+        for (let operation of Object.values(flow_body)) {
+            let operationBody = {};
+            operationBody.command = operation.command;
+            operationBody.enabled = operation.enabled;
+            
+
+            if (operation?.input_fields) {
+                Object.entries(operation.input_fields).forEach(([field_name, field]) => {
+                    operationBody[field_name] = field.value;
+                })
+            }
+
+            flowBuffer.push(operationBody);
+        }
+
+        payloadBuffer.flows[flow_name] = flowBuffer;
+    });
+    return JSON.stringify(payloadBuffer, null, 3);
+}
+
 export const placeholderMatchRegExp = new RegExp(`${ envPlaceholder.start }.*${ envPlaceholder.end }`, 'g');
 
 export function snakeCaseToPascalCase (_string, _spaced = false) {

@@ -1,42 +1,34 @@
 <script>
     import { PAYLOAD } from "$lib/PayloadStore";
     import { onMount } from "svelte";
-    import Modal from "./Modal.svelte";
-    import Switch from "./Switch.svelte";
+    import Modal from "../components/Modal.svelte";
+    import Switch from "../components/Switch.svelte";
 
     export let appendToast;
-    let pageSettingsModal;
     export let wsEndpoint;
+
+    let showDanger;
+    let pageSettingsModal;
     let lastWSEndpoint;
 
     onMount(() => {
         if (localStorage.getItem('last_ws_endpoint')) {
-            console.log('[LOCAL STORAGE]', localStorage.getItem('last_ws_endpoint'));
             lastWSEndpoint = localStorage.getItem('last_ws_endpoint');
-            console.log('[WS_ENDPOINT]', lastWSEndpoint, wsEndpoint);
             wsEndpoint = lastWSEndpoint;
             PAYLOAD.setConfig('ws_endpoint', lastWSEndpoint);
         }
     })
 
-    function saveTempPresetToLocalStorage () {
+    function saveTempPreset () {
         try {
             localStorage.setItem('temp_preset', JSON.stringify($PAYLOAD));
-            localStorage.setItem('last_ws_endpoint', wsEndpoint);
+            if (wsEndpoint) {
+                localStorage.setItem('last_ws_endpoint', wsEndpoint);
+            }
             appendToast('Temp Preset saved!', 'success');
         } catch (err) {
             appendToast('Failed to save Temp Preset', 'error');
             console.error(err);
-        }
-    }
-
-    function clearTempPresetToLocalStorage () {
-        if (localStorage?.getItem('temp_preset')) {
-            localStorage.removeItem('temp_preset');
-        }
-
-        if (localStorage?.getItem('last_ws_endpoint')) {
-            localStorage.removeItem('last_ws_endpoint');
         }
     }
 
@@ -56,6 +48,19 @@
     function openModal () {
         pageSettingsModal.open();
     }
+
+    function clearLogs () {
+        showDanger(() => {
+            localStorage.removeItem('logs');
+        }, { danger_modal_title: 'Clear logs?' });
+    }
+
+    function clearPresets () {
+        showDanger(() => {
+            localStorage.removeItem('temp_preset');
+            localStorage.removeItem('last_ws_endpoint');
+        }, { danger_modal_title: 'Clear local storage?' })
+    }
 </script>
 
 <button on:click={openModal} class="btn-md">
@@ -63,16 +68,21 @@
     Settings
 </button>
 
-<Modal bind:this={pageSettingsModal} title="Settings" let:openDangerModal>
+<Modal bind:this={pageSettingsModal} title="Settings" bind:showDanger>
     <div class="btn-bar">
-        <button on:click={() => openDangerModal(clearTempPresetToLocalStorage, { danger_modal_title: 'Clear local storage?' })} class="btn-sm btn-danger w-full">
+        <button on:click={clearPresets} class="btn-sm btn-danger w-full">
             <i class="ti ti-database-x"></i>
-            Clear Local Storage
+            Clear Temp Preset?
         </button>
 
-        <button on:click={saveTempPresetToLocalStorage} class="btn-sm btn-full">
+        <button on:click={clearLogs} class="btn-sm btn-danger btn-full">
+            <i class="ti ti-message-x"></i>
+            Clear logs
+        </button>
+
+        <button on:click={saveTempPreset} class="btn-sm col-span-full btn-full">
             <i class="ti ti-device-floppy text-blue-500"></i>
-            Save to Local Storage
+            Save to Temp Preset
         </button>
     
         <div class="grid grid-cols-[min-content_auto] gap-y-3 col-span-full w-full">
