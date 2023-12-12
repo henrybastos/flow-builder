@@ -12,10 +12,15 @@
     import { CURRENT_PRESET_NAME } from '$lib/PresetsStore';
     import { transformToJSON } from '$lib/utils';
 
+    import CodeMirror from "svelte-codemirror-editor";
+    import { json } from "@codemirror/lang-json";
+
     let showGlobalToast;
     let loadedPresetName = '';
     let pageSettingsWSEndpoint;
     let payloadModalTextearea;
+
+    let codeMirrorValue;
 
     function checkAndLoadTempPreset () {
         if (localStorage?.getItem('temp_preset')) {
@@ -88,6 +93,11 @@
 </header>
 
 <main class="flex flex-col w-[50rem] mt-28">
+
+    { codeMirrorValue }
+
+    <CodeMirror bind:value={codeMirrorValue} lang={json()} />
+
     {#each Object.keys($PAYLOAD.flows) as flow_name}
         <Flow {loadedPresetName} flowName={flow_name} />
     {/each}
@@ -95,4 +105,13 @@
     <ToastsWrapper bind:showGlobalToast={showGlobalToast}/>
     <p class="text-center text-neutral-500 mb-4">Powered by Tailwind, SvelteKit and Puppeteer</p>
 </main>
+
+<style>
+    :global(.cm-editor .cm-gutter) {
+        display: none;
+    }
+    :global(.cm-editor .cm-content) { 
+        @apply font-code;
+    }
+</style>
 
