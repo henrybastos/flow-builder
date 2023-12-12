@@ -2,7 +2,7 @@
     import { onMount } from "svelte";
     import { slide } from "svelte/transition";
     import { ServerHandler } from "$lib/ServerHandler";
-    import { FLOW_PRESETS } from "$lib/PresetsStore";
+    import { createEventDispatcher } from "svelte";
     import { FLOW_BUILDER_OPERATION_TEMPLATES } from "$lib/store";
     import { LOGGER, TAGS } from "$lib/LogStore";
     import { CURRENT_PRESET_NAME } from "$lib/PresetsStore";
@@ -14,6 +14,7 @@
     export let payloadModal;
     export let payloadModalTextearea;    
 
+    let dispatch = createEventDispatcher();
     let isUserDragginFileOver;
 
     $: payloadToURI = `data:text/json;charset=utf-8,${ encodeURIComponent(payloadModalTextearea) }`;
@@ -31,6 +32,13 @@
     });
 
     function loadPayload () {
+        try {
+            JSON.parse(payloadModalTextearea);
+        } catch (err) {
+            showToast('Invalid JSON. Impossible to parse.', 'error');
+            return;
+        }
+
         const payloadJSON = JSON.parse(payloadModalTextearea);
 
         PAYLOAD.resetPayload();
@@ -61,7 +69,9 @@
             PAYLOAD._fix_fixNullConfig();
         }
 
+        payloadModalTextearea = JSON.stringify($PAYLOAD, null, 3);
         payloadModal.close();
+        dispatch('payload_loaded');
     }
 
     function onFileDropped (_evt) {

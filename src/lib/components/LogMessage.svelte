@@ -28,8 +28,6 @@
       window.navigator.clipboard.writeText(_text);
       dispatch('clipboard_copy');
    }
-
-   $: console.log(data);
 </script>
 
 <div class="font-code w-full">

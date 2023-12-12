@@ -12,7 +12,7 @@
     import { CURRENT_PRESET_NAME } from '$lib/PresetsStore';
     import { transformToJSON } from '$lib/utils';
 
-    let appendToast;
+    let showGlobalToast;
     let loadedPresetName = '';
     let pageSettingsWSEndpoint;
     let payloadModalTextearea;
@@ -27,14 +27,14 @@
         if (localStorage?.getItem('presets')) {
             try {
                 // FLOW_PRESETS.loadPresets(JSON.parse(localStorage.getItem('presets')));
-                appendToast('Presets loaded successfully!', 'success');
+                showGlobalToast('Presets loaded successfully!', 'success');
             } catch (err) {
                 console.error(err);
                 console.error(`[ERR] Invalid presets strucuture.`);
-                appendToast('[ERR] Invalid presets strucuture.', 'error');
+                showGlobalToast('[ERR] Invalid presets strucuture.', 'error');
             }
         } else {
-            appendToast('No presets found :(', 'error');
+            showGlobalToast('No presets found :(', 'error');
         }
     }
 
@@ -61,17 +61,17 @@
         <h3>Flow Builder</h3>
     
         <div class="inline-flex gap-x-2">
-            <PresetsModal on:preset_loaded={onPresetLoadedHandler} {appendToast}/>
+            <PresetsModal on:preset_loaded={onPresetLoadedHandler} {showGlobalToast}/>
 
             {#if $CURRENT_PRESET_NAME}
                 <UpdateCurrentPresetModal />
             {/if}
         
-            <PageSettings bind:wsEndpoint={pageSettingsWSEndpoint} {appendToast}/>
+            <PageSettings bind:wsEndpoint={pageSettingsWSEndpoint} {showGlobalToast}/>
             
             <AddFlowModal />
     
-            <PayloadModal bind:payloadModalTextearea={payloadModalTextearea} />
+            <PayloadModal bind:payloadModalTextearea={payloadModalTextearea} {showGlobalToast} />
 
             <!-- <button 
                 class="bg-transparent border-none p-3" 
@@ -92,7 +92,7 @@
         <Flow {loadedPresetName} flowName={flow_name} />
     {/each}
     
-    <ToastsWrapper bind:appendToast={appendToast}/>
+    <ToastsWrapper bind:showGlobalToast={showGlobalToast}/>
     <p class="text-center text-neutral-500 mb-4">Powered by Tailwind, SvelteKit and Puppeteer</p>
 </main>
 

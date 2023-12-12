@@ -60,7 +60,7 @@
      * @param {'success'|'info'|'error'|'danger'} _type
      */
     export function showToast (_message, _type) {
-        console.log(_message, _type);
+        console.log(`[${ _type.split('').map(w => w.toUpperCase()).join('') }] ${ _message }`);
         modalToasts = [...modalToasts, { message: _message, type: _type }];
     }
     

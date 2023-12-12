@@ -4,7 +4,7 @@
     import Modal from "../components/Modal.svelte";
     import Switch from "../components/Switch.svelte";
 
-    export let appendToast;
+    export let showGlobalToast;
     export let wsEndpoint;
 
     let showDanger;
@@ -25,9 +25,9 @@
             if (wsEndpoint) {
                 localStorage.setItem('last_ws_endpoint', wsEndpoint);
             }
-            appendToast('Temp Preset saved!', 'success');
+            showGlobalToast('Temp Preset saved!', 'success');
         } catch (err) {
-            appendToast('Failed to save Temp Preset', 'error');
+            showGlobalToast('Failed to save Temp Preset', 'error');
             console.error(err);
         }
     }
