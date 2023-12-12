@@ -6,7 +6,6 @@
    import { checkClickOnGuideIDs } from "$lib/utils";
 
    let ALL_PRESETS = {};
-   let loadedPreset;
    let presetsModal;
    let inputPresetName;
    let isPresetNameEditable = '';
@@ -16,7 +15,7 @@
    const dispatch = createEventDispatcher();
 
     onMount(async () => {
-        loadedPreset = await loadAllPresetsFromLibrary();
+        await loadAllPresetsFromLibrary();
     })
 
     async function loadAllPresetsFromLibrary () {
@@ -58,7 +57,7 @@
             PAYLOAD._fix_fixNullConfig();
         }
 
-        dispatch('preset_loaded', { presetName: _preset_name });
+        dispatch('preset_loaded', { presetName: _preset_name, presetBody: $PAYLOAD });
         // console.log($FLOW_PRESETS[_preset_name]);
         presetsModal.close();
     }
