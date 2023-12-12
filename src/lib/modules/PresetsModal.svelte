@@ -10,7 +10,7 @@
    let inputPresetName;
    let isPresetNameEditable = '';
    let presetNameEdit;
-   export let appendToast;
+   export let showGlobalToast;
 
    const dispatch = createEventDispatcher();
 
@@ -41,7 +41,7 @@
     function clearPresets () {
         FLOW_PRESETS.clearPresets();
         presetsModal.close();
-        appendToast('Presets cleared', 'success');
+        showGlobalToast('Presets cleared', 'success');
     }
 
     function removePreset (_preset_name) {

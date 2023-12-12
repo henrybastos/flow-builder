@@ -8,7 +8,7 @@
      * @param _message {string}
      * @param _type {'success'|'info'|'error'|'danger'}
      */
-    export function appendToast (_message, _type) {
+    export function showGlobalToast (_message, _type) {
         toastCollection = [...toastCollection, {
             message: _message,
             type: _type,
