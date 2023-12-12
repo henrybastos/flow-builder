@@ -13,11 +13,11 @@ export function transformToJSON (_payload) {
         let flowBuffer = [];
 
         for (let operation of Object.values(flow_body)) {
-            let operationBody = {};
-            operationBody.command = operation.command;
-            operationBody.enabled = operation.enabled;
+            let operationBody = {
+                command: operation.command,
+                enabled: operation.enabled
+            };
             
-
             if (operation?.input_fields) {
                 Object.entries(operation.input_fields).forEach(([field_name, field]) => {
                     operationBody[field_name] = field.value;

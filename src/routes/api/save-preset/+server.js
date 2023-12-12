@@ -7,7 +7,7 @@ import fs from 'fs';
  */
 export async function POST ({ request }) {
     const [_preset] = Object.entries(await request.json());
-    console.log(_preset);
+    console.log('/api/save-preset // [NEW PRESET SAVED]',_preset);
     fs.writeFileSync(`public/presets/${ _preset[0] }.json`, JSON.stringify({ ..._preset[1] }));
 
     return new Response(JSON.stringify({ 

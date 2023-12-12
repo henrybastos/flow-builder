@@ -10,10 +10,12 @@
     import UpdateCurrentPresetModal from '$lib/modules/UpdateCurrentPresetModal.svelte';
     import Flow from '$lib/modules/Flow.svelte';
     import { CURRENT_PRESET_NAME } from '$lib/PresetsStore';
+    import { transformToJSON } from '$lib/utils';
 
     let appendToast;
     let loadedPresetName = '';
     let pageSettingsWSEndpoint;
+    let payloadModalTextearea;
 
     function checkAndLoadTempPreset () {
         if (localStorage?.getItem('temp_preset')) {
@@ -39,6 +41,8 @@
     function onPresetLoadedHandler ({ detail }) {
         loadedPresetName = detail.presetName;
         pageSettingsWSEndpoint = '';
+        payloadModalTextearea = transformToJSON(detail.presetBody);
+        console.log(detail);
     }
 
     onMount(() => {
@@ -67,7 +71,7 @@
             
             <AddFlowModal />
     
-            <PayloadModal />
+            <PayloadModal bind:payloadModalTextearea={payloadModalTextearea} />
 
             <!-- <button 
                 class="bg-transparent border-none p-3" 

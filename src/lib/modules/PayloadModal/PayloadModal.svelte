@@ -7,6 +7,8 @@
     import ConsoleTab from "./ConsoleTab.svelte";
     import ResponsePayloadTab from "./ResponseTab.svelte";
 
+    export let payloadModalTextearea;
+
     const tabs = ['payload', 'console', 'response payload'];
     let payloadModal;
 
@@ -15,10 +17,6 @@
             LOGGER.loadLogs(localStorage.getItem('logs'));
         }
     })
-
-    function onPayloadModalCloseHandler () {
-        runFlowMessage.message = '';
-    }
 </script>
 
 <button on:click={() => payloadModal.open()} class="btn-md">
@@ -32,11 +30,10 @@
     bind:this={payloadModal} 
     let:showToast 
     let:showDanger 
-    on:close={onPayloadModalCloseHandler} 
 >
     <TabsBar let:activeTab modalTabs={tabs}>
         {#if activeTab === 'payload'}
-            <PayloadTab {showToast} />
+            <PayloadTab {showToast} {payloadModal} bind:payloadModalTextearea={payloadModalTextearea} />
         {:else if activeTab === 'console'}
             <ConsoleTab {showDanger} {showToast} />
         {:else if activeTab === 'response payload'}

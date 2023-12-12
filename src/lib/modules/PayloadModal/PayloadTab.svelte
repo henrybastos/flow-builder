@@ -11,9 +11,10 @@
     import { transformToJSON } from "$lib/utils";
 
     export let showToast;
+    export let payloadModal;
+    export let payloadModalTextearea;    
 
     let isUserDragginFileOver;
-    let payloadModalTextearea;    
 
     $: payloadToURI = `data:text/json;charset=utf-8,${ encodeURIComponent(payloadModalTextearea) }`;
     $: payloadURIPresetName = `${ $CURRENT_PRESET_NAME?.match(/[A-z,0-9]*[^\s:_,.]/gi)?.join('_')?.toLowerCase() || 'preset' }.json`;
