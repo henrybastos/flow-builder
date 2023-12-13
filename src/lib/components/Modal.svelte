@@ -3,6 +3,12 @@
     import Toast from "./Toast.svelte";
     import { checkClickOnGuideIDs } from "$lib/utils";
 
+    /**
+     * @typedef {function} ShowToast
+     * @param {string} _message
+     * @param {'success'|'info'|'error'|'danger'} _type
+     */
+
     const dispatch = createEventDispatcher();
 
     let modal, dangerModal, modalBody;
@@ -54,11 +60,7 @@
         modal.close();
     }
 
-    /**
-     * 
-     * @param {string} _message
-     * @param {'success'|'info'|'error'|'danger'} _type
-     */
+    /** @type {ShowToast} */
     export function showToast (_message, _type) {
         console.log(`[${ _type.split('').map(w => w.toUpperCase()).join('') }] ${ _message }`);
         modalToasts = [...modalToasts, { message: _message, type: _type }];

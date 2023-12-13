@@ -22,9 +22,7 @@
     function saveTempPreset () {
         try {
             localStorage.setItem('temp_preset', JSON.stringify($PAYLOAD));
-            if (wsEndpoint) {
-                localStorage.setItem('last_ws_endpoint', wsEndpoint);
-            }
+            localStorage.setItem('last_ws_endpoint', wsEndpoint || '');
             showGlobalToast('Temp Preset saved!', 'success');
         } catch (err) {
             showGlobalToast('Failed to save Temp Preset', 'error');
