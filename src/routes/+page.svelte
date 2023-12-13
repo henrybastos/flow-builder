@@ -7,7 +7,7 @@
      *========================================================================**/
 
     import '../app.postcss';
-    import { onMount } from 'svelte';
+    import { onMount, setContext } from 'svelte';
     import { PAYLOAD } from "$lib/PayloadStore";
     import { FLOW_PRESETS } from '$lib/PresetsStore';
     import PageSettings from '$lib/modules/PageSettings.svelte';
@@ -69,6 +69,8 @@
         // codeMirrorValue = transformToJSON($PAYLOAD);
         // codeMirrorValue = 'var 1 = "Hello!;"';
     }
+
+    setContext('loadAllPresetsFromLibrary', loadAllPresetsFromLibrary);
 
     onMount(async () => {
         await loadAllPresetsFromLibrary();

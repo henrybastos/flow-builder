@@ -4,8 +4,10 @@
     import { PAYLOAD } from "$lib/PayloadStore";
     import { createEventDispatcher, onMount } from "svelte";
     import { checkClickOnGuideIDs } from "$lib/utils";
+    import { getContext } from "svelte";
 
     let presetsModal;
+    let showToast;
     let inputPresetName;
     let isPresetNameEditable = '';
     let presetNameEdit;
@@ -13,14 +15,20 @@
 
     const dispatch = createEventDispatcher();
 
+    const loadAllPresetsFromLibrary = getContext('loadAllPresetsFromLibrary');
+
    async function savePreset () {
-        PAYLOAD._fix_fixNullConfig();
-        FLOW_PRESETS.savePresetToLibrary({ [inputPresetName || 'New Preset']: { ...$PAYLOAD } });
-        await loadAllPresetsFromLibrary();
-        $CURRENT_PRESET_NAME = inputPresetName;
-        dispatch('preset_loaded', { presetName: inputPresetName });
-        console.log('Preset saved!');
-        inputPresetName = '';
+        try {
+            PAYLOAD._fix_fixNullConfig();
+            await loadAllPresetsFromLibrary();
+            $CURRENT_PRESET_NAME = inputPresetName;
+            FLOW_PRESETS.savePresetToLibrary({ [inputPresetName || 'New Preset']: { ...$PAYLOAD } });
+            dispatch('preset_loaded', { presetName: inputPresetName });
+            showToast(`Preset ${ inputPresetName } saved.`, 'success');
+            inputPresetName = '';
+        } catch (err) {
+            showToast(`Preset could not be saved.`, 'error')
+        }
     }
 
     function clearPresets () {
@@ -106,6 +114,7 @@
     bind:this={presetsModal} 
     title="Presets" 
     let:showDanger 
+    bind:showToast={showToast}
 >
    <div class="btn-bar mb-3 overflow-y-auto max-h-[30rem] p-3 border-2 border-neutral-800 bg-neutral-950 rounded-lg">
        {#each Object.keys($FLOW_PRESETS) as preset_name}

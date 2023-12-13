@@ -87,6 +87,10 @@ export async function POST ({ request }) {
         try {
             console.log(`Attempting to connect at ${ payload.config.ws_endpoint }...`);
             _browser = await puppeteer.connect({ browserWSEndpoint: payload.config.ws_endpoint });
+            ServerLogger.logEvent('system', {
+                message: `Browser connected at: ${ payload.config.ws_endpoint }`,
+                status_message: 'info'
+            });
             console.log(`Browser connected at ${ payload.config.ws_endpoint }`);
         } catch (_err) {
             console.error(`Failed to connect at ${ payload.config.ws_endpoint }. Launching a new browser...`);
