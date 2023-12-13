@@ -1,7 +1,15 @@
 <script>
+    /**========================================================================
+     * ?                                ABOUT
+     * @author         :  Henry B. Silva
+     * @repo           :  https://github.com/henrybastos/flow-builder.git
+     * @description    :  The main page for Flow Builder
+     *========================================================================**/
+
     import '../app.postcss';
     import { onMount } from 'svelte';
     import { PAYLOAD } from "$lib/PayloadStore";
+    import { FLOW_PRESETS } from '$lib/PresetsStore';
     import PageSettings from '$lib/modules/PageSettings.svelte';
     import PresetsModal from '$lib/modules/PresetsModal.svelte';
     import PayloadModal from '$lib/modules/PayloadModal/PayloadModal.svelte';
@@ -12,20 +20,25 @@
     import { CURRENT_PRESET_NAME } from '$lib/PresetsStore';
     import { transformToJSON } from '$lib/utils';
 
-    import CodeMirror from "svelte-codemirror-editor";
-    import { json } from "@codemirror/lang-json";
-
     let showGlobalToast;
     let loadedPresetName = '';
     let pageSettingsWSEndpoint;
     let payloadModalTextearea;
 
-    let codeMirrorValue;
-
     function checkAndLoadTempPreset () {
         if (localStorage?.getItem('temp_preset')) {
             PAYLOAD.loadPayload(JSON.parse(localStorage.getItem('temp_preset')));
         }
+    }
+
+    async function loadAllPresetsFromLibrary () {
+        const ALL_PRESETS = await FLOW_PRESETS.loadAllPresetsFromLibrary();
+
+        for(const [preset_name, preset_payload] of Object.entries(ALL_PRESETS)) {
+            FLOW_PRESETS.savePreset({ [preset_name.match(/[^\s].*(?=\.json)/g)]: { ...preset_payload }});
+        }
+
+        $FLOW_PRESETS = $FLOW_PRESETS;
     }
 
     function checkAndLoadPresets () {
@@ -46,11 +59,19 @@
     function onPresetLoadedHandler ({ detail }) {
         loadedPresetName = detail.presetName;
         pageSettingsWSEndpoint = '';
+        console.log(detail.presetBody);
         payloadModalTextearea = transformToJSON(detail.presetBody);
         console.log(detail);
     }
 
-    onMount(() => {
+    function onPayloadModalOpen() {
+        payloadModalTextearea = transformToJSON($PAYLOAD);
+        // codeMirrorValue = transformToJSON($PAYLOAD);
+        // codeMirrorValue = 'var 1 = "Hello!;"';
+    }
+
+    onMount(async () => {
+        await loadAllPresetsFromLibrary();
         checkAndLoadTempPreset();
         checkAndLoadPresets();
     });
@@ -76,7 +97,7 @@
             
             <AddFlowModal />
     
-            <PayloadModal bind:payloadModalTextearea={payloadModalTextearea} {showGlobalToast} />
+            <PayloadModal on:open={onPayloadModalOpen} bind:payloadModalTextearea={payloadModalTextearea} {showGlobalToast} />
 
             <!-- <button 
                 class="bg-transparent border-none p-3" 
@@ -93,11 +114,6 @@
 </header>
 
 <main class="flex flex-col w-[50rem] mt-28">
-
-    { codeMirrorValue }
-
-    <CodeMirror bind:value={codeMirrorValue} lang={json()} />
-
     {#each Object.keys($PAYLOAD.flows) as flow_name}
         <Flow {loadedPresetName} flowName={flow_name} />
     {/each}
@@ -106,12 +122,20 @@
     <p class="text-center text-neutral-500 mb-4">Powered by Tailwind, SvelteKit and Puppeteer</p>
 </main>
 
-<style>
-    :global(.cm-editor .cm-gutter) {
-        display: none;
+<!-- <style lang="postcss">
+    :global(.cm-editor .cm-line) {
+        @apply bg-neutral-900;
     }
+    
     :global(.cm-editor .cm-content) { 
-        @apply font-code;
+        @apply font-code bg-neutral-900;
     }
-</style>
 
+    :global(.cm-editor .cm-cursorLayer .cm-cursor) { 
+        @apply border-blue-500;
+    }
+
+    :global(.cm-focused .cm-selectionBackground), :global(::selection) { 
+        @apply bg-blue-500;
+    }
+</style> -->
