@@ -35,6 +35,7 @@
     bind:this={payloadModal} 
     let:showToast 
     let:showDanger 
+    on:open
 >
     <TabsBar let:activeTab modalTabs={tabs}>
         {#if activeTab === 'payload'}

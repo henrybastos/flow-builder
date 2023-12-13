@@ -11,6 +11,7 @@
     "lint": "eslint ."
   },
   "devDependencies": {
+    "@codemirror/language": "^6.9.3",
     "@sveltejs/adapter-auto": "^2.0.0",
     "@sveltejs/kit": "^1.20.4",
     "autoprefixer": "^10.4.14",
@@ -28,6 +29,8 @@
   "type": "module",
   "dependencies": {
     "@codemirror/lang-json": "^6.0.1",
+    "@codemirror/view": "^6.22.3",
+    "@lezer/highlight": "^1.2.0",
     "puppeteer": "^21.3.4",
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2",

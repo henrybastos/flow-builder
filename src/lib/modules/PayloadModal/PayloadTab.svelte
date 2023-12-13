@@ -8,6 +8,7 @@
     import { CURRENT_PRESET_NAME } from "$lib/PresetsStore";
     import { PAYLOAD } from "$lib/PayloadStore";
     import LogMessage from "$lib/components/LogMessage.svelte";
+    import CodeMirrorModule from "../CodeMirrorModule/CodeMirrorModule.svelte";
     import { transformToJSON } from "$lib/utils";
 
     export let showToast;
@@ -26,9 +27,8 @@
     ServerHandler.logger = LOGGER;
     ServerHandler.logger_tags = TAGS;
 
-    onMount(() => {
+    onMount(async () => {
         PAYLOAD._fix_fixNullConfig();
-        payloadModalTextearea = transformToJSON($PAYLOAD);
     });
 
     function loadPayload () {
@@ -104,22 +104,26 @@
         </a>
     </div>
 
+    <!-- on:drop|preventDefault={onFileDropped} 
+    on:dragover|preventDefault={() => isUserDragginFileOver = true} 
+    on:dragleave={() => isUserDragginFileOver = false} -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
-        class="h-fit relative w-full overflow-clip border-neutral-800 border-2 rounded-md"
+        class="h-fit max-h-[30rem] relative w-full overflow-x-clip overflow-y-auto border-neutral-800 border-2 rounded-md"
         class:wrapperOnDragOver={isUserDragginFileOver}
-        on:drop|preventDefault={onFileDropped} 
-        on:dragover|preventDefault={() => isUserDragginFileOver = true} 
-        on:dragleave={() => isUserDragginFileOver = false}
+        
     >
-        <div class="absolute invisible grid place-items-center bg-black bg-opacity-75 -inset-2" class:onDragOver={isUserDragginFileOver} on:dragleave={() => isUserDragginFileOver = false}>
+        <!-- <div class="absolute invisible grid place-items-center bg-black bg-opacity-75 -inset-2" class:onDragOver={isUserDragginFileOver} on:dragleave={() => isUserDragginFileOver = false}>
             <h4>Drop file in here</h4>
-        </div>
-        <textarea 
+        </div> -->
+
+        <CodeMirrorModule bind:value={payloadModalTextearea}/>
+
+        <!-- <textarea 
             class="font-code border-none rounded-none -mb-2 bg-neutral-950 w-[105%] h-full" 
             bind:value={payloadModalTextearea} 
             cols="30" rows="16"
-        ></textarea>
+        ></textarea> -->
     </div>
     
 
