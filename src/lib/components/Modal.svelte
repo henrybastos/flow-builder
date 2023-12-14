@@ -1,5 +1,5 @@
 <script>
-    import { createEventDispatcher } from "svelte";
+    import { createEventDispatcher, onMount } from "svelte";
     import Toast from "./Toast.svelte";
     import { checkClickOnGuideIDs } from "$lib/utils";
 
@@ -20,6 +20,7 @@
     export let dangerConfirmPlaceholder = 'Confirm';
     export let dangerCancelPlaceholder = 'Cancel';
     export let dangerConfirmCallbackAction = null;
+    export let openOnMount = false;
 
     export function dangerConfirmAction () {
         dispatch(dangerConfirmEventMessage);
@@ -76,6 +77,12 @@
             close();
         }
     }
+
+    onMount(() => {
+        if (openOnMount) {
+            open();
+        }
+    })
 </script>
 
 <dialog bind:this={dangerModal} class="p-3">

@@ -3,7 +3,7 @@
     import { slide } from "svelte/transition";
     import { ServerHandler } from "$lib/ServerHandler";
     import { createEventDispatcher } from "svelte";
-    import { FLOW_BUILDER_OPERATION_TEMPLATES } from "$lib/store";
+    import { FLOW_BUILDER_OPERATION_TEMPLATES } from "$lib/OperationTemplates";
     import { LOGGER, TAGS } from "$lib/LogStore";
     import { CURRENT_PRESET_NAME } from "$lib/PresetsStore";
     import { PAYLOAD } from "$lib/PayloadStore";
