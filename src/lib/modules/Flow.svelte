@@ -3,7 +3,7 @@
     import OperationBuilder from "./OperationBuilder.svelte";
     import Modal from "../components/Modal.svelte";
     import { PAYLOAD } from "$lib/PayloadStore";
-    import { FLOW_BUILDER_OPERATION_TEMPLATES } from "$lib/store";
+    import { FLOW_BUILDER_OPERATION_TEMPLATES } from "$lib/OperationTemplates";
 
     import { snakeCaseToPascalCase } from "$lib/utils";
 
@@ -13,7 +13,7 @@
 
     export let flowName;
     // To collapse Fieldsets when preset is loaded
-    export let loadedPresetName;
+    // export let loadedPresetName;
 
     function addOp (_flow_name, _operation) {
         PAYLOAD.addOperation(_flow_name, _operation);

@@ -11,6 +11,7 @@
     let inputPresetName;
     let isPresetNameEditable = '';
     let presetNameEdit;
+    let isControlDown = false;
     export let showGlobalToast;
 
     const dispatch = createEventDispatcher();
@@ -84,6 +85,10 @@
         }
     }
 
+    function selectPreset (_preset_name) {
+        console.log(_preset_name);
+    }
+
     function _window_checkEditPresetNameClick (_target) {
         // Disables isPresetNameEditable if click is not the Edit Preset Name button or icon
         const allowedEditPresetGuideIDs = [
@@ -101,9 +106,20 @@
     function _window_handleClicks (_event) {
         _window_checkEditPresetNameClick(_event.target);
     }
+
+    function _window_handleKeyDown ({ key }) {
+        if (key === 'Control' && !isControlDown) {
+            isControlDown = true;
+            console.log(isControlDown);
+        }
+    }
+
+    function _window_handleKeyUp ({ key }) {
+        isControlDown = false;
+    }
 </script>
 
-<svelte:window on:click={_window_handleClicks} />
+<svelte:window on:keydown={_window_handleKeyDown} on:keyup={_window_handleKeyUp} on:click={_window_handleClicks} />
 
 <button on:click={() => presetsModal.open()} class="btn-md">
     <i class="ti ti-bookmarks text-blue-500"></i>
@@ -111,14 +127,23 @@
 </button>
 
 <Modal 
+    openOnMount={true}
     bind:this={presetsModal} 
     title="Presets" 
     let:showDanger 
     bind:showToast={showToast}
 >
+    <div id="presets_header" class="mb-3">
+        <button>Load preset</button>
+        <button>Rename</button>
+        <button>Update preset</button>
+        <button disabled>Delete presets</button>
+        { isControlDown }
+    </div>
+
    <div class="btn-bar mb-3 overflow-y-auto max-h-[30rem] p-3 border-2 border-neutral-800 bg-neutral-950 rounded-lg">
        {#each Object.keys($FLOW_PRESETS) as preset_name}
-           <div class="flex flex-nowrap col-span-full gap-x-3">
+           <div class="flex flex-wrap gap-x-2">
                 {#if isPresetNameEditable === preset_name}
                     <input data-guide-id="edit_preset_name_input" class="btn-md col-span-full w-full outline-offset-1" type="text" bind:value={ presetNameEdit }>
 
@@ -128,26 +153,27 @@
                         </button>
                     {/if}
                 {:else}
-                    <button class="btn-md col-span-full w-full outline-offset-1" on:click={() => loadPreset(preset_name)}>
-                        <i class="ti ti-bookmark-filled text-blue-500"></i>
+                    <!-- <button class="preset_block" on:click={() => loadPreset(preset_name)}> -->
+                    <button class="preset_block" on:click={() => selectPreset(preset_name)}>
+                        <!-- <i class="ti ti-bookmark-filled text-blue-500"></i> -->
                         { preset_name }
                     </button>
                 {/if}
 
                <!-- Edit preset name -->
-               <button data-guide-id="edit_preset_name_btn" class="btn-md" on:click={() => toggleEditPresetName(preset_name)}>
+               <!-- <button data-guide-id="edit_preset_name_btn" class="btn-md" on:click={() => toggleEditPresetName(preset_name)}>
                    <i data-guide-id="edit_preset_name_icon" class="ti ti-ballpen"></i>
-               </button>
+               </button> -->
 
                <!-- Update preset -->
-               <button class="btn-md" on:click={() => showDanger(() => updatePreset(preset_name), { danger_modal_title: `Update preset ${ preset_name }?` })}>
+               <!-- <button class="btn-md" on:click={() => showDanger(() => updatePreset(preset_name), { danger_modal_title: `Update preset ${ preset_name }?` })}>
                    <i class="ti ti-arrows-transfer-up"></i>
-               </button>
+               </button> -->
 
                <!-- Delete preset -->
-               <button class="btn-md btn-danger" on:click={() => showDanger(() => removePreset(preset_name), { danger_modal_title: `Delete preset ${ preset_name }?` })}>
+               <!-- <button class="btn-md btn-danger" on:click={() => showDanger(() => removePreset(preset_name), { danger_modal_title: `Delete preset ${ preset_name }?` })}>
                    <i class="ti ti-trash-x"></i>
-               </button>
+               </button> -->
            </div>
        {/each}
    </div>
@@ -172,3 +198,13 @@
        <p class="text-red-600 col-span-full peer-invalid/preset-name:visible invisible">Invalid preset name</p>
    </div>
 </Modal>
+
+<style lang="postcss">
+    #presets_header button {
+        @apply clear-btn px-4 py-3;
+    }
+
+    .preset_block {
+        @apply w-full outline-offset-1 rounded bg-neutral-900 hover:bg-neutral-800 transition-all py-4 border-2 border-transparent focus:border-blue-600;
+    }
+</style>
