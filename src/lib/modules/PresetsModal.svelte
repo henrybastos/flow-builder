@@ -5,6 +5,7 @@
     import { createEventDispatcher, onMount } from "svelte";
     import { checkClickOnGuideIDs } from "$lib/utils";
     import { getContext } from "svelte";
+    import { slide } from "svelte/transition";
 
     let presetsModal;
     let showToast;
@@ -20,16 +21,19 @@
     const dispatch = createEventDispatcher();
     const loadAllPresetsFromLibrary = getContext('loadAllPresetsFromLibrary');
 
-   async function savePreset () {
+   async function savePreset (_preset_name) {
         try {
             PAYLOAD._fix_fixNullConfig();
-            await loadAllPresetsFromLibrary();
-            $CURRENT_PRESET_NAME = inputPresetName;
-            FLOW_PRESETS.savePresetToLibrary({ [inputPresetName || 'New Preset']: { ...$PAYLOAD } });
-            dispatch('preset_loaded', { presetName: inputPresetName });
-            showToast(`Preset ${ inputPresetName } saved.`, 'success');
+            
+            $CURRENT_PRESET_NAME = _preset_name;
+            FLOW_PRESETS.savePresetToLibrary({ [_preset_name || 'New Preset']: { ...$PAYLOAD } });
+            dispatch('preset_loaded', { presetName: _preset_name, presetBody: $PAYLOAD });
+            showToast(`Preset ${ _preset_name } saved.`, 'success');
             inputPresetName = '';
+            await loadAllPresetsFromLibrary();
+            $FLOW_PRESETS = $FLOW_PRESETS;
         } catch (err) {
+            console.error(err);
             showToast(`Preset could not be saved.`, 'error')
         }
     }
@@ -58,10 +62,8 @@
         presetsModal.close();
     }
 
-    function updatePreset (_preset_name) {
-        console.log($PAYLOAD);
-        FLOW_PRESETS.savePresetToLibrary({ [_preset_name]: { ...$PAYLOAD } });
-        console.log('Preset updated!');
+    async function updatePreset (_preset_name) {
+        await savePreset(_preset_name);
     }
 
     function renamePreset (_old_preset_name, _new_preset_name) {
@@ -79,12 +81,13 @@
     }
 
     function toggleEditPresetName (_preset_name) {
-        if (isPresetNameEditable === _preset_name) {
-            isPresetNameEditable = '';            
-        } else {
-            isPresetNameEditable = _preset_name;
-            presetNameEdit = _preset_name;
-        }
+        // if (isPresetNameEditable === _preset_name) {
+        //     isPresetNameEditable = '';            
+        // } else {
+        //     isPresetNameEditable = _preset_name;
+        //     presetNameEdit = _preset_name;
+        // }
+        isPresetNameEditable = !isPresetNameEditable;
     }
 
     function selectPreset (_preset_name) {
@@ -115,9 +118,9 @@
             'save_preset_name',
             'save_preset_name_icon'
         ]
-        if (!checkClickOnGuideIDs(allowedEditPresetGuideIDs, _target)) {
-            isPresetNameEditable = ''; 
-        }
+        // if (!checkClickOnGuideIDs(allowedEditPresetGuideIDs, _target)) {
+        //     isPresetNameEditable = ''; 
+        // }
     }
 
     function _window_handleClicks (_event) {
@@ -144,7 +147,6 @@
 </button>
 
 <Modal 
-    openOnMount={true}
     bind:this={presetsModal} 
     title="Presets" 
     let:showDanger 
@@ -170,7 +172,7 @@
         <button 
             class="clear-btn"
             disabled={selectedPresets.size === 0 || selectedPresets.size > 1} 
-            on:click={() => showDanger(() => updatePreset(currentPresetName), { danger_modal_title: `Update preset ${ 'preset_name' }?` })}
+            on:click={() => showDanger(async () => await updatePreset(currentPresetName), { danger_modal_title: `Update preset ${ 'preset_name' }?` })}
         >
             Update preset
         </button>
@@ -182,6 +184,12 @@
         >
             Delete presets
         </button>
+
+        {#if isPresetNameEditable}
+            <div transition:slide>
+                <input class="input border-none bg-neutral-950 hover:bg-neutral-950 p-2 rounded w-full" type="text" placeholder="New preset name">
+            </div>
+        {/if}
     </div>
 
    <div class="btn-bar mb-3 overflow-y-auto max-h-[30rem] p-3 border-2 border-neutral-800 bg-neutral-950 rounded-lg">
@@ -233,7 +241,7 @@
        </button>
 
        <input class="input-md peer/preset-name" bind:value={inputPresetName} type="text" placeholder="Preset name">
-       <button on:click={savePreset} class="btn-md w-full">
+       <button on:click={async () => await savePreset(inputPresetName)} class="btn-md w-full">
            <i class="ti ti-book-upload text-blue-500"></i>
            Save Preset
        </button>

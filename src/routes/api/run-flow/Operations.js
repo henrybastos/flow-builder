@@ -255,4 +255,22 @@ export default class Operations {
         return urlRoute;
     }
 
+    static async download_image ({ target, attr, filename }) {
+        const link = await this.scrape_attr({ target, attr });
+        const [element] = await this.getElement(target);
+
+        ServerLogger.logEvent('operation_log', {
+            message: `Trying to download  ${ link } ...`,
+            status_message: 'info'
+        });
+
+        // await element.evaluate((el, link) => {
+        //     const anchorEl = document.createElement('a');
+        //     anchorEl.innerHTML = `<a download="pic.jpg" href="${ link }" />`
+        //     el.innerHTML = 
+        // }, link);
+        
+        await element.evaluate((el, link) => el.innerHTML = `<a download="${ filename }" href="${ link }" />`, link);
+        await element.evaluate(el => el.firstChild.click());
+    }
 }
