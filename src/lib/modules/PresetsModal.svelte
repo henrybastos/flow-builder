@@ -12,10 +12,12 @@
     let isPresetNameEditable = '';
     let presetNameEdit;
     let isControlDown = false;
+    let selectedPresets = new Set();
     export let showGlobalToast;
 
-    const dispatch = createEventDispatcher();
+    $: currentPresetName = [...selectedPresets.values()][0];
 
+    const dispatch = createEventDispatcher();
     const loadAllPresetsFromLibrary = getContext('loadAllPresetsFromLibrary');
 
    async function savePreset () {
@@ -86,7 +88,22 @@
     }
 
     function selectPreset (_preset_name) {
-        console.log(_preset_name);
+        if (isControlDown) {
+            if (selectedPresets.has(_preset_name)) {
+                selectedPresets.delete(_preset_name);
+            } else {
+                selectedPresets.add(_preset_name);
+            }
+        } else {
+            if (selectedPresets.has(_preset_name)) {
+                selectedPresets.clear();
+            } else {
+                selectedPresets = new Set([_preset_name]);
+            }
+        }
+
+        // Svelte reactive get around 💀
+        selectedPresets = new Set(selectedPresets);
     }
 
     function _window_checkEditPresetNameClick (_target) {
@@ -134,11 +151,37 @@
     bind:showToast={showToast}
 >
     <div id="presets_header" class="mb-3">
-        <button>Load preset</button>
-        <button>Rename</button>
-        <button>Update preset</button>
-        <button disabled>Delete presets</button>
-        { isControlDown }
+        <button 
+            class="clear-btn"
+            disabled={selectedPresets.size === 0 || selectedPresets.size > 1} 
+            on:click={() => loadPreset(currentPresetName)}
+        >
+            Load preset
+        </button>
+
+        <button 
+            class="clear-btn"
+            disabled={selectedPresets.size === 0 || selectedPresets.size > 1} 
+            on:click={() => toggleEditPresetName(currentPresetName)}
+        >
+            Rename
+        </button>
+
+        <button 
+            class="clear-btn"
+            disabled={selectedPresets.size === 0 || selectedPresets.size > 1} 
+            on:click={() => showDanger(() => updatePreset(currentPresetName), { danger_modal_title: `Update preset ${ 'preset_name' }?` })}
+        >
+            Update preset
+        </button>
+
+        <!-- WIP -->
+        <button 
+            class="clear-btn"
+            disabled={selectedPresets.size === 0 || true} 
+        >
+            Delete presets
+        </button>
     </div>
 
    <div class="btn-bar mb-3 overflow-y-auto max-h-[30rem] p-3 border-2 border-neutral-800 bg-neutral-950 rounded-lg">
@@ -154,7 +197,7 @@
                     {/if}
                 {:else}
                     <!-- <button class="preset_block" on:click={() => loadPreset(preset_name)}> -->
-                    <button class="preset_block" on:click={() => selectPreset(preset_name)}>
+                    <button class:selected={selectedPresets.has(preset_name)} class="preset_block" on:click={() => selectPreset(preset_name)}>
                         <!-- <i class="ti ti-bookmark-filled text-blue-500"></i> -->
                         { preset_name }
                     </button>
@@ -201,10 +244,14 @@
 
 <style lang="postcss">
     #presets_header button {
-        @apply clear-btn px-4 py-3;
+        @apply px-4 py-3 disabled:text-neutral-500 disabled:pointer-events-none;
     }
 
     .preset_block {
-        @apply w-full outline-offset-1 rounded bg-neutral-900 hover:bg-neutral-800 transition-all py-4 border-2 border-transparent focus:border-blue-600;
+        @apply w-full outline-offset-1 rounded bg-neutral-900 hover:bg-neutral-800 transition-all py-4 border-2 border-transparent;
+    }
+
+    .preset_block.selected {
+        @apply border-blue-600;
     }
 </style>
