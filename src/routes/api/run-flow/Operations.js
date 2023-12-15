@@ -263,14 +263,8 @@ export default class Operations {
             message: `Trying to download  ${ link } ...`,
             status_message: 'info'
         });
-
-        // await element.evaluate((el, link) => {
-        //     const anchorEl = document.createElement('a');
-        //     anchorEl.innerHTML = `<a download="pic.jpg" href="${ link }" />`
-        //     el.innerHTML = 
-        // }, link);
         
-        await element.evaluate((el, link) => el.innerHTML = `<a download="${ filename }" href="${ link }" />`, link);
+        await element.evaluate((el, link, filename) => el.innerHTML = `<a download="${ filename }" href="${ link }" />`, link, filename);
         await element.evaluate(el => el.firstChild.click());
     }
 }
