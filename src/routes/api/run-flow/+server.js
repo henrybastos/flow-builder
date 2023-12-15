@@ -18,19 +18,6 @@ import Operations from "./Operations";
 
 const logCommands = false;
 
-const ENV_VARIABLES_INPUT_ALLOWLIST = [
-    'target',
-    'trigger_target',
-    'picker_target',
-    'color',
-    'key',
-    'mod_keys',
-    'keys',
-    'response_slot',
-    'time',
-    'value'
-]
-
 export async function POST ({ request }) {
     const payload = await request.json();
     const { browser } = await _startEngine();
@@ -127,7 +114,7 @@ export async function POST ({ request }) {
         }
         
         for (const [_input_name, _input_value] of Object.entries(_operation)) {
-            if (ENV_VARIABLES_INPUT_ALLOWLIST.includes(_input_name)) {
+            if (EnvHandler.ENV_VARIABLES_INPUT_ALLOWLIST.includes(_input_name)) {
                 _operation[_input_name] = EnvHandler.checkPlaceholders(_input_value, _env);
             }
         }

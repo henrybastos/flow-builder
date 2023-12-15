@@ -1,5 +1,19 @@
 export class EnvHandler {
-   static log_events = true;
+   static log_events = false;
+
+   static ENV_VARIABLES_INPUT_ALLOWLIST = [
+      'target',
+      'trigger_target',
+      'picker_target',
+      'color',
+      'key',
+      'mod_keys',
+      'keys',
+      'response_slot',
+      'time',
+      'value',
+      'filename'
+   ];
 
    static setGlobalEnv (_env) {
       this.env = _env;
