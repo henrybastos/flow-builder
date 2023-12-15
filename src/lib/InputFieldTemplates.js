@@ -96,6 +96,12 @@ export const FLOW_BUILDER_INPUT_FIELD_TEMPLATES = {
         placeholder: 'Value',
         value: ''
     },
+    filename: {
+        type: 'text',
+        label: 'Filename',
+        placeholder: 'file.txt',
+        value: ''
+    },
     key: {
         type: 'dropdown',
         label: 'Key',

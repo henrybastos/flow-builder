@@ -231,5 +231,16 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = {
         input_fields: {
             key: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.key
         }
+    },
+    download_image: {
+        command: 'download_image',
+        enabled: true,
+        label: 'Download Image',
+        icon: 'ti-download',
+        input_fields: {
+            target: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.target,
+            attr: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.attr,
+            filename: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.filename
+        }
     }
 };
