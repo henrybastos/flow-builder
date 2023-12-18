@@ -102,14 +102,13 @@ export class EnvHandler {
       const placeholders = _str.match(/(?<=%)(.*?)(?=%)/g);
 
       if (!placeholders) {
-         console.log('No placeholders placeholders found.', _str, placeholders);
          return null;
       }
 
       // Gets all even placeholders 
       // e.g.: In "%var_1%/%var_2%" it would return ["%var_1%", "/", "%var_2%"], and the "/" its not desired, its a subproduct.
       let evenPlaceholders = placeholders?.filter((w,i) => i % 2 == 0 && w);
-      console.log('evenPlaceholders', evenPlaceholders);
+      // console.log('evenPlaceholders', evenPlaceholders);
 
       // Removes the "$$env" and "$$res"
       return evenPlaceholders;
@@ -132,7 +131,7 @@ export class EnvHandler {
    }
    
    static resolveDotNotation (_str, _env) {
-      console.log(_env);
+      // console.log(_env);
       return [_env, ..._str.split('.')]?.reduce((a,b) => a?.[b]) || 'invalid_env_var';
    }
 }
