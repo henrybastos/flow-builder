@@ -264,7 +264,17 @@ export default class Operations {
             status_message: 'info'
         });
         
-        await element.evaluate((el, link, filename) => el.innerHTML = `<a download="${ filename }" href="${ link }" />`, link, filename);
-        await element.evaluate(el => el.firstChild.click());
+        await element.evaluate(async (el, link, filename) => {
+            const response = await fetch(link);
+            const blobImage = await response.blob();
+            const href = URL.createObjectURL(blobImage);
+
+            const anchor = document.createElement('a');
+            anchor.setAttribute('download', filename);
+            anchor.setAttribute('href', href);
+
+            document.querySelector('body').appendChild(anchor);
+            anchor.click();
+        }, link, filename);
     }
 }
