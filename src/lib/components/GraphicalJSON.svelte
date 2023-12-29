@@ -16,12 +16,15 @@
             {#if typeof value === 'string'}
                 <span class="gui_object_value">
                     <span class="text-neutral-500 mr-2">{ index }</span>
-                    { Array.isArray(values) ? value : `${ key } : ${ value }` }
+                    { Array.isArray(values) ? `${ value }` : `${ key } : ${ value }` }
                 </span>
-            {:else}
+            {:else if typeof value === 'object'}
                 <div transition:slide={{ duration: 400 }} class='gui_object_body'>
                     <svelte:self key={ Array.isArray(value) ? key : Object.keys(value)[0] } values={ Array.isArray(value) ? value : value[Object.keys(value)[0]] } />
                 </div>
+            {:else}
+                <span class="text-neutral-500 mr-2">{ index }</span>
+                Invalid response
             {/if}
         {/each}
     </div>
