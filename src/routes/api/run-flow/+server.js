@@ -20,7 +20,6 @@ const logCommands = false;
 
 export async function POST ({ request }) {
     const payload = await request.json();
-    const { browser } = await _startEngine();
     let responsePayload = {};
 
     console.log('Calling local endpoint: [::1]:5173/api/run-flow');
@@ -28,14 +27,17 @@ export async function POST ({ request }) {
     const stream = new ReadableStream({
         async start(controller) {
             ServerLogger._setController(controller);
+            const { browser } = await _startEngine();
+            
             if (!payload.config.ws_endpoint) {
+
                 ServerLogger.logEvent('system', {
                     message: `WS Endpoint: ${ browser.wsEndpoint() }`,
                     status_message: 'info'
                 });
             }
 
-            await _execStream();
+            await _execStream(browser);
         }
     });  
 
@@ -74,13 +76,13 @@ export async function POST ({ request }) {
         try {
             console.log(`Attempting to connect at ${ payload.config.ws_endpoint }...`);
             _browser = await puppeteer.connect({ browserWSEndpoint: payload.config.ws_endpoint });
-            ServerLogger.logEvent('system', {
-                message: `Browser connected at: ${ payload.config.ws_endpoint }`,
-                status_message: 'info'
-            });
+            // ServerLogger.logEvent('system', {
+            //     message: `Browser connected at: ${ payload.config.ws_endpoint }`,
+            //     status_message: 'info'
+            // });
             console.log(`Browser connected at ${ payload.config.ws_endpoint }`);
         } catch (_err) {
-            console.error(`Failed to connect at ${ payload.config.ws_endpoint }. Launching a new browser...`);
+            console.error(`Failed to connect at ${ payload.config.ws_endpoint }. Launching a new browser...\n`, _err);
             
             _browser = await puppeteer.launch({
                 headless: false,
@@ -155,7 +157,7 @@ export async function POST ({ request }) {
         }
     }
 
-    async function _execStream () {
+    async function _execStream (browser) {
         try {  
             EnvHandler.setGlobalEnv(payload.env);
             await runFlow(payload.flows.main_flow, payload.env);
