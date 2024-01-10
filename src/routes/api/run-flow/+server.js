@@ -28,7 +28,7 @@ export async function POST ({ request }) {
         async start(controller) {
             ServerLogger._setController(controller);
             const { browser } = await _startEngine();
-            
+
             if (!payload.config.ws_endpoint) {
 
                 ServerLogger.logEvent('system', {
@@ -165,6 +165,8 @@ export async function POST ({ request }) {
             if (!payload.config.ws_endpoint && payload.config.close_browser_on_finish) {
                 await browser.close();
             }
+
+            console.log('RESPONSE PAYLOAD', responsePayload);
             
             ServerLogger.logEvent('response', {
                 message: 'All operations done.',

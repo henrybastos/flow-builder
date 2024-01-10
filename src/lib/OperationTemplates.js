@@ -242,5 +242,19 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = {
             attr: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.attr,
             filename: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.filename
         }
+    },
+    set_iframe_as_page: {
+        command: 'set_iframe_as_page',
+        enabled: true,
+        label: 'Set iFrame as page',
+        icon: 'ti-command',
+        input_fields: {
+            name: {
+                type: 'text',
+                label: 'iFrame name',
+                placeholder: 'videoplayer',
+                value: ''
+            }
+        }
     }
 };
