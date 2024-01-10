@@ -1,12 +1,13 @@
 import ServerLogger from "./ServerLogger"
 
 export default class Operations {
+    static pages = [];
     /**
      * Sets the page which the operation will work with.
      * @param {import('puppeteer').Page} _page 
      */
     static _setPage (_page) {
-        this.page = _page;
+        this.curr_page = _page;
     }
 
     static _setBrowser (_browser) {
@@ -23,16 +24,16 @@ export default class Operations {
             status_message: 'info'
         });
         
-        await this.page.goto(target, { waitUntil: 'networkidle0' });
+        await this.curr_page.goto(target, { waitUntil: 'networkidle0' });
     }
 
     static async wait_for_selector (_target, timeout = 15000 ) {
-        await this.page.waitForSelector(`xpath/${ _target }`, { timeout });
+        await this.curr_page.waitForSelector(`xpath/${ _target }`, { timeout });
     }
 
     static async getElement (_target) {
         await this.wait_for_selector(_target, this.payload?.wait_timeout);
-        return await this.page.$$(`xpath/${ _target }`);
+        return await this.curr_page.$$(`xpath/${ _target }`);
     }
 
     static async user_click ({ target }) {
@@ -88,7 +89,7 @@ export default class Operations {
         return await element.evaluate((dom_el, _attr) => dom_el[_attr], attr);
     }
 
-    static async scrape_multiple_attr ({ target, attr }) {
+    static async scrape_multiple_attr ({ target, attr, response_slot }) {
         const elements = await this.getElement(target);
         let scraped_attributes = [];
 
@@ -98,7 +99,8 @@ export default class Operations {
         });
 
         for (const _el of elements) {
-            scraped_attributes.push(await _el.evaluate((dom_el, _attr) => dom_el[_attr], attr));
+            // scraped_attributes.push({ [response_slot]: [await _el.evaluate((dom_el, _attr) => dom_el[_attr] || dom_el.getAttribute(_attr), attr)] });
+            scraped_attributes.push(await _el.evaluate((dom_el, _attr) => dom_el[_attr] || dom_el.getAttribute(_attr), attr));
         }
 
         return scraped_attributes;
@@ -157,7 +159,7 @@ export default class Operations {
                 message: `Waiting for navigation...`,
                 status_message: 'info'
             });
-            await this.page.waitForNavigation();
+            await this.curr_page.waitForNavigation();
         } catch (err) {
             ServerLogger.logEvent('operation_log', {
                 message: `Failed to wait for navigation`,
@@ -167,7 +169,7 @@ export default class Operations {
     }
 
     static async reload () {
-        await this.page.reload({ waitUntil: ['networkidle0', "domcontentloaded"] });
+        await this.curr_page.reload({ waitUntil: ['networkidle0', "domcontentloaded"] });
     }
 
     static async press_key ({ key }) {
@@ -176,7 +178,7 @@ export default class Operations {
             status_message: 'info'
         });
 
-        await this.page.keyboard.press(key);
+        await this.curr_page.keyboard.press(key);
     }
 
     /**
@@ -190,15 +192,15 @@ export default class Operations {
         });
 
         for(const key of mod_keys) {
-            await this.page.keyboard.down(key);
+            await this.curr_page.keyboard.down(key);
         }
         
         for(const key of keys) {
-            await this.page.keyboard.press(key);
+            await this.curr_page.keyboard.press(key);
         }
         
         for(const key of mod_keys) {
-            await this.page.keyboard.up(key);
+            await this.curr_page.keyboard.up(key);
         }
     }
 
@@ -232,7 +234,7 @@ export default class Operations {
             status_message: 'info'
         });
         
-        const urlSearchParams = new URLSearchParams(await this.page.evaluate(() => window.location.search));
+        const urlSearchParams = new URLSearchParams(await this.curr_page.evaluate(() => window.location.search));
         return urlSearchParams.get(param);
     }
 
@@ -244,7 +246,7 @@ export default class Operations {
 
         // const pathnameRegex = new RegExp('(?<=/cursos/[0-9]*/editar/modulos/).*(?=/aula/)', 'g')
         const pathnameRegex = new RegExp(regex, 'g');
-        const urlPathname = await this.page.evaluate(() => window.location.pathname)
+        const urlPathname = await this.curr_page.evaluate(() => window.location.pathname)
         const [urlRoute] = urlPathname.match(pathnameRegex);
 
         ServerLogger.logEvent('operation_log', {
@@ -276,5 +278,22 @@ export default class Operations {
             document.querySelector('body').appendChild(anchor);
             anchor.click();
         }, link, filename);
+    }
+
+    static async set_iframe_as_page ({ name }) {
+        this.curr_page = await this.curr_page.frames.find(frame => frame.name() === name);
+
+        ServerLogger.logEvent('operation_log', {
+            message: `The PAGE was set to an iframe called ${ name }`,
+            status_message: 'info'
+        });
+    }
+
+    static async select_page ({ page }) {
+        if (typeof page === 'number') {
+            this.curr_page = this.pages[page]
+        } else if (typeof page === 'string') {
+            
+        }
     }
 }
