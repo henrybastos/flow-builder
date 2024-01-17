@@ -117,8 +117,19 @@ export const FLOW_BUILDER_INPUT_FIELD_TEMPLATES = {
             {
                 label: 'End',
                 value: 'End'
+            },
+            {
+                label: 'Backspace',
+                value: 'Backspace'
             }
         ],
+        value: ''
+    },
+    expression: {
+        code_font: true,
+        type: 'text',
+        label: 'Expression',
+        placeholder: 'window.location.href = "http://google.com.br";',
         value: ''
     }
 };

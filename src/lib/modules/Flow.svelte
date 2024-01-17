@@ -55,7 +55,7 @@
 </Fieldset>
 
 <Modal bind:this={addOperationsModal} title="Add operation" bind:showDanger>
-    <div class="grid grid-cols-2 gap-x-4 gap-y-2 h-fit">
+    <div class="grid grid-cols-2 gap-x-4 gap-y-2 max-h-[40rem] overflow-y-auto">
         {#each Object.values(FLOW_BUILDER_OPERATION_TEMPLATES) as operationTemplate}
             {#if !operationTemplate.disabled}                
                 <button class="btn btn-md w-full" on:click={() => addOp(flowName, structuredClone(operationTemplate))}>
