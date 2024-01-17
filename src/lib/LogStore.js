@@ -17,6 +17,14 @@ export const TAGS = {
    warning: {
       type: 'warning',
       label: '[WARNING]'
+   },
+   timer: {
+      type: 'timer',
+      label: '[ELAPSED TIME]'
+   },
+   running: {
+      type: 'running',
+      label: '[RUNNING]'
    }
 }
 
