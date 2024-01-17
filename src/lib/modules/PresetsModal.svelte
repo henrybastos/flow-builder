@@ -172,7 +172,7 @@
         <button 
             class="clear-btn"
             disabled={selectedPresets.size === 0 || selectedPresets.size > 1} 
-            on:click={() => showDanger(async () => await updatePreset(currentPresetName), { danger_modal_title: `Update preset ${ 'preset_name' }?` })}
+            on:click={() => showDanger(async () => await updatePreset(currentPresetName), { danger_modal_title: `Update preset ${ currentPresetName }?` })}
         >
             Update preset
         </button>

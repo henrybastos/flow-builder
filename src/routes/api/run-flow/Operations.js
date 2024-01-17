@@ -2,12 +2,19 @@ import ServerLogger from "./ServerLogger"
 
 export default class Operations {
     static pages = [];
+    static __flow_builder_are_funcs_injected__ = false;
+    static __flow_builder_injection_funcs__ = {
+        x: (path) => document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue,
+        goto: (href) => { window.location.href = href}
+    }    
+
     /**
      * Sets the page which the operation will work with.
      * @param {import('puppeteer').Page} _page 
      */
     static _setPage (_page) {
         this.curr_page = _page;
+        console.log('SET PAGE');
     }
 
     static _setBrowser (_browser) {
@@ -16,6 +23,16 @@ export default class Operations {
 
     static _setPayload (_payload) {
         this.payload = _payload;
+    }
+
+    static async _injectFunctions () {
+        for (let [fn_name, fn_func] of Object.entries(this.__flow_builder_injection_funcs__)) {
+            if (!await this.curr_page.evaluate(`try { ${ fn_name } } catch (err) { false }`)) {
+                console.log('[FUNC INJECTION]: Injecting function', fn_name);
+                // Injects the functions into the page, so it can be used with evaluate.
+                await this.curr_page.evaluate(`const ${ fn_name } = ${ fn_func }`);
+            }
+        }
     }
 
     static async goto({ target }) {
@@ -89,7 +106,7 @@ export default class Operations {
         return await element.evaluate((dom_el, _attr) => dom_el[_attr], attr);
     }
 
-    static async scrape_multiple_attr ({ target, attr, response_slot }) {
+    static async scrape_multiple_attr ({ target, attr }) {
         const elements = await this.getElement(target);
         let scraped_attributes = [];
 
@@ -289,11 +306,21 @@ export default class Operations {
         });
     }
 
-    static async select_page ({ page }) {
-        if (typeof page === 'number') {
-            this.curr_page = this.pages[page]
-        } else if (typeof page === 'string') {
+    // WIP
+    // static async select_page ({ page }) {
+    //     if (typeof page === 'number') {
+    //         this.curr_page = this.pages[page]
+    //     } else if (typeof page === 'string') {
             
-        }
+    //     }
+    // }
+
+    static async eval_expression ({ expression }) {
+        await this._injectFunctions();
+        ServerLogger.logEvent("operation_log", {
+            message: `Evaluating expression: ${ expression }`,
+            status_message: "info"
+        })
+        await this.curr_page.evaluate(expression);
     }
 }

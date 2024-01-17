@@ -256,5 +256,14 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = {
                 value: ''
             }
         }
+    },
+    eval_expression: {
+        command: 'eval_expression',
+        enabled: true,
+        label: 'Evaluate expression',
+        icon: 'ti-terminal-2',
+        input_fields: {
+            expression: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.expression
+        }
     }
 };

@@ -20,7 +20,7 @@
 
     $: payloadToURI = `data:text/json;charset=utf-8,${ encodeURIComponent(payloadModalTextearea) }`;
     $: payloadURIPresetName = `${ $CURRENT_PRESET_NAME?.match(/[A-z,0-9]*[^\s:_,.]/gi)?.join('_')?.toLowerCase() || 'preset' }.json`;
-    $: rawPayloadToURI = `data:text/json;charset=utf-8,${ encodeURIComponent(JSON.stringify($PAYLOAD)) }`;
+    $: rawPayloadToURI = `data:text/json;charset=utf-8,${ encodeURIComponent(JSON.stringify($PAYLOAD, null, 3)) }`;
     $: rawPayloadURIPresetName = `raw_${ $CURRENT_PRESET_NAME?.match(/\w*[^\s:_,.]/gi)?.join('_')?.toLowerCase() || 'preset' }.json`;
     $: ServerHandler.currentPresetName = $CURRENT_PRESET_NAME;
 

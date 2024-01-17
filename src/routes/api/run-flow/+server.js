@@ -17,6 +17,10 @@ import Operations from "./Operations";
  */
 
 const logCommands = false;
+const EXECUTABLE_PATHS = {
+    CHROME: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    OPERA_GX: 'C:/Users/kebook.programacao.2/AppData/Local/Programs/Opera GX/opera.exe'
+}
 
 export async function POST ({ request }) {
     const payload = await request.json();
@@ -58,11 +62,12 @@ export async function POST ({ request }) {
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko)  Safari/537.36', 
             'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8', 
             'accept-encoding': 'gzip, deflate, br', 
-            'accept-language': 'en-US,en;q=0.9,en;q=0.8' 
+            'accept-language': 'en-US,en;q=0.9,en;q=0.8'
         }); 
 
         Operations._setPage(page);
         Operations._setBrowser(browser);
+        // await Operations._injectFunctions();
 
         return { page, browser };
     }
@@ -72,28 +77,44 @@ export async function POST ({ request }) {
         const width = 1366;
         const height = 720;
 
-        // Tries to connect to a running browser instance. If it fails, it launches a new one.
-        try {
+        if (payload.config.ws_endpoint) {
             console.log(`Attempting to connect at ${ payload.config.ws_endpoint }...`);
             _browser = await puppeteer.connect({ browserWSEndpoint: payload.config.ws_endpoint });
-            // ServerLogger.logEvent('system', {
-            //     message: `Browser connected at: ${ payload.config.ws_endpoint }`,
-            //     status_message: 'info'
-            // });
             console.log(`Browser connected at ${ payload.config.ws_endpoint }`);
-        } catch (_err) {
-            console.error(`Failed to connect at ${ payload.config.ws_endpoint }. Launching a new browser...\n`, _err);
-            
+        } else {
             _browser = await puppeteer.launch({
+                dumpio: true,
                 headless: false,
-                executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+                executablePath: EXECUTABLE_PATHS.CHROME,
                 args: [
-                    `--window-size=${ width },${ height + 200 }`
+                    `--window-size=${ width },${ height + 200 }`,
                 ]
             });
-            
             console.log(`New browser launched: ${ _browser.wsEndpoint() }`);
         }
+
+        // Tries to connect to a running browser instance. If it fails, it launches a new one.
+        // try {
+        //     console.log(`Attempting to connect at ${ payload.config.ws_endpoint }...`);
+        //     _browser = await puppeteer.connect({ browserWSEndpoint: payload.config.ws_endpoint });
+        //     // ServerLogger.logEvent('system', {
+        //     //     message: `Browser connected at: ${ payload.config.ws_endpoint }`,
+        //     //     status_message: 'info'
+        //     // });
+        //     console.log(`Browser connected at ${ payload.config.ws_endpoint }`);
+        // } catch (_err) {
+        //     console.error(`Failed to connect at ${ payload.config.ws_endpoint }. Launching a new browser...\n`, _err);
+            
+        //     _browser = await puppeteer.launch({
+        //         headless: false,
+        //         executablePath: EXECUTABLE_PATHS.OPERA_GX,
+        //         args: [
+        //             `--window-size=${ width },${ height + 200 }`
+        //         ]
+        //     });
+            
+        //     console.log(`New browser launched: ${ _browser.wsEndpoint() }`);
+        // }
 
         return _browser;
     }
