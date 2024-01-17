@@ -12,7 +12,8 @@ export class EnvHandler {
       'response_slot',
       'time',
       'value',
-      'filename'
+      'filename',
+      'expression'
    ];
 
    static setGlobalEnv (_env) {

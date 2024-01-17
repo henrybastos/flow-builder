@@ -6,7 +6,7 @@
     * @property {string} message
     * @property {string} date
     * @property {string} time
-    * @property {{ label: string, type: 'success' | 'info' | 'error' | 'warning' }} tag
+    * @property {{ label: string, type: 'success' | 'info' | 'error' | 'warning' | 'timer' }} tag
     */
 
    /** @type {Data} */
@@ -62,5 +62,13 @@
 
   .tag_warning {
       @apply text-orange-500;
+  }
+
+  .tag_timer {
+      @apply text-teal-500;
+  }
+
+  .tag_running {
+      @apply text-teal-500;
   }
 </style>

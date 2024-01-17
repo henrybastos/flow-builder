@@ -80,9 +80,10 @@ export class ServerHandler {
             this.isRequestCanceled = false;
             
             try {
+                let startTime = Date.now();
                 this.logger.logMessage(
                     `${ this.currentPresetName ? `[PRESET # ${ this.currentPresetName }] ` : '' } Calling API...`, 
-                    this.logger_tags.info
+                    this.logger_tags.running
                 );
 
                 const response = await fetch('http://localhost:5173/api/run-flow', {
@@ -108,6 +109,9 @@ export class ServerHandler {
                 } else {
                     this.logger.logMessage('Finished', this.logger_tags.info);
                 }
+                let elapsedTime = Math.ceil(Date.now() - startTime);
+                let formattedElapsedTime = `${ Math.floor((elapsedTime / 1000) / 60) }m ${ Math.floor((elapsedTime / 1000) % 60) }s ${ Math.floor(elapsedTime % 1000) }ms`
+                this.logger.logMessage(`${ formattedElapsedTime }`, this.logger_tags.timer);
             } catch (err) {
                 console.error(err);
                 this.logger.logMessage('Fetch error. Something went wrong.', this.logger_tags.error);
