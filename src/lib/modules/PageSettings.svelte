@@ -59,6 +59,10 @@
             localStorage.removeItem('last_ws_endpoint');
         }, { danger_modal_title: 'Clear local storage?' })
     }
+
+    function preventFromClosingPage () {
+        PAYLOAD.setConfig('prevent_from_closing', detail);
+    }
 </script>
 
 <button on:click={openModal} class="btn-md">
@@ -89,7 +93,7 @@
 
             <span class="col-start-1 col-end-2 whitespace-nowrap mr-4 my-auto transition-all text-lg">Close browser on finish</span>
             <span class="inline-flex gap-x-3">
-                <Switch disabled={$PAYLOAD.config.ws_endpoint} on:toggle={updateCloseBrowserOnFinish} />
+                <Switch disabled={$PAYLOAD.config.ws_endpoint}  on:toggle={updateCloseBrowserOnFinish} />
                 {#if $PAYLOAD.config.ws_endpoint}
                     <p class="text-neutral-400">Cannot auto-close browser while using a Web Socket endpoint.</p>
                 {/if}
@@ -97,10 +101,18 @@
             
             <span class="col-start-1 col-end-2 whitespace-nowrap mr-4 my-auto transition-all text-lg">Close browser on Cancel Request</span>
             <span class="inline-flex gap-x-3">
-                <Switch disabled={$PAYLOAD.config.ws_endpoint} on:toggle={updateCloseBrowserOnCancelRequest} />
+                <Switch disabled={$PAYLOAD.config.ws_endpoint}   on:toggle={updateCloseBrowserOnCancelRequest} />
                 {#if $PAYLOAD.config.ws_endpoint}
                     <p class="text-neutral-400">Cannot auto-close browser while using a Web Socket endpoint.</p>
                 {/if}
+            </span>
+
+            <span class="col-start-1 col-end-2 whitespace-nowrap mr-4 my-auto transition-all text-lg">Prevent user from closing the page</span>
+            <span class="inline-flex gap-x-3">
+                <Switch on:toggle={preventFromClosingPage} />
+                <!-- {#if $PAYLOAD.config.ws_endpoint}
+                    <p class="text-neutral-400">User already can't close the browser due to Web Socket usage.</p>
+                {/if} -->
             </span>
         </div>
     </div>

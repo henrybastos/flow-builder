@@ -49,14 +49,16 @@ export async function POST ({ request }) {
         // Avoids unwanted detection
         puppeteer.use(pluginStealth());
         const browser = await _connectOrLaunchBrowser();
-        
         const [page] = await browser.pages();
 
         page.setViewport({ width: 1366, height: 720 });
 
-        page.on('dialog', async (dialog) => {
-            await dialog.accept();
-        });
+        // FIXME: Used to get around of Jivo's dialog, but it shouldn't be the default 
+        // behavior for dialogs (e.g. when prompting user to prevent from closing and losing data in the page)
+        // 
+        // page.on('dialog', async (dialog) => {
+        //     await dialog.accept();
+        // });
 
         await page.setExtraHTTPHeaders({ 
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko)  Safari/537.36', 
@@ -65,9 +67,14 @@ export async function POST ({ request }) {
             'accept-language': 'en-US,en;q=0.9,en;q=0.8'
         }); 
 
+        // FIXME: Everything crashing idk why AAAAAAAAAA
+        // page.evaluate(`window.addEventListener("close", () => {
+        //     confirm("Close windows?");
+        //     return false;
+        // }, false)`);
+
         Operations._setPage(page);
         Operations._setBrowser(browser);
-        // await Operations._injectFunctions();
 
         return { page, browser };
     }
@@ -92,29 +99,6 @@ export async function POST ({ request }) {
             });
             console.log(`New browser launched: ${ _browser.wsEndpoint() }`);
         }
-
-        // Tries to connect to a running browser instance. If it fails, it launches a new one.
-        // try {
-        //     console.log(`Attempting to connect at ${ payload.config.ws_endpoint }...`);
-        //     _browser = await puppeteer.connect({ browserWSEndpoint: payload.config.ws_endpoint });
-        //     // ServerLogger.logEvent('system', {
-        //     //     message: `Browser connected at: ${ payload.config.ws_endpoint }`,
-        //     //     status_message: 'info'
-        //     // });
-        //     console.log(`Browser connected at ${ payload.config.ws_endpoint }`);
-        // } catch (_err) {
-        //     console.error(`Failed to connect at ${ payload.config.ws_endpoint }. Launching a new browser...\n`, _err);
-            
-        //     _browser = await puppeteer.launch({
-        //         headless: false,
-        //         executablePath: EXECUTABLE_PATHS.OPERA_GX,
-        //         args: [
-        //             `--window-size=${ width },${ height + 200 }`
-        //         ]
-        //     });
-            
-        //     console.log(`New browser launched: ${ _browser.wsEndpoint() }`);
-        // }
 
         return _browser;
     }
