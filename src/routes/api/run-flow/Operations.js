@@ -5,7 +5,41 @@ export default class Operations {
     static __flow_builder_are_funcs_injected__ = false;
     static __flow_builder_injection_funcs__ = {
         x: (path) => document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue,
-        goto: (href) => { window.location.href = href}
+        goto: (href) => { window.location.href = href },
+        download_blob: async (filename, link) => {
+            // Hoping it resolves CORS problems
+            
+            console.log('Fetching url...');
+            const response = await fetch(link);
+            console.log('Converting to blob...');
+            const blobImage = await response.blob();
+            const href = URL.createObjectURL(blobImage);
+            
+            const anchor = document.createElement('a');
+            anchor.setAttribute('download', filename);
+            anchor.setAttribute('href', href);
+            
+            document.querySelector('body').appendChild(anchor);
+            console.log('Downloading...');
+            anchor.click();
+            console.log('Done');
+        },
+        download_yt_video: async (filename) => {
+            const ytPayload = JSON.parse(x("//*/script[contains(text(), 'var ytInitialPlayerResponse')]").innerText
+                    .replace('var ytInitialPlayerResponse = ', '')
+                    .replace(/;var head.*/, ''))
+
+            const [fhd, hd] = ytPayload.streamingData.adaptiveFormats.filter(({ height }) => height == 1080 || height == 720).map(({ url, height, width }) => {
+                return {
+                    format: `${width}x${height}`,
+                    url: decodeURIComponent(url)
+                }
+            });
+
+            goto(hd.url);
+            // await download_blob(filename, fhd.url);
+            // return fhd.url;
+        }
     }    
 
     /**
@@ -30,6 +64,7 @@ export default class Operations {
             if (!await this.curr_page.evaluate(`try { ${ fn_name } } catch (err) { false }`)) {
                 console.log('[FUNC INJECTION]: Injecting function', fn_name);
                 // Injects the functions into the page, so it can be used with evaluate.
+                // console.log(`[FUNC] ${fn_name} :: const ${ fn_name } = ${ fn_func }`);
                 await this.curr_page.evaluate(`const ${ fn_name } = ${ fn_func }`);
             }
         }
@@ -321,6 +356,7 @@ export default class Operations {
             message: `Evaluating expression: ${ expression }`,
             status_message: "info"
         })
+        
         await this.curr_page.evaluate(expression);
     }
 }

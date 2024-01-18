@@ -5,20 +5,20 @@
     export let label = '';
     export let disabled = false;
 
-    // Logic has to be inverted, for some reason T _ T
-    export let unchecked = true;
+    export let checked = false;
 
-    $: disabled ? unchecked = disabled : unchecked = unchecked;
+    // FIXME: Should be separate?
+    $: disabled ? checked = false : checked = checked;
 
     function onToggle () {
-        dispatch('toggle', unchecked);
+        dispatch('toggle', !checked);
     }
 </script>
 
 <label class="flex items-center w-fit select-none cursor-pointer">
     { label }
-    <input {disabled} on:change={onToggle} bind:checked={unchecked} class="absolute invisible" type="checkbox">
+    <input {disabled} on:change={onToggle} bind:checked={checked} class="absolute invisible" type="checkbox">
     <span class={`border-2 border-neutral-600 rounded-md p-1 w-12 ${ disabled ? 'cursor-not-allowed' : 'cursor-pointer' }`}>
-        <span class={`block h-4 w-4 rounded-sm transition-all ${ unchecked ? 'ml-0 bg-neutral-600' : 'ml-5 bg-green-400' }`}></span>
+        <span class={`block h-4 w-4 rounded-sm transition-all ${ checked ? 'ml-5 bg-green-400' : 'ml-0 bg-neutral-600' }`}></span>
     </span>
 </label>
