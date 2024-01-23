@@ -9,9 +9,11 @@ export default class Operations {
         download_blob: async (filename, link) => {
             // Hoping it resolves CORS problems
             
-            console.log('Fetching url...');
+            let startTime = Date.now();
+
+            console.log(`[${ new Date().toLocaleTimeString() }] Fetching url...`);
             const response = await fetch(link);
-            console.log('Converting to blob...');
+            console.log(`[${ new Date().toLocaleTimeString() }] Converting to blob...`);
             const blobImage = await response.blob();
             const href = URL.createObjectURL(blobImage);
             
@@ -20,22 +22,31 @@ export default class Operations {
             anchor.setAttribute('href', href);
             
             document.querySelector('body').appendChild(anchor);
-            console.log('Downloading...');
+            console.log(`[${ new Date().toLocaleTimeString() }] Downloading...`);
             anchor.click();
-            console.log('Done');
+
+            let elapsedTime = Math.ceil(Date.now() - startTime);
+            let formattedElapsedTime = `${ Math.floor((elapsedTime / 1000) / 60) }m ${ Math.floor((elapsedTime / 1000) % 60) }s ${ Math.floor(elapsedTime % 1000) }ms`
+
+            console.log(`[${ new Date().toLocaleTimeString() }] Done`);
+            console.log(`Elapsed time: ${ formattedElapsedTime }`);
         },
         download_yt_video: async (filename) => {
             const ytPayload = JSON.parse(x("//*/script[contains(text(), 'var ytInitialPlayerResponse')]").innerText
                     .replace('var ytInitialPlayerResponse = ', '')
-                    .replace(/;var head.*/, ''))
+                    .replace(/(;$|;var (meta|head).*)/, ''))
 
-            const [fhd, hd] = ytPayload.streamingData.adaptiveFormats.filter(({ height }) => height == 1080 || height == 720).map(({ url, height, width }) => {
+            console.log();
+
+            const [hd] = ytPayload.streamingData.formats.filter(({ qualityLabel }) => qualityLabel == '720p').map(({ url, quality, audioQuality, fps }) => {
                 return {
-                    format: `${width}x${height}`,
+                    fps,
+                    audioQuality,
+                    quality,
                     url: decodeURIComponent(url)
                 }
             });
-
+            // console.log(hd);
             goto(hd.url);
             // await download_blob(filename, fhd.url);
             // return fhd.url;

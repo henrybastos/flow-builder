@@ -53,12 +53,10 @@ export async function POST ({ request }) {
 
         page.setViewport({ width: 1366, height: 720 });
 
-        // FIXME: Used to get around of Jivo's dialog, but it shouldn't be the default 
-        // behavior for dialogs (e.g. when prompting user to prevent from closing and losing data in the page)
-        // 
-        // page.on('dialog', async (dialog) => {
-        //     await dialog.accept();
-        // });
+        page.on('dialog', async (dialog) => {
+            // Required to reload the page on "Create Jivo PT" flow preset.
+            if (page.url() == 'https://app.jivosite.com/settings/channels?lang=pt') { await dialog.accept() }
+        });
 
         await page.setExtraHTTPHeaders({ 
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko)  Safari/537.36', 
