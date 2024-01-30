@@ -189,8 +189,9 @@ export default class Operations {
 
     // Disabled because of eval
     // eslint-disable-next-line no-unused-vars
-    static async set_env ({ env_var, value }, _env) {
-        eval(`_env.${ env_var } = value`);
+    static async set_env ({ env_query, value }, _env) {
+        eval(`_env.${ env_query } = value`);
+        console.log('ENV', _env);
         return _env;
     }
 
