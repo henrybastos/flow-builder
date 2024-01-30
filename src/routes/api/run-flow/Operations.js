@@ -10,6 +10,14 @@ export default class Operations {
     static __flow_builder_are_funcs_injected__ = false;
     static __flow_builder_injection_funcs__ = {
         x: (path) => document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue,
+        xxx: (path) => {
+            const nodesSnapshot = document.evaluate(path, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+            let elements = [];
+            for (let i = 0; i < nodesSnapshot.snapshotLength; i++) {
+                elements.push(nodesSnapshot.snapshotItem(i));
+            }
+            return elements;
+        },
         goto: (href) => { window.location.href = href },
         download_blob: async (filename, link) => {
             // Hoping it resolves CORS problems

@@ -338,7 +338,7 @@
 
 <style lang="postcss">
     #presets_header button {
-        @apply px-4 py-3 disabled:text-neutral-500 disabled:pointer-events-none;
+        @apply px-4 py-3 disabled:text-neutral-500 disabled:hover:bg-transparent disabled:cursor-not-allowed;
     }
 
     .preset_block {

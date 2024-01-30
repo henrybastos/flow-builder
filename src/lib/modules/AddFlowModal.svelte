@@ -26,6 +26,7 @@
     <Dialog.Trigger asChild let:builder>
         <Button variant="secondary" class="w-28" builders={[builder]}>Add flow</Button>
     </Dialog.Trigger>
+    
     <Dialog.Content>
         <Dialog.Header>
             <Dialog.Title>Add flow</Dialog.Title>

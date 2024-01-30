@@ -22,6 +22,7 @@
     import { transformToJSON } from '$lib/utils';
     import { Button } from '$lib/components/ui/button';
     import { VERSION } from '$lib/store';
+    import FlowBlocks from '$lib/modules/FlowBlocks.svelte';
 
     // import Button from '$lib/components/ui/button/button.svelte';
     // import { toggleMode } from 'mode-watcher';
@@ -126,7 +127,7 @@
         </DropdownMenu.Root>
     
         <div class="inline-flex gap-x-2 items-center">
-            <span class="text-neutral-500">{ VERSION }</span>
+            <FlowBlocks />
 
             <PresetsModal on:preset_loaded={onPresetLoadedHandler} {showGlobalToast}/>
 
@@ -139,13 +140,6 @@
             <AddFlowModal />
     
             <PayloadModal on:open={onPayloadModalOpen} bind:payloadModalTextearea={payloadModalTextearea} {showGlobalToast} />
-
-            <!-- <button 
-                class="bg-transparent border-none p-3" 
-                on:click={async () => await FLOW_PRESETS.loadAllPresetsFromLibrary()}
-            >
-                Load all presets
-            </button> -->
 
             <!-- <Button on:click={toggleMode} variant="outline" size="icon">
                 <i class="ti ti-moon h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"></i>
@@ -166,23 +160,5 @@
     {/each}
     
     <ToastsWrapper bind:showGlobalToast={showGlobalToast}/>
-    <p class="text-center text-neutral-500 mb-4">Powered by Tailwind, SvelteKit and Puppeteer</p>
+    <p class="text-center text-neutral-500 mb-4">Powered by Tailwind, SvelteKit and Puppeteer • { VERSION }</p>
 </main>
-
-<!-- <style lang="postcss">
-    :global(.cm-editor .cm-line) {
-        @apply bg-neutral-900;
-    }
-    
-    :global(.cm-editor .cm-content) { 
-        @apply font-code bg-neutral-900;
-    }
-
-    :global(.cm-editor .cm-cursorLayer .cm-cursor) { 
-        @apply border-blue-500;
-    }
-
-    :global(.cm-focused .cm-selectionBackground), :global(::selection) { 
-        @apply bg-blue-500;
-    }
-</style> -->
