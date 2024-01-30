@@ -79,6 +79,7 @@ function createPayload () {
                 }
             }
         }),
+        loadBlankPayload: () => set(initStruct),
         loadPayload: (_custom_payload) => set(_custom_payload),
         addFlow: (_flow_name) => update((_payload) => {
             return {

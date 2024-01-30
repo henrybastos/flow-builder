@@ -109,7 +109,7 @@
     on:dragleave={() => isUserDragginFileOver = false} -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
-        class="h-fit max-h-[30rem] relative w-full overflow-x-clip overflow-y-auto border-neutral-800 border-2 rounded-md"
+        class="h-[30rem] max-h-[30rem] relative w-full overflow-x-clip overflow-y-auto border-neutral-800 border-2 rounded-md"
         class:wrapperOnDragOver={isUserDragginFileOver}
         
     >

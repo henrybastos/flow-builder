@@ -243,20 +243,6 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = {
             filename: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.filename
         }
     },
-    set_iframe_as_page: {
-        command: 'set_iframe_as_page',
-        enabled: true,
-        label: 'Set iFrame as page',
-        icon: 'ti-command',
-        input_fields: {
-            name: {
-                type: 'text',
-                label: 'iFrame name',
-                placeholder: 'videoplayer',
-                value: ''
-            }
-        }
-    },
     eval_expression: {
         command: 'eval_expression',
         enabled: true,
@@ -265,5 +251,25 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = {
         input_fields: {
             expression: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.expression
         }
-    }
+    },
+    attach_to_iframe: {
+        command: 'attach_to_iframe',
+        enabled: true,
+        label: 'Attach to IFrame',
+        icon: 'ti-box-margin',
+        input_fields: {
+            name: {
+                type: 'text',
+                label: 'iFrame',
+                placeholder: 'videoplayer',
+                value: ''
+            }
+        }
+    },
+    detach_from_iframe: {
+        command: 'detach_from_iframe',
+        enabled: true,
+        label: 'Detach from IFrame',
+        icon: 'ti-box-padding'
+    },
 };

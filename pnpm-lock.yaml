@@ -35,6 +35,9 @@ dependencies:
   puppeteer-extra-plugin-stealth:
     specifier: ^2.11.2
     version: 2.11.2(puppeteer-extra@3.3.6)
+  radix-icons-svelte:
+    specifier: ^1.2.1
+    version: 1.2.1
   svelte-codemirror-editor:
     specifier: ^1.2.0
     version: 1.2.0(codemirror@6.0.1)(svelte@4.2.1)
@@ -2396,6 +2399,10 @@ packages:
 
   /queue-tick@1.0.1:
     resolution: {integrity: sha512-kJt5qhMxoszgU/62PLP1CJytzd2NKetjSRnyuj31fDd3Rlcz3fzlFdFLD1SItunPwyqEOkca6GbV612BWfaBag==}
+    dev: false
+
+  /radix-icons-svelte@1.2.1:
+    resolution: {integrity: sha512-svmiMd0ocpdTm9cvAz0klcZpnh639lVctj6psQiawd4pYalVzOG4cX+JizAgRckyTAsRVdzObP7D2EBrSfdghA==}
     dev: false
 
   /read-cache@1.0.0:
