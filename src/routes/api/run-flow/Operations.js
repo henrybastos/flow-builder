@@ -1,7 +1,12 @@
 import ServerLogger from "./ServerLogger"
+import { scrape_attr } from "$lib/operations/scrapeAttribute";
 
 export default class Operations {
     static pages = [];
+    static logger = ServerLogger;
+
+    static scrape_attr = scrape_attr;
+
     static __flow_builder_are_funcs_injected__ = false;
     static __flow_builder_injection_funcs__ = {
         x: (path) => document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue,
@@ -90,12 +95,17 @@ export default class Operations {
         await this.curr_page.goto(target, { waitUntil: 'networkidle0' });
     }
 
-    static async wait_for_selector (_target, timeout = 15000 ) {
-        await this.curr_page.waitForSelector(`xpath/${ _target }`, { timeout });
+    static async wait_for_selector ({ target, timeout = 15000 }) {
+        await this.curr_page.waitForSelector(`xpath/${ target }`, { timeout });
+
+        ServerLogger.logEvent('operation_log', {
+            message: `Waiting for element ${ target } has ended.`,
+            status_message: "info"
+        });
     }
 
     static async getElement (_target) {
-        await this.wait_for_selector(_target, this.payload?.wait_timeout);
+        await this.wait_for_selector({ target: _target, timeout: this.payload?.wait_timeout });
         return await this.curr_page.$$(`xpath/${ _target }`);
     }
 
@@ -139,17 +149,6 @@ export default class Operations {
     static async select_option ({ target }) {
         const [element] = await this.getElement(target);
         return await element.evaluate(dom_el => dom_el.select());
-    }
-
-    static async scrape_attr ({ target, attr }) {
-        const [element] = await this.getElement(target);
-
-        ServerLogger.logEvent('operation_log', {
-            message: `Scrapping ${ attr } from ${ target }`,
-            status_message: 'info'
-        });
-
-        return await element.evaluate((dom_el, _attr) => dom_el[_attr], attr);
     }
 
     static async scrape_multiple_attr ({ target, attr }) {
@@ -343,11 +342,23 @@ export default class Operations {
         }, link, filename);
     }
 
-    static async set_iframe_as_page ({ name }) {
-        this.curr_page = await this.curr_page.frames.find(frame => frame.name() === name);
+    static async attach_to_iframe ({ name }) {
+        console.log('FRAMES', this.curr_page.frames());
+        const frame = await this.curr_page.frames().find((frame) => frame.name().match(name) || frame.url().match(name));
 
+        console.log('IFRAME', frame);
+        this.curr_page = frame;
         ServerLogger.logEvent('operation_log', {
-            message: `The PAGE was set to an iframe called ${ name }`,
+            message: `The iFrame ${ frame.url() } was set as the current page.`,
+            status_message: 'info'
+        });
+    }
+
+    static async detach_from_iframe () {
+        console.log('PAGE TYPE', typeof this.curr_page);
+        this.curr_page = this.curr_page.page();
+        ServerLogger.logEvent('operation_log', {
+            message: `The iFrame was detached.`,
             status_message: 'info'
         });
     }

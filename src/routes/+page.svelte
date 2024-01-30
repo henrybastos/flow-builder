@@ -16,18 +16,20 @@
     import AddFlowModal from '$lib/modules/AddFlowModal.svelte';
     import ToastsWrapper from "$lib/components/ToastsWrapper.svelte";
     import UpdateCurrentPresetModal from '$lib/modules/UpdateCurrentPresetModal.svelte';
+    import * as DropdownMenu from '$lib/components/ui/dropdown-menu'
     import Flow from '$lib/modules/Flow.svelte';
     import { CURRENT_PRESET_NAME } from '$lib/PresetsStore';
     import { transformToJSON } from '$lib/utils';
+    import { Button } from '$lib/components/ui/button';
+    import { VERSION } from '$lib/store';
 
-    import Button from '$lib/components/ui/button/button.svelte';
-    import { toggleMode } from 'mode-watcher';
+    // import Button from '$lib/components/ui/button/button.svelte';
+    // import { toggleMode } from 'mode-watcher';
     
     let showGlobalToast;
     let loadedPresetName = '';
     let pageSettingsWSEndpoint;
     let payloadModalTextearea;
-
 
     function checkAndLoadTempPreset () {
         if (localStorage?.getItem('temp_preset')) {
@@ -68,8 +70,22 @@
         console.log(detail);
     }
 
+    /**
+     * Loads a default payload code to the Code Mirror editor.
+     */
+    function loadDefaultPayload () {
+        console.log('Default payload loaded');
+        payloadModalTextearea = `${ transformToJSON($PAYLOAD) }\n\n\n\n\n\n\n\n\n\n\n\n\n\n`;
+    }
+
+    function loadBlankPayload () {
+        PAYLOAD.loadBlankPayload();
+        payloadModalTextearea = `${ transformToJSON($PAYLOAD) }\n\n\n\n\n\n\n\n\n\n\n\n\n\n`;
+        console.log('Blank payload loaded');
+    }
+    
     function onPayloadModalOpen() {
-        payloadModalTextearea = transformToJSON($PAYLOAD);
+        loadDefaultPayload();
         // codeMirrorValue = transformToJSON($PAYLOAD);
         // codeMirrorValue = 'var 1 = "Hello!;"';
     }
@@ -90,9 +106,28 @@
 
 <header class="fixed w-full bg-neutral-900">
     <div class="flex flex-row justify-between items-center py-3 px-4 w-full">
-        <h3>Flow Builder</h3>
+        <!-- <h3>Flow Builder</h3> -->
+        <DropdownMenu.Root>
+            <DropdownMenu.Trigger asChild let:builder>
+                <Button builders={[builder]} variant="ghost" size="icon">
+                    <i class="ti ti-menu-2"></i>
+                </Button>
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Content class="w-[16rem]">
+                <DropdownMenu.Label>Flow Builder</DropdownMenu.Label>
+                <DropdownMenu.Separator />
+                <DropdownMenu.Group>
+                    <DropdownMenu.Item on:click={loadBlankPayload}>
+                        <i class="ti ti-file mr-2"></i>
+                        <span>New flow</span>
+                    </DropdownMenu.Item>
+                </DropdownMenu.Group>
+            </DropdownMenu.Content>
+        </DropdownMenu.Root>
     
-        <div class="inline-flex gap-x-2">
+        <div class="inline-flex gap-x-2 items-center">
+            <span class="text-neutral-500">{ VERSION }</span>
+
             <PresetsModal on:preset_loaded={onPresetLoadedHandler} {showGlobalToast}/>
 
             {#if $CURRENT_PRESET_NAME}
