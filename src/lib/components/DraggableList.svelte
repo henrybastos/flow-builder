@@ -19,7 +19,6 @@
         dragToIndex = detail.to;
 
         let itemToInsert = itemsList[dragFromIndex];
-        let itemToDelete;
 
         itemsList[dragFromIndex] = { __draggable_item_to_delete__: itemsList[dragFromIndex] };
         
