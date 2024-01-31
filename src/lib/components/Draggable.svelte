@@ -1,24 +1,20 @@
 <script>
     import { createEventDispatcher } from "svelte";
+    import { onMount } from "svelte";
 
     const dispatch = createEventDispatcher();
 
     let draggableWrapperEl;
 
+    export let obsRoot;
+    export let observableElements;
     export let moving = false;
 	export let left = 0;
 	export let top = 0;
     export let start = {
-        x: 100,
-        y: 100
+        x: 0,
+        y: 0
     }
-
-	const observer = new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => console.log(entry));
-    }, {
-        root: draggableWrapperEl,
-        threshold: 1.0
-    })
 	
 	function onMouseDown() {
         dispatch('dragstart');
@@ -27,7 +23,7 @@
 	
 	function onMouseMove(e) {
         if (moving) {
-            // left += e.movementX;
+            left += e.movementX;
 			top += e.movementY;
 		}
 	}
@@ -38,6 +34,22 @@
 		left = start.x;
 		top = start.y;
 	}
+
+    // onMount(() => {
+    //     observableElements.forEach(el => {
+    //         const observer = new IntersectionObserver((entries, observer) => {
+    //             entries.forEach(entry => console.log(entry));
+    //         }, {
+    //             root: el,
+    //             threshold: 0.1
+    //         });
+
+    //         observer.observe(draggableWrapperEl)
+    //         console.log('ENLISTED');
+    //     });
+    // })
+
+    // $: observableElements.forEach(el => observer.observe(el));
 </script>
 
 <div 
