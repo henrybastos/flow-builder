@@ -22,12 +22,19 @@
 
         node.addEventListener('dragstart', () => {
             isOnDrag = true;
+            node.firstChild.classList.add('border-neutral-500')
+            node.firstChild.classList.add('border-2')
             console.log('DRAG START', cardIndex, hoverSlotIndex);
-            dispatch('dragstart', { from: cardIndex });
+            dispatch('dragstart', { 
+                from: cardIndex,
+                target: node
+            });
         })
 
         node.addEventListener('dragend', () => {
             isOnDrag = false;
+            node.firstChild.classList.remove('border-neutral-500')
+            node.firstChild.classList.remove('border-2')
             dispatch('dragend');
         })
     }

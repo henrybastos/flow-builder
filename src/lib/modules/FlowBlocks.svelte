@@ -2,7 +2,6 @@
     import Button from "$lib/components/ui/button/button.svelte";
     import * as Card from "$lib/components/ui/card";
     import * as Sheet from "$lib/components/ui/sheet";
-    import { onMount } from "svelte";
     import DraggableList from "$lib/components/DraggableList.svelte";
 
     let isSheetOpen = false;
@@ -18,6 +17,14 @@
         {
             title: 'Card 003',
             description: 'Card 003 description'
+        },
+        {
+            title: 'Card 004',
+            description: 'Card 004 description'
+        },
+        {
+            title: 'Card 005',
+            description: 'Card 005 description'
         }
     ];
 </script>

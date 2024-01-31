@@ -31,5 +31,5 @@
     transition:slide={{ duration: 200 }}
     ondragover="return false" 
     target-id={slotIndex}
-    class="flex w-full py-2 rounded transition-all border-neutral-600 border-2 border-dotted"
+    class="flex w-full py-2 rounded transition-all border-neutral-500 border-2 border-dotted"
 ></span>
