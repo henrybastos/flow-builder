@@ -1,0 +1,60 @@
+<script>
+    import Draggable from "$lib/components/Draggable.svelte";
+    let isOnDrag = false;
+    let dragFromIndex;
+    let dragToIndex;
+    
+    export let itemsList;
+
+    function handleDragStart ({ detail }) {
+        dragFromIndex = detail.from;
+        isOnDrag = true;
+    }
+
+    function handleDragEnd () {
+        isOnDrag = false;
+    }
+
+    function handleDrop ({ detail }) {
+        dragToIndex = detail.to;
+
+        let itemToInsert = itemsList[dragFromIndex];
+        let itemToDelete;
+
+        itemsList[dragFromIndex] = { __draggable_item_to_delete__: itemsList[dragFromIndex] };
+        
+        if (dragToIndex === (itemsList.length + 1)) {
+            itemsList.splice(dragToIndex + 1, 0, itemToInsert);
+        } else {
+            itemsList.splice(dragToIndex, 0, itemToInsert);
+        }
+
+        itemsList.splice(itemsList.indexOf(itemsList.find(item => item.__draggable_item_to_delete__)), 1);
+    }
+
+    function getArrayIndex (root, copy) {
+        return root.filter((a,i) => a.every((item, indx) => item === copy[indx]));
+    }
+
+    function getObjectIndex (root, copy) {
+        return root.indexOf(root.find(({ name }) => name == 'Taylor'))
+    }
+</script>
+
+<div class={$$restProps.class}>
+    {#each itemsList as item, index}
+        <Draggable 
+            {isOnDrag} 
+            on:dragstart={handleDragStart}
+            on:dragend={handleDragEnd}
+            on:drop={handleDrop}
+            activeIndex={dragFromIndex}
+            itemIndex={index} 
+            hoverSlotIndex={index}
+            lastIndex={itemsList.length}
+            cardIndex={index}
+        >
+            <slot {item} list-id="ITEM_{index}"/>
+        </Draggable>
+    {/each}
+</div>
