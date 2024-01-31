@@ -55,7 +55,7 @@ export async function POST ({ request }) {
 
         page.on('dialog', async (dialog) => {
             // Required to reload the page on "Create Jivo PT" flow preset.
-            if (page.url() == 'https://app.jivosite.com/settings/channels?lang=pt') { await dialog.accept() }
+            if (page.url().match(/app.jivosite.com/gi)) { await dialog.accept() }
         });
 
         await page.setExtraHTTPHeaders({ 
@@ -90,7 +90,6 @@ export async function POST ({ request }) {
             _browser = await puppeteer.launch({
                 dumpio: true,
                 headless: false,
-                executablePath: EXECUTABLE_PATHS.CHROME,
                 args: [
                     `--window-size=${ width },${ height + 200 }`,
                 ]
