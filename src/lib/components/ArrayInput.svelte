@@ -4,8 +4,8 @@
     import * as Tooltip from "$lib/components/ui/tooltip";
     import Label from "$lib/components/ui/label/label.svelte";
     import Badge from "$lib/components/ui/badge/badge.svelte";
-    import { SvelteComponent, onMount } from "svelte";
     import DraggableList from "./DraggableList.svelte";
+    import Button from "$lib/components/ui/button/button.svelte";
 
     export let labelContent: string;
     export let inputType: 'password' | 'text' | 'number' | 'email' = 'text';
@@ -51,11 +51,19 @@
         </Label>
     {/if}
 
-    <DraggableList itemsList={items}>
-        {#if autofocus}
-            <Input autofocus {value} on:change class="text-base mt-1 mb-3 last:mb-0" placeholder={placeholderContent} type={inputType}/>
+    <div class="flex flex-col border border-neutral-800 rounded-md p-3 gap-y-2 mt-1 mb-3 last:mb-0">
+        {#if items.length === 0}
+            <p class="text-base mx-auto text-neutral-500">No items <i class="ti ti-ghost-2-filled"></i></p>    
         {:else}
-            <Input  {value} on:change class="text-base mt-1 first:mt-0" placeholder={placeholderContent} type={inputType}/>
+            <DraggableList bind:itemsList={items} let:item let:index>
+                <Input on:change={({ target }) => items[index] = target?.value} class="text-base mt-1 first:mt-0" placeholder="Item {index + 1}" type={inputType}/>
+            </DraggableList>
         {/if}
-    </DraggableList>
+
+        <Button on:click={() => items.push('')} size="sm" variant="ghost">
+            <i class="ti ti-plus"></i>
+        </Button>
+
+        <Button on:click={() => console.log(items)} size="sm" variant="ghost">See</Button>
+    </div>
 </div>

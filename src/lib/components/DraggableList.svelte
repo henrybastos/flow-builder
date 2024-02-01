@@ -53,7 +53,7 @@
             lastIndex={itemsList.length}
             cardIndex={index}
         >
-            <slot {item}/>
+            <slot {item} {index}/>
         </Draggable>
     {/each}
 </div>
