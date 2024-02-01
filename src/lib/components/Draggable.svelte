@@ -10,9 +10,20 @@
     export let lastIndex;
     export let activeIndex;
 
+    let lastDraggedOver;
+    let draggableDragOverClassList = [
+        'outline-neutral-500',
+        'outline-offset-2',
+        'outline-double',
+        'outline-2'
+    ];
+
     function draggable (node) {
         // id="card_{cards[index]}:{cards[index + 1]}"
         node.draggable = "true";
+        draggableDragOverClassList.push(
+            `rounded-[${ getComputedStyle(node.firstChild)['border-radius'] }]`
+        )
 
         node.addEventListener('drag', () => {
             let dragElement = node.getBoundingClientRect();
@@ -20,22 +31,28 @@
             if(dragElement.bottom > window.innerHeight){ window.scrollBy(0, 10); }
         })
 
-        node.addEventListener('dragstart', () => {
-            isOnDrag = true;
-            node.firstChild.classList.add('border-neutral-500')
-            node.firstChild.classList.add('border-2')
-            console.log('DRAG START', cardIndex, hoverSlotIndex);
-            dispatch('dragstart', { 
-                from: cardIndex,
-                target: node
-            });
+        node.addEventListener('dragstart', (evt) => {
+            if (evt.target === node) {
+                dispatch('dragstart', { 
+                    from: cardIndex,
+                    target: node
+                });
+                isOnDrag = true;
+                draggableDragOverClassList.forEach(className => node.classList.add(className));
+            }
+        })
+        
+        node.addEventListener('dragend', () => {
+            dispatch('dragend');
+            isOnDrag = false;
+            draggableDragOverClassList.forEach(className => node.classList.remove(className));
         })
 
-        node.addEventListener('dragend', () => {
-            isOnDrag = false;
-            node.firstChild.classList.remove('border-neutral-500')
-            node.firstChild.classList.remove('border-2')
-            dispatch('dragend');
+        node.addEventListener('dragover', (evt) => {
+            if (evt.target !== lastDraggedOver) {
+                lastDraggedOver = evt.target;
+                // console.log(evt.target.getAttribute('draggable_id'));
+            }
         })
     }
 
@@ -52,7 +69,7 @@
 </script>
 
 <div>
-    {#if showFirst} <DraggableSlot on:drop slotIndex={hoverSlotIndex} /> {/if}
+    {#if showFirst} <DraggableSlot on:dragend on:drop slotIndex={hoverSlotIndex} /> {/if}
 
     <div use:draggable card-index={cardIndex}> <slot /> </div>
 
