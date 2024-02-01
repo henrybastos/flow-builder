@@ -102,7 +102,6 @@
 
 <svelte:head>
     <title>Flow Builder</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 </svelte:head>
 
 <header class="fixed w-full bg-neutral-900">

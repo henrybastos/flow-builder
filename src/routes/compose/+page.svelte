@@ -3,14 +3,21 @@
     import * as Card from "$lib/components/ui/card";
     import DraggableList from "$lib/components/DraggableList.svelte";
     import * as Dialog from "$lib/components/ui/dialog";
+    import SimpleInput from "$lib/components/SimpleInput.svelte";
 
-    let flowBlockDialogOpen = false;
+    import Input from "$lib/components/ui/input/input.svelte";
+    import Label from "$lib/components/ui/label/label.svelte";
+    import Badge from "$lib/components/ui/badge/badge.svelte";
+    import ArrayInput from "$lib/components/ArrayInput.svelte";
+
+    let isFlowBlockDialogOpen = false;
+    let isFullPayloadDialogOpen = true;
 
     let currentFlowBlock = {
         title: 'Eduzz - Login',
         block_id: 'A1B2C3D4',
         description: 'Faz login na Eduzz',
-        code: {}
+        payload: {}
     }
 
     let flowBlocks = [
@@ -20,7 +27,11 @@
             description: 'Faz login na Eduzz',
             payload: {
                 "env": {
-                    "prop_01": "AAA"
+                    "prop_01": "AAA",
+                    "credentials": {
+                        "email": "",
+                        "password": ""
+                    }
                 },
                 "main_flow": [
                     {
@@ -131,58 +142,120 @@
         }
     ];
 
+    function combineAllPayloads () {
+        let fullPayload = {};
+
+        for (let block of flowBlocks) {
+            for (let [prop_key, prop_value] of Object.entries(block.payload)) {
+                if (!fullPayload[prop_key]) {
+                    if (Array.isArray(prop_value)) {
+                        fullPayload[prop_key] = [];
+                    } else if (typeof fullPayload[prop_key] === 'object') {
+                        fullPayload[prop_key] = {};
+                    }
+                } 
+
+                // console.log(fullPayload[prop_key].length);
+                if (Array.isArray(prop_value)) {
+                    fullPayload[prop_key] = [
+                        ...(fullPayload[prop_key]),
+                        ...(prop_value)
+                    ]
+                } else {
+                    fullPayload[prop_key] = {
+                        ...(fullPayload[prop_key]),
+                        ...(prop_value)
+                    }
+                }
+
+            }
+        }
+
+        return structuredClone(fullPayload);
+    }
+
     function openFlowBlockDialog (item) {
         currentFlowBlock = item;
-        flowBlockDialogOpen = true;
+        isFlowBlockDialogOpen = true;
     }
 
     function seeFullPayload () {
-        flowBlockDialogOpen = true;
+        isFullPayloadDialogOpen = true;
+    }
 
-        let fullPayload = flowBlocks.reduce((prev, curr) => {
-            for (let prop of Object.keys(prev)) {
-                prev[prop] = [
-                    ...prev[prop],
-                    ...curr[prop],
-                ]
-            }
-            return prev;
-        })
+    let testEnv = {
+        link: '',
+        credentials: {
+            email: '',
+            password: ''
+        },
+        banners: []
     }
 </script>
 
 <svelte:head>
-    <title>FLow Builder • Compose</title>
+    <title>Flow Builder • Compose</title>
 </svelte:head>
 
 <main class="flex flex-col p-3 border border-neutral-800 rounded-lg">
     <DraggableList bind:itemsList={flowBlocks} let:item class="flex flex-col gap-y-3">
         <Card.Root class="rounded-lg">
-            <Card.Header class="p-4 pb-0">
-                <Card.Title class="text-xl text-left">{ item.title }</Card.Title>
+            <Card.Header class="p-4">
+                <Card.Title class="text-xl text-left flex justify-between">
+                    { item.title }
+                    <Button on:click={() => openFlowBlockDialog(item)} variant="outline" size="icon"><i class="ti ti-code text-neutral-500"></i></Button>
+                </Card.Title>
                 <Card.Description class="text-base">{ item.description }</Card.Description>
             </Card.Header>
-            <Card.Content class="p-4">
-                <Button on:click={() => openFlowBlockDialog(item)} class="w-full" variant="outline">See code</Button>
-            </Card.Content>
         </Card.Root>
     </DraggableList>
 
-    <Button on:click={seeFullPayload}>See full payload</Button>
+    <Button class="mt-3" on:click={seeFullPayload}>See full payload</Button>
 
-    <Dialog.Root bind:open={flowBlockDialogOpen}>
+    <Dialog.Root bind:open={isFlowBlockDialogOpen}>
         <Dialog.Content class="max-w-[60rem]">
             <Dialog.Header>
                 <Dialog.Title>
                     { currentFlowBlock.title }
-                    <span class="text-neutral-500 font-code text-base pl-2">{ currentFlowBlock.block_id }</span>
+                    {#if currentFlowBlock.block_id}
+                        <span class="text-neutral-500 font-code text-base pl-2">{ currentFlowBlock.block_id }</span>
+                    {/if}
                 </Dialog.Title>
                 <Dialog.Description>{ currentFlowBlock.description }</Dialog.Description>
             </Dialog.Header>
 
-            <pre class="max-h-[80vh] overflow-y-auto border border-neutral-700 rounded-lg p-4 font-code">
-                { JSON.stringify(currentFlowBlock.payload, null, 3) }
-            </pre>
+            <pre class="max-h-[80vh] overflow-y-auto border border-neutral-700 rounded-lg p-4 font-code">{ JSON.stringify(currentFlowBlock.payload, null, 3) }</pre>
+        </Dialog.Content>
+    </Dialog.Root>
+
+    <Dialog.Root bind:open={isFullPayloadDialogOpen}>
+        <Dialog.Content class="max-w-[60rem]">
+            <Dialog.Header>
+                <Dialog.Title>Payload completo</Dialog.Title>
+                <Dialog.Description>Todos os payloads de todos os blocos combinados.</Dialog.Description>
+            </Dialog.Header>
+
+            <div>
+                <SimpleInput autofocus labelContent="Link" dataType="link" inputType="text" placeholderContent="https://tabler.io/icons/icon/bug"/>
+                
+                <ArrayInput items={testEnv.banners}/>
+                <Label class="text-lg">Credentials <Badge class="ml-2 mb-1 uppercase text-neutral-300" variant="secondary">Dicionário</Badge></Label>
+                <div class="border border-neutral-800 rounded-md p-3 mt-1 mb-3 last:mb-0">
+                    <div>
+                        <Label class="text-lg">E-mail</Label>
+                        <Input class="text-base mt-1" placeholder="user@email.com" type="text"/>
+                    </div>
+
+                    <Label class="text-lg">Password</Label>
+                    <Input class="text-base mt-1" placeholder="*******" type="text"/>
+                </div>
+
+                <Label class="text-lg">Banners <Badge class="ml-2 mb-1 uppercase text-neutral-300" variant="secondary">Lista</Badge></Label>
+                <div class="flex flex-col border border-neutral-800 rounded-md p-3 gap-y-2 mt-1 mb-3 last:mb-0">
+                    <SimpleInput inputType="text" placeholderContent="user@email.com"/>
+                    <SimpleInput inputType="text" placeholderContent="*********"/>
+        </div>
+            </div>
         </Dialog.Content>
     </Dialog.Root>
 </main>
