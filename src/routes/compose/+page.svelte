@@ -238,7 +238,8 @@
             <div>
                 <SimpleInput autofocus labelContent="Link" dataType="link" inputType="text" placeholderContent="https://tabler.io/icons/icon/bug"/>
                 
-                <ArrayInput items={testEnv.banners}/>
+                <ArrayInput labelContent="Banners" items={testEnv.banners}/>
+                
                 <Label class="text-lg">Credentials <Badge class="ml-2 mb-1 uppercase text-neutral-300" variant="secondary">Dicionário</Badge></Label>
                 <div class="border border-neutral-800 rounded-md p-3 mt-1 mb-3 last:mb-0">
                     <div>
@@ -250,11 +251,11 @@
                     <Input class="text-base mt-1" placeholder="*******" type="text"/>
                 </div>
 
-                <Label class="text-lg">Banners <Badge class="ml-2 mb-1 uppercase text-neutral-300" variant="secondary">Lista</Badge></Label>
+                <!-- <Label class="text-lg">Banners <Badge class="ml-2 mb-1 uppercase text-neutral-300" variant="secondary">Lista</Badge></Label>
                 <div class="flex flex-col border border-neutral-800 rounded-md p-3 gap-y-2 mt-1 mb-3 last:mb-0">
                     <SimpleInput inputType="text" placeholderContent="user@email.com"/>
                     <SimpleInput inputType="text" placeholderContent="*********"/>
-        </div>
+                </div> -->
             </div>
         </Dialog.Content>
     </Dialog.Root>
