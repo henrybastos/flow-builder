@@ -7,6 +7,7 @@
     import ComposeLabel from "$lib/components/compose/ComposeLabel.svelte";
 
     export let isEnvPanelOpen = false;
+    export let combinedEnvPayload;
     
     let changesMade = false;
     let confirmAlertDialog = false;
@@ -54,7 +55,7 @@
         }
     }
 
-    let envClone = structuredClone(testEnv);
+    $: envClone = structuredClone(combinedEnvPayload);
 
     function closeEnvPanel (state = true) {
         changesMade = state;
@@ -76,12 +77,13 @@
 
     function buildEnv () {
         let envPayload = {};
+        console.log(envClone);
 
-        for (let [name, props] of Object.entries(envClone)) {
-            envPayload[name] = props.value || props.values;
-        }
+        // for (let [name, props] of Object.entries(envClone)) {
+        //     envPayload[name] = props.value || props.values;
+        // }
 
-        console.log(envPayload);
+        // console.log(envPayload);
         changesMade = false;
     }
 </script>
@@ -115,6 +117,16 @@
                         items={data}
                         on:change={watchChanges} 
                     />
+                    <!-- {#if Array.isArray(data.schema.fields)}
+                    {:else}
+                        <ComposeLabel tooltip={data.schema.tooltip}>Banners</ComposeLabel>
+                        <ComposeInputList 
+                            listName="Banners" 
+                            labelContent="Banners" 
+                            items={data}
+                            on:change={watchChanges} 
+                        />
+                    {/if} -->
                 {:else if data.schema.fields}
                     <ComposeLabel tooltip={data.schema.tooltip} groupType="object">Credenciais</ComposeLabel>
                     <div class="border border-neutral-800 rounded-md p-3 mt-1 mb-3 last:mb-0">
