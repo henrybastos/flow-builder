@@ -1,17 +1,12 @@
 <script>
-    import Button from "$lib/components/ui/button/button.svelte";
     import * as Card from "$lib/components/ui/card";
-    import DraggableList from "$lib/components/DraggableList.svelte";
     import * as Dialog from "$lib/components/ui/dialog";
-    import SimpleInput from "$lib/components/SimpleInput.svelte";
+    import Button from "$lib/components/ui/button/button.svelte";
+    import DraggableList from "$lib/components/DraggableList.svelte";
+    import EnvPanel from "./EnvPanel.svelte";
 
-    import Input from "$lib/components/ui/input/input.svelte";
-    import Label from "$lib/components/ui/label/label.svelte";
-    import Badge from "$lib/components/ui/badge/badge.svelte";
-    import ArrayInput from "$lib/components/ArrayInput.svelte";
-
-    let isFlowBlockDialogOpen = false;
-    let isFullPayloadDialogOpen = true;
+    let isFlowBlockPanelOpen = false;
+    let isEnvPanelOpen = false;
 
     let currentFlowBlock = {
         title: 'Eduzz - Login',
@@ -176,21 +171,10 @@
 
     function openFlowBlockDialog (item) {
         currentFlowBlock = item;
-        isFlowBlockDialogOpen = true;
+        isFlowBlockPanelOpen = true;
     }
 
-    function seeFullPayload () {
-        isFullPayloadDialogOpen = true;
-    }
-
-    let testEnv = {
-        link: '',
-        credentials: {
-            email: '',
-            password: ''
-        },
-        banners: []
-    }
+    let flowBlocksClone = structuredClone(flowBlocks);
 </script>
 
 <svelte:head>
@@ -198,7 +182,7 @@
 </svelte:head>
 
 <main class="flex flex-col p-3 border border-neutral-800 rounded-lg">
-    <DraggableList bind:itemsList={flowBlocks} let:item class="flex flex-col gap-y-3">
+    <DraggableList bind:itemsList={flowBlocksClone} let:item class="flex flex-col gap-y-3">
         <Card.Root class="rounded-lg">
             <Card.Header class="p-4">
                 <Card.Title class="text-xl text-left flex justify-between">
@@ -210,9 +194,9 @@
         </Card.Root>
     </DraggableList>
 
-    <Button class="mt-3" on:click={seeFullPayload}>See full payload</Button>
+    <Button class="text-base mt-3" on:click={() => isEnvPanelOpen = true}>Painel de Variáveis</Button>
 
-    <Dialog.Root bind:open={isFlowBlockDialogOpen}>
+    <Dialog.Root bind:open={isFlowBlockPanelOpen}>
         <Dialog.Content class="max-w-[60rem]">
             <Dialog.Header>
                 <Dialog.Title>
@@ -228,35 +212,5 @@
         </Dialog.Content>
     </Dialog.Root>
 
-    <Dialog.Root bind:open={isFullPayloadDialogOpen}>
-        <Dialog.Content class="max-w-[60rem]">
-            <Dialog.Header>
-                <Dialog.Title>Payload completo</Dialog.Title>
-                <Dialog.Description>Todos os payloads de todos os blocos combinados.</Dialog.Description>
-            </Dialog.Header>
-
-            <div>
-                <SimpleInput autofocus labelContent="Link" dataType="link" inputType="text" placeholderContent="https://tabler.io/icons/icon/bug"/>
-                
-                <ArrayInput labelContent="Banners" items={testEnv.banners}/>
-                
-                <Label class="text-lg">Credentials <Badge class="ml-2 mb-1 uppercase text-neutral-300" variant="secondary">Dicionário</Badge></Label>
-                <div class="border border-neutral-800 rounded-md p-3 mt-1 mb-3 last:mb-0">
-                    <div>
-                        <Label class="text-lg">E-mail</Label>
-                        <Input class="text-base mt-1" placeholder="user@email.com" type="text"/>
-                    </div>
-
-                    <Label class="text-lg">Password</Label>
-                    <Input class="text-base mt-1" placeholder="*******" type="text"/>
-                </div>
-
-                <!-- <Label class="text-lg">Banners <Badge class="ml-2 mb-1 uppercase text-neutral-300" variant="secondary">Lista</Badge></Label>
-                <div class="flex flex-col border border-neutral-800 rounded-md p-3 gap-y-2 mt-1 mb-3 last:mb-0">
-                    <SimpleInput inputType="text" placeholderContent="user@email.com"/>
-                    <SimpleInput inputType="text" placeholderContent="*********"/>
-                </div> -->
-            </div>
-        </Dialog.Content>
-    </Dialog.Root>
+    <EnvPanel bind:isEnvPanelOpen={isEnvPanelOpen} />
 </main>

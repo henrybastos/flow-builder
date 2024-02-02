@@ -1,14 +1,18 @@
 <script>
+    import { createEventDispatcher } from "svelte";
     import Draggable from "$lib/components/Draggable.svelte";
     let isOnDrag = false;
     let dragFromIndex;
     let dragToIndex;
     
+    export let isDraggable = true;
     export let itemsList;
+
+    const dispatch = createEventDispatcher();
 
     function handleDragStart ({ detail }) {
         dragFromIndex = detail.from;
-        isOnDrag = true;
+        isOnDrag = isDraggable;
     }
 
     function handleDragEnd () {
@@ -29,14 +33,7 @@
         }
 
         itemsList.splice(itemsList.indexOf(itemsList.find(item => item.__draggable_item_to_delete__)), 1);
-    }
-
-    function getArrayIndex (root, copy) {
-        return root.filter((a,i) => a.every((item, indx) => item === copy[indx]));
-    }
-
-    function getObjectIndex (root, copy) {
-        return root.indexOf(root.find(({ name }) => name == 'Taylor'))
+        dispatch('change');
     }
 </script>
 
@@ -48,8 +45,6 @@
             on:dragend={handleDragEnd}
             on:drop={handleDrop}
             activeIndex={dragFromIndex}
-            itemIndex={index} 
-            hoverSlotIndex={index}
             lastIndex={itemsList.length}
             cardIndex={index}
         >
