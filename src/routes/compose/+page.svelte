@@ -119,13 +119,20 @@
         isFlowBlockPanelOpen = true;
     }
 
-    function combineEnvPayloads () {
+    function openEnvPanel () {
         for (let block of FlowBlocks) {
-            console.log(block.env_payload);
+            combinedEnvPayload = {
+                ...(combinedEnvPayload),
+                ...(block.env_payload)
+            }
         }
+
+        console.log(combinedEnvPayload);
+        isEnvPanelOpen = true;
     }
 
     let flowBlocksClone = structuredClone(FlowBlocks);
+    let combinedEnvPayload;
 </script>
 
 <svelte:head>
@@ -145,8 +152,7 @@
         </Card.Root>
     </DraggableList>
 
-    <Button class="text-base mt-3" on:click={() => isEnvPanelOpen = true}>Painel de Variáveis</Button>
-    <Button class="text-base mt-3" on:click={combineEnvPayloads}>Combine all Env Payloads</Button>
+    <Button class="text-base mt-3" on:click={openEnvPanel}>Painel de Variáveis</Button>
 
     <Dialog.Root bind:open={isFlowBlockPanelOpen}>
         <Dialog.Content class="max-w-[60rem]">
@@ -164,5 +170,5 @@
         </Dialog.Content>
     </Dialog.Root>
 
-    <EnvPanel bind:isEnvPanelOpen={isEnvPanelOpen} />
+    <EnvPanel bind:combinedEnvPayload={combinedEnvPayload} bind:isEnvPanelOpen={isEnvPanelOpen} />
 </main>

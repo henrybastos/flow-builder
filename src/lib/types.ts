@@ -9,6 +9,9 @@ export interface Operation {
     enabled: boolean
     target?: string
     value?: string
+    flow?: string
+    time?: string
+    env_var?: string
     input_fields?: InputFields
 }
 
@@ -33,9 +36,9 @@ export interface EnvPayload {
     [key: string]: {
         schema: EnvSchema
         value?: string | ''
-        values?: string[] | { 
-            [key: string]: string
-        }
+        values?: Array<string | number | { 
+            [key: string]: string | number | boolean
+        }>
     }
 }
 
@@ -47,5 +50,7 @@ export interface EnvSchema {
     groupType?: 'object' | 'array'
     fields?: {
         [key: string]: EnvSchema
-    }
+    } | Array<{
+        [key: string]: EnvSchema
+    }>
 }

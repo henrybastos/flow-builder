@@ -1,6 +1,6 @@
 import type { EnvPayload, Payload } from "$lib/types"
 
-const EduzzLoginEnv: EnvPayload = {
+const ENV_PAYLOAD: EnvPayload = {
 	login_email: {
 		schema: {
 			label: 'E-mail',
@@ -21,7 +21,7 @@ const EduzzLoginEnv: EnvPayload = {
 	}
 }
 
-const EduzzPayload: Payload = {
+const PAYLOAD: Payload = {
    env: {
       login_email: '',
       login_password: ''
@@ -63,6 +63,6 @@ export const EduzzLoginBlock = {
    title: 'Eduzz - Login',
    block_id: '5817351e-5c56-4059-a620-759145d938a5',
    description: 'Faz login na Eduzz',
-   payload: EduzzPayload,
-   env_payload: EduzzLoginEnv
+   payload: PAYLOAD,
+   env_payload: ENV_PAYLOAD
 }
