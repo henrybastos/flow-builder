@@ -4,74 +4,19 @@
     import Button from "$lib/components/ui/button/button.svelte";
     import DraggableList from "$lib/components/DraggableList.svelte";
     import EnvPanel from "./EnvPanel.svelte";
+    import { FlowBlocks } from "$lib/flow-blocks/FlowBlocks";
 
     let isFlowBlockPanelOpen = false;
     let isEnvPanelOpen = false;
 
     let currentFlowBlock = {
-        title: 'Eduzz - Login',
-        block_id: 'A1B2C3D4',
-        description: 'Faz login na Eduzz',
+        title: '',
+        block_id: '',
+        description: '',
         payload: {}
     }
 
     let flowBlocks = [
-        {
-            title: 'Eduzz - Login',
-            block_id: '5817351e-5c56-4059-a620-759145d938a5',
-            description: 'Faz login na Eduzz',
-            payload: {
-                "env": {
-                    "prop_01": "AAA",
-                    "credentials": {
-                        "email": "",
-                        "password": ""
-                    }
-                },
-                "main_flow": [
-                    {
-                        "command": "goto",
-                        "enabled": true,
-                        "target": "https://app.jivosite.com/settings/channels?lang=pt"
-                    },
-                    {
-                        "command": "type",
-                        "enabled": true,
-                        "target": "//*/input[@type='email']",
-                        "value": "%jivo_email%"
-                    },
-                    {
-                        "command": "type",
-                        "enabled": true,
-                        "target": "//*/input[@type='password']",
-                        "value": "%jivo_password%"
-                    },
-                    {
-                        "command": "click",
-                        "enabled": true,
-                        "target": "//*/button[text()='Entrar']"
-                    }
-                ],
-                "select_brand_flow": [
-                    {
-                        "command": "click",
-                        "enabled": true,
-                        "target": "//*/div[contains(text(), '%jivo_url%')]"
-                    },
-                    {
-                        "command": "run_flow",
-                        "enabled": true,
-                        "flow": "instalation_flow"
-                    },
-                    {
-                        "command": "set_payload_slot",
-                        "enabled": true,
-                        "response_slot": "operation_status",
-                        "value": "Jivo already existed. Instalation code extracted."
-                    }
-                ],
-            }
-        },
         {
             title: 'Pegar ID dos produtos',
             block_id: '33fec0a0-0e0d-49fb-9430-24b189e211df',
@@ -174,14 +119,20 @@
         isFlowBlockPanelOpen = true;
     }
 
-    let flowBlocksClone = structuredClone(flowBlocks);
+    function combineEnvPayloads () {
+        for (let block of FlowBlocks) {
+            console.log(block.env_payload);
+        }
+    }
+
+    let flowBlocksClone = structuredClone(FlowBlocks);
 </script>
 
 <svelte:head>
     <title>Flow Builder • Compose</title>
 </svelte:head>
 
-<main class="flex flex-col p-3 border border-neutral-800 rounded-lg">
+<main class="flex flex-col p-3 border border-neutral-800 rounded-lg w-[40rem]">
     <DraggableList bind:itemsList={flowBlocksClone} let:item class="flex flex-col gap-y-3">
         <Card.Root class="rounded-lg">
             <Card.Header class="p-4">
@@ -195,6 +146,7 @@
     </DraggableList>
 
     <Button class="text-base mt-3" on:click={() => isEnvPanelOpen = true}>Painel de Variáveis</Button>
+    <Button class="text-base mt-3" on:click={combineEnvPayloads}>Combine all Env Payloads</Button>
 
     <Dialog.Root bind:open={isFlowBlockPanelOpen}>
         <Dialog.Content class="max-w-[60rem]">
