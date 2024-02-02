@@ -5,7 +5,7 @@
     const dispatch = createEventDispatcher();
 
     export let cardIndex;
-    export let hoverSlotIndex;
+    let hoverSlotIndex = cardIndex;
     export let isOnDrag = false;
     export let lastIndex;
     export let activeIndex;
@@ -21,6 +21,7 @@
     function draggable (node) {
         // id="card_{cards[index]}:{cards[index + 1]}"
         node.draggable = "true";
+
         draggableDragOverClassList.push(
             `rounded-[${ getComputedStyle(node.firstChild)['border-radius'] }]`
         )
@@ -69,9 +70,9 @@
 </script>
 
 <div>
-    {#if showFirst} <DraggableSlot on:dragend on:drop slotIndex={hoverSlotIndex} /> {/if}
+    {#if showFirst} <DraggableSlot class="mb-2" on:dragend on:drop slotIndex={hoverSlotIndex} /> {/if}
 
     <div use:draggable card-index={cardIndex}> <slot /> </div>
 
-    {#if showLast} <DraggableSlot on:drop slotIndex={hoverSlotIndex + 1} /> {/if}
+    {#if showLast} <DraggableSlot class="mt-2" on:drop slotIndex={hoverSlotIndex + 1} /> {/if}
 </div>

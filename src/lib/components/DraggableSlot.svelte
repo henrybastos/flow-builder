@@ -1,6 +1,7 @@
 <script>
     import { createEventDispatcher } from "svelte";
     import { slide } from "svelte/transition";
+    import { cn } from "$lib/utils";
 
     export let slotIndex;
     
@@ -31,5 +32,5 @@
     transition:slide={{ duration: 200 }}
     ondragover="return false" 
     target-id={slotIndex}
-    class="flex w-full rounded py-2 border-neutral-500 border-2 border-dotted transition-all"
+    class={cn('flex w-full rounded-md py-2 border-neutral-500 border-2 border-dotted transition-all', $$restProps.class)}
 ></span>
