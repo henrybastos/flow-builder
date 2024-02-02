@@ -1,9 +1,7 @@
 <script>
     import * as Dialog from "$lib/components/ui/dialog";
+    import * as AlertDialog from "$lib/components/ui/alert-dialog";
     import Button from "$lib/components/ui/button/button.svelte";
-    import Input from "$lib/components/ui/input/input.svelte";
-    import Label from "$lib/components/ui/label/label.svelte";
-    import Badge from "$lib/components/ui/badge/badge.svelte";
     import ComposeInput from "$lib/components/compose/ComposeInput.svelte";
     import ComposeInputList from "$lib/components/compose/ComposeInputList.svelte";
     import ComposeLabel from "$lib/components/compose/ComposeLabel.svelte";
@@ -11,6 +9,8 @@
     export let isEnvPanelOpen = false;
     
     let changesMade = false;
+    let confirmAlertDialog = false;
+
     let testEnv = {
         link: {
             schema: {
@@ -54,11 +54,17 @@
         }
     }
 
-    function closeEnvPanel () {
+    let envClone = structuredClone(testEnv);
+
+    function closeEnvPanel (state = true) {
+        changesMade = state;
+
         if (changesMade) { 
+            confirmAlertDialog = true;
             console.log('Cannot close. Changes were made');
             return;
         };
+        confirmAlertDialog = false;
         isEnvPanelOpen = false;
     }
 
@@ -67,12 +73,25 @@
         if (typeof cb == 'function') { cb() };
     }
 
+
     function buildEnv () {
-        console.log(testEnv);
+        let envPayload = {};
+
+        for (let [name, props] of Object.entries(envClone)) {
+            envPayload[name] = props.value || props.values;
+        }
+
+        console.log(envPayload);
+        changesMade = false;
     }
 </script>
 
-<Dialog.Root closeOnOutsideClick={!changesMade} onOutsideClick={closeEnvPanel} bind:open={isEnvPanelOpen}>
+<Dialog.Root 
+    closeOnEscape={!changesMade} 
+    closeOnOutsideClick={!changesMade} 
+    onOutsideClick={() => closeEnvPanel(changesMade)} 
+    bind:open={isEnvPanelOpen}
+>
     <Dialog.Content class="max-w-[60rem]">
         <Dialog.Header>
             <Dialog.Title class="text-2xl">Painel de variáveis</Dialog.Title>
@@ -80,11 +99,10 @@
         </Dialog.Header>
 
         <div class="max-h-[80vh] overflow-y-auto p-1">
-            {#each Object.values(testEnv) as data}
+            {#each Object.values(envClone) as data}
                 {#if typeof data.value == 'string'}
                     <ComposeLabel tooltip={data.schema.tooltip}>{data.schema.label}</ComposeLabel>
-                    <ComposeInput 
-                        autofocus
+                    <ComposeInput
                         inputType={data.schema.type}
                         placeholder={data.schema.placeholder}
                         on:change={(evt) => watchChanges(() => data.value = evt.target.value)} 
@@ -116,41 +134,10 @@
             {/each}
         </div>
 
-        <div class="hidden">
-            <ComposeLabel tooltip={testEnv.link.schema.tooltip}>{testEnv.link.schema.label}</ComposeLabel>
-            <ComposeInput 
-                on:change={(evt) => testEnv.link.value = evt.target.value} 
-                autofocus
-                inputType={testEnv.link.schema.type}
-                placeholder={testEnv.link.schema.placeholder}
-            />
-            
-            <ComposeLabel tooltip={testEnv.banners.schema.tooltip}>Banners</ComposeLabel>
-            <ComposeInputList 
-                on:change={watchChanges} 
-                listName="Banners" 
-                labelContent="Banners" 
-                items={testEnv.banners}
-            />
-
-            <ComposeLabel tooltip={testEnv.credentials.schema.tooltip} groupType="object">Credenciais</ComposeLabel>
-            <div class="border border-neutral-800 rounded-md p-3 mt-1 mb-3 last:mb-0">
-                {#each Object.entries(testEnv.credentials.schema.fields) as [field_name, field]}
-                    <ComposeLabel tooltip={field.tooltip}>{ field.label }</ComposeLabel>
-                    <ComposeInput inputType={field.type} placeholder={field.placeholder} on:change={(evt) => testEnv.credentials.values[field_name] = evt.target.value}/>
-                {/each}
-            </div>
-
-            <!-- <Label class="text-lg">Banners <Badge class="ml-2 mb-1 uppercase text-neutral-300" variant="secondary">Lista</Badge></Label>
-            <div class="flex flex-col border border-neutral-800 rounded-md p-3 gap-y-2 mt-1 mb-3 last:mb-0">
-                <ComposeInput inputType="text" placeholderContent="user@email.com"/>
-                <ComposeInput inputType="text" placeholderContent="*********"/>
-            </div> -->
-        </div>
-
         <Dialog.Footer class="mt-2">
-            <Button variant="outline" on:click={closeEnvPanel}>Cancelar</Button>
-            <Button disabled={!changesMade} class="relative">
+            <Button variant="outline" on:click={() => closeEnvPanel(changesMade)}>Cancelar</Button>
+            
+            <Button disabled={!changesMade} on:click={buildEnv} class="relative">
                 {#if changesMade}    
                     <span class="absolute flex h-3 w-3 -top-1 -right-1">
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
@@ -159,7 +146,21 @@
                 {/if}
                 Salvar dados
             </Button>
-            <Button on:click={buildEnv}>Build</Button>
+
         </Dialog.Footer>
     </Dialog.Content>
 </Dialog.Root>
+
+<AlertDialog.Root bind:open={confirmAlertDialog}>
+    <AlertDialog.Content>
+        <AlertDialog.Header>
+            <AlertDialog.Title>Você gostaria de salvar suas alterações?</AlertDialog.Title>
+            <AlertDialog.Description>Esta operação não pode ser desfeita.</AlertDialog.Description>
+        </AlertDialog.Header>
+
+        <AlertDialog.Footer>
+            <AlertDialog.Cancel on:click={() => closeEnvPanel(false)}>Descartar alterações</AlertDialog.Cancel>
+            <AlertDialog.Action>Continuar editando</AlertDialog.Action>
+          </AlertDialog.Footer>
+    </AlertDialog.Content>
+</AlertDialog.Root>

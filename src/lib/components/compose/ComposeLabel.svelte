@@ -26,7 +26,7 @@
 
     {#if groupType}
         <Tooltip.Root>
-            <Tooltip.Trigger class="cursor-help">
+            <Tooltip.Trigger tabindex={-1} class="cursor-help">
                 <Badge class="ml-1 mb-1 uppercase text-neutral-300 pointer-events-none" variant="secondary">{groupTypeTooltipContent[groupType].label}</Badge>
             </Tooltip.Trigger>
             <Tooltip.Content>
@@ -37,7 +37,7 @@
 
     {#if tooltip}    
         <Tooltip.Root>
-            <Tooltip.Trigger class="cursor-help">
+            <Tooltip.Trigger tabindex={-1} class="cursor-help">
                 <i class="ti ti-info-circle text-xl ml-1 text-neutral-600 hover:text-neutral-400"></i>
             </Tooltip.Trigger>
             <Tooltip.Content>
