@@ -21,7 +21,7 @@
     }
 </script>
 
-<Label class="text-lg flex mb-1 mt-2">
+<Label class="text-lg flex mb-1 mt-2 whitespace-nowrap mr-3">
     <slot />
 
     {#if groupType}

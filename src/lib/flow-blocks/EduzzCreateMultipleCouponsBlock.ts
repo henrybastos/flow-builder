@@ -1,32 +1,11 @@
 import type { EnvPayload, Payload } from "$lib/types";
 
 const ENV_PAYLOAD: EnvPayload = {
-   credentials: {
-      schema: {
-          tooltip: 'As credenciais utilizadas pelo usuário no Kronus.',
-          groupType: 'object',
-          fields: {
-              email: {
-                  label: 'E-mail',
-                  tooltip: 'O email do usuário.',
-                  placeholder: 'user@email.com',
-                  type: 'text'
-              },
-              password: {
-                  label: 'Senha',
-                  tooltip: 'A senha do usuário.',
-                  placeholder: '********',
-                  type: 'text'
-              }
-          }
-      },
-      values: {
-          email: '',
-          password: ''
-      }
-  },
    product_id: {
       value: '',
+      template_schema: {
+         product_id: ''
+      },
       schema: {
          label: 'ID do produto',
          placeholder: '2143359',
@@ -35,71 +14,108 @@ const ENV_PAYLOAD: EnvPayload = {
       }
    },
    coupons: {
+      template_schema: {
+         name: '',
+         description: '',
+         discount: '',
+         year: '',
+         day: '',
+         month: ''
+      },
       schema: {
          label: 'Cupons',
          tooltip: 'Cupons à serem criados.',
-         groupType: 'array',
-         fields: [
-            {
+         fields_type: 'array',
+         fields: {
+            name: {
                label: 'Código do cupom',
                tooltip: 'Ex.: CARNAVAL40',
                placeholder: 'CARNAVAL40',
-               type: 'text',
-               key: 'name',
-               value: ''
+               type: 'text'
             },
-            {
+            description: {
                label: 'Descrição do cupom',
                tooltip: 'Ex.: Cupom de 40% de desconto.',
                placeholder: 'Cupom de 40% de desconto.',
-               type: 'text',
-               key: 'description',
-               value: ''
+               type: 'text'
             },
-            {
+            discount: {
                label: 'Valor do desconto',
                tooltip: 'Ex.: 40',
                placeholder: '40',
-               type: 'number',
-               key: 'discount',
-               value: ''
+               type: 'number'
             },
-            {
+            year: {
                label: 'Ano limite',
                tooltip: 'Data limite que o cupom ainda será válido.',
                placeholder: '2024',
-               type: 'text',
-               key: 'year',
-               value: ''
+               type: 'text'
             },
-            {
+            day: {
                label: 'Dia limite',
                tooltip: 'Data limite que o cupom ainda será válido.',
                placeholder: '01',
-               type: 'text',
-               key: 'day',
-               value: ''
+               type: 'text'
             },
-            {
+            month: {
                label: 'Mês limite',
                tooltip: 'Data limite que o cupom ainda será válido.',
                placeholder: '02',
-               type: 'text',
-               key: 'month',
-               value: ''
+               type: 'text'
             }
-         ]
-      },
-      values: [
-         {
-            name: '',
-            description: '',
-            discount: '',
-            year: '',
-            day: '',
-            month: ''
          }
-      ]
+         // fields: [
+         //    {
+         //       label: 'Código do cupom',
+         //       tooltip: 'Ex.: CARNAVAL40',
+         //       placeholder: 'CARNAVAL40',
+         //       type: 'text',
+         //       key: 'name',
+         //       value: ''
+         //    },
+         //    {
+         //       label: 'Descrição do cupom',
+         //       tooltip: 'Ex.: Cupom de 40% de desconto.',
+         //       placeholder: 'Cupom de 40% de desconto.',
+         //       type: 'text',
+         //       key: 'description',
+         //       value: ''
+         //    },
+         //    {
+         //       label: 'Valor do desconto',
+         //       tooltip: 'Ex.: 40',
+         //       placeholder: '40',
+         //       type: 'number',
+         //       key: 'discount',
+         //       value: ''
+         //    },
+         //    {
+         //       label: 'Ano limite',
+         //       tooltip: 'Data limite que o cupom ainda será válido.',
+         //       placeholder: '2024',
+         //       type: 'text',
+         //       key: 'year',
+         //       value: ''
+         //    },
+         //    {
+         //       label: 'Dia limite',
+         //       tooltip: 'Data limite que o cupom ainda será válido.',
+         //       placeholder: '01',
+         //       type: 'text',
+         //       key: 'day',
+         //       value: ''
+         //    },
+         //    {
+         //       label: 'Mês limite',
+         //       tooltip: 'Data limite que o cupom ainda será válido.',
+         //       placeholder: '02',
+         //       type: 'text',
+         //       key: 'month',
+         //       value: ''
+         //    }
+         // ]
+      },
+      values: []
       // values: [
       //    {
       //       "name": "UPSELL25",

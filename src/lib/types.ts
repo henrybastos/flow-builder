@@ -34,7 +34,8 @@ export interface Payload {
 
 export interface EnvPayload {
     [key: string]: {
-        schema: EnvSchema
+        schema: EnvSchema,
+        template_schema?: object | string,
         value?: string | ''
         values?: Array<string | number | { 
             [key: string]: string | number | boolean
@@ -47,10 +48,8 @@ export interface EnvSchema {
     tooltip?: string
     placeholder?: string
     type?: string
-    groupType?: 'object' | 'array'
+    fields_type?: 'object' | 'array'
     fields?: {
         [key: string]: EnvSchema
-    } | Array<{
-        [key: string]: EnvSchema
-    }>
+    }
 }
