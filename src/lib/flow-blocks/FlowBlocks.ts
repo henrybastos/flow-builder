@@ -1,7 +1,9 @@
 import { EduzzLoginBlock } from "./EduzzLoginBlock";
 import { EduzzCreateMultipleCouponsBlock } from "./EduzzCreateMultipleCouponsBlock";
+import { TestBlock } from "./TestBlock";
 
 export const FlowBlocks = [
-   EduzzLoginBlock,
-   EduzzCreateMultipleCouponsBlock
+   TestBlock,
+   // EduzzLoginBlock,
+   // EduzzCreateMultipleCouponsBlock
 ];

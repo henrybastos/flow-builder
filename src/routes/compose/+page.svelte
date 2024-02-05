@@ -5,6 +5,10 @@
     import DraggableList from "$lib/components/DraggableList.svelte";
     import EnvPanel from "./EnvPanel.svelte";
     import { FlowBlocks } from "$lib/flow-blocks/FlowBlocks";
+    import { initStruct } from "$lib/PayloadStore";
+    import { onMount } from "svelte";
+    import { ServerHandler } from "$lib/ServerHandler";
+    import { LOGGER, TAGS } from "$lib/LogStore";
 
     let isFlowBlockPanelOpen = false;
     let isEnvPanelOpen = false;
@@ -16,109 +20,44 @@
         payload: {}
     }
 
-    let flowBlocks = [
-        {
-            title: 'Pegar ID dos produtos',
-            block_id: '33fec0a0-0e0d-49fb-9430-24b189e211df',
-            description: 'Retorna o ID de todos os produtos',
-            payload: {
-                "env": {
-                    "prop_002": "BBB"
-                },
-                "main_flow": [
-                    {
-                        "command": "type",
-                        "enabled": true,
-                        "target": "//*/input[contains(@placeholder,'Busque')]",
-                        "value": "%jivo_url%"
-                    },
-                    {
-                        "command": "check_element",
-                        "enabled": true,
-                        "target": "//*[text()='%jivo_url%']",
-                        "success_flow": "select_brand_flow",
-                        "error_flow": "create_brand_flow"
-                    }
-                ],
-                "create_brand_flow": [
-                    {
-                        "command": "reload",
-                        "enabled": true
-                    },
-                    {
-                        "command": "click",
-                        "enabled": true,
-                        "target": "//*/h3[text()='Chat online']"
-                    },
-                    {
-                        "command": "click",
-                        "enabled": true,
-                        "target": "//*/button[text()='Adicionar site']"
-                    },
-                    {
-                        "command": "type",
-                        "enabled": true,
-                        "target": "//*/input[@name='channelNameInput']",
-                        "value": "%jivo_url%"
-                    }
-                ]
-            }
-        },
-        {
-            title: 'Criar Jivo',
-            block_id: 'cfe560de-fa49-4e37-bf1d-3286da8e1fa2',
-            description: 'Cria o Jivo Chat para o parceiro',
-            payload: {
-                "status": 'W.I.P.'
-            }
-        },
-        {
-            title: 'Fazer campanhas',
-            block_id: '0a9bd0cd-4535-4271-bc83-705a807c2f1e',
-            description: 'Cria e configura as campanhas',
-            payload: {
-                "status": 'W.I.P.'
-            }
-        }
-    ];
+    let combinedPayload = {};
 
     function combineAllPayloads () {
         let fullPayload = {};
 
-        // TODO: combineEnv
-        // TODO: combineFlows
-        // TODO: combineConfig
-
-        for (let block of flowBlocksClone) {
-            for (let [prop_key, prop_value] of Object.entries(block.payload)) {
-                if (!fullPayload[prop_key]) {
-                    if (Array.isArray(prop_value)) {
-                        fullPayload[prop_key] = [];
-                    } else if (typeof fullPayload[prop_key] === 'object') {
-                        fullPayload[prop_key] = {};
-                    }
-                } 
-
-                // console.log(fullPayload[prop_key].length);
-                if (!Array.isArray(prop_value)) {
-                    fullPayload[prop_key] = {
-                        ...(fullPayload[prop_key]),
-                        ...(prop_value)
-                    }
+        function _combineEnv () {
+            for (let block of flowBlocksClone) {
+                fullPayload.env = {
+                    ...(fullPayload.env),
+                    ...(block.payload.env)
                 }
             }
         }
 
-        fullPayload.flows.main_flow = [];
+        function _combineFlows () {
+            fullPayload.flows = {};
+            fullPayload.flows.main_flow = [];
 
-        for (let block of flowBlocksClone) {
-            fullPayload.flows.main_flow = [
-                ...(fullPayload.flows.main_flow),
-                ...(block.payload.flows.main_flow)
-            ]
+            for (let block of flowBlocksClone) {
+                fullPayload.flows.main_flow = [
+                    ...(fullPayload.flows.main_flow),
+                    ...(block.payload.flows.main_flow)
+                ]
+            }
+
+            for (let block of flowBlocksClone) {
+                for (let [flow_name, flow_ops] of Object.entries(block.payload.flows)) {
+                    fullPayload.flows = {
+                        ...(fullPayload.flows),
+                        [flow_name]: flow_ops
+                    }
+                }
+            }
         }
-
-        console.log(fullPayload);
+        
+        _combineEnv()
+        _combineFlows()
+        fullPayload.config = initStruct.config;
         return structuredClone(fullPayload);
     }
 
@@ -128,12 +67,20 @@
     }
 
     function openCombinedBlocksDialog () {
-        openFlowBlockDialog({
+        combinedPayload = {
             title: 'Fazer campanhas',
             block_id: '0a9bd0cd-4535-4271-bc83-705a807c2f1e',
-            description: 'Cria e configura as campanhas',
-            payload: combineAllPayloads()
-        });
+            description: 'Cria e configura as campanhas'
+        };
+
+        combinedPayload.payload = combineAllPayloads();
+
+        if (combinedEnvPayload) {
+            for (let [field_name, field_value] of Object.entries(combinedEnvPayload)) {
+                combinedPayload.payload.env[field_name] = field_value.value;
+            }
+        }
+        openFlowBlockDialog(combinedPayload);
     }
 
     function openEnvPanel () {
@@ -144,12 +91,26 @@
             }
         }
 
-        console.log(combinedEnvPayload);
         isEnvPanelOpen = true;
     }
 
     let flowBlocksClone = structuredClone(FlowBlocks);
-    let combinedEnvPayload;
+    let combinedEnvPayload = {};
+
+    onMount(() => {
+        // document.querySelector('body').addEventListener('wheel', () => {
+        //     console.log('Wheeling')
+        // })
+        // window.onwheel = () => console.log('Wheeling');
+    })
+
+    ServerHandler.logger = LOGGER;
+    ServerHandler.logger_tags = TAGS;
+
+    async function runCombinedPayload () {
+        combinedPayload = combineAllPayloads();
+        await ServerHandler.sendFlowPayload(combinedPayload);
+    }
 </script>
 
 <svelte:head>
@@ -171,6 +132,7 @@
 
     <Button class="text-base mt-3" on:click={openCombinedBlocksDialog}>Combinar blocos</Button>
     <Button class="text-base mt-3" on:click={openEnvPanel}>Painel de Variáveis</Button>
+    <Button class="text-base mt-3" on:click={runCombinedPayload}>Executar blocos</Button>
 
     <Dialog.Root bind:open={isFlowBlockPanelOpen}>
         <Dialog.Content class="max-w-[60rem]">

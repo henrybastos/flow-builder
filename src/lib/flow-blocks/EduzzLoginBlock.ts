@@ -15,7 +15,7 @@ const ENV_PAYLOAD: EnvPayload = {
 			label: 'Senha',
 			tooltip: 'A senha utilizada para entrar na Eduzz',
 			placeholder: '********',
-			type: 'text'
+			type: 'password'
 		},
 		value: ''
 	}

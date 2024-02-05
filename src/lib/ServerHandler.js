@@ -58,7 +58,7 @@ export class ServerHandler {
     }
     
     static async closeBrowserOnCancelRequest () {
-        await fetch('http://localhost:5173/api/run-flow', {
+        await fetch('/api/run-flow', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -86,7 +86,7 @@ export class ServerHandler {
                     this.logger_tags.running
                 );
 
-                const response = await fetch('http://localhost:5173/api/run-flow', {
+                const response = await fetch('/api/run-flow', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

@@ -3,9 +3,6 @@ import type { EnvPayload, Payload } from "$lib/types";
 const ENV_PAYLOAD: EnvPayload = {
    product_id: {
       value: '',
-      template_schema: {
-         product_id: ''
-      },
       schema: {
          label: 'ID do produto',
          placeholder: '2143359',
@@ -64,164 +61,113 @@ const ENV_PAYLOAD: EnvPayload = {
                type: 'text'
             }
          }
-         // fields: [
-         //    {
-         //       label: 'Código do cupom',
-         //       tooltip: 'Ex.: CARNAVAL40',
-         //       placeholder: 'CARNAVAL40',
-         //       type: 'text',
-         //       key: 'name',
-         //       value: ''
-         //    },
-         //    {
-         //       label: 'Descrição do cupom',
-         //       tooltip: 'Ex.: Cupom de 40% de desconto.',
-         //       placeholder: 'Cupom de 40% de desconto.',
-         //       type: 'text',
-         //       key: 'description',
-         //       value: ''
-         //    },
-         //    {
-         //       label: 'Valor do desconto',
-         //       tooltip: 'Ex.: 40',
-         //       placeholder: '40',
-         //       type: 'number',
-         //       key: 'discount',
-         //       value: ''
-         //    },
-         //    {
-         //       label: 'Ano limite',
-         //       tooltip: 'Data limite que o cupom ainda será válido.',
-         //       placeholder: '2024',
-         //       type: 'text',
-         //       key: 'year',
-         //       value: ''
-         //    },
-         //    {
-         //       label: 'Dia limite',
-         //       tooltip: 'Data limite que o cupom ainda será válido.',
-         //       placeholder: '01',
-         //       type: 'text',
-         //       key: 'day',
-         //       value: ''
-         //    },
-         //    {
-         //       label: 'Mês limite',
-         //       tooltip: 'Data limite que o cupom ainda será válido.',
-         //       placeholder: '02',
-         //       type: 'text',
-         //       key: 'month',
-         //       value: ''
-         //    }
-         // ]
       },
-      values: []
-      // values: [
-      //    {
-      //       "name": "UPSELL25",
-      //       "description": "Coupon 25%",
-      //       "discount": 25,
-      //       "year": "2025",
-      //       "day": "01",
-      //       "month": "01"
-      //    },
-      //    {
-      //       "name": "ANONOVO40",
-      //       "description": "Coupon 40%",
-      //       "discount": 40,
-      //       "year": "2024",
-      //       "day": "01",
-      //       "month": "02"
-      //    },
-      //    {
-      //       "name": "CARNAVAL40",
-      //       "description": "Coupon 40%",
-      //       "discount": 40,
-      //       "year": "2024",
-      //       "day": "01",
-      //       "month": "02"
-      //    },
-      //    {
-      //       "name": "MULHER35",
-      //       "description": "Coupon 35%",
-      //       "discount": 35,
-      //       "year": "2024",
-      //       "day": "09",
-      //       "month": "04"
-      //    },
-      //    {
-      //       "name": "PASCOA40",
-      //       "description": "Coupon 40%",
-      //       "discount": 40,
-      //       "year": "2024",
-      //       "day": "05",
-      //       "month": "04"
-      //    },
-      //    {
-      //       "name": "MAES40",
-      //       "description": "Coupon 40%",
-      //       "discount": 40,
-      //       "year": "2024",
-      //       "day": "01",
-      //       "month": "06"
-      //    },
-      //    {
-      //       "name": "AMOR40",
-      //       "description": "Coupon 40%",
-      //       "discount": 40,
-      //       "year": "2024",
-      //       "day": "01",
-      //       "month": "07"
-      //    },
-      //    {
-      //       "name": "INVERNO35",
-      //       "description": "Coupon 35%",
-      //       "discount": 35,
-      //       "year": "2024",
-      //       "day": "01",
-      //       "month": "08"
-      //    },
-      //    {
-      //       "name": "PAIS45",
-      //       "description": "Coupon 45%",
-      //       "discount": 45,
-      //       "year": "2024",
-      //       "day": "01",
-      //       "month": "09"
-      //    },
-      //    {
-      //       "name": "PRIMAVERA45",
-      //       "description": "Coupon 45%",
-      //       "discount": 45,
-      //       "year": "2024",
-      //       "day": "01",
-      //       "month": "10"
-      //    },
-      //    {
-      //       "name": "HALLOWEEN40",
-      //       "description": "Coupon 40%",
-      //       "discount": 40,
-      //       "year": "2024",
-      //       "day": "01",
-      //       "month": "11"
-      //    },
-      //    {
-      //       "name": "BLACK55",
-      //       "description": "Coupon 55%",
-      //       "discount": 55,
-      //       "year": "2024",
-      //       "day": "01",
-      //       "month": "12"
-      //    },
-      //    {
-      //       "name": "NATAL50",
-      //       "description": "Coupon 50%",
-      //       "discount": 50,
-      //       "year": "2024",
-      //       "day": "01",
-      //       "month": "01"
-      //    }
-      // ]
+      value: [
+         {
+            "name": "UPSELL25",
+            "description": "Coupon 25%",
+            "discount": 25,
+            "year": "2025",
+            "day": "01",
+            "month": "01"
+         },
+         {
+            "name": "ANONOVO40",
+            "description": "Coupon 40%",
+            "discount": 40,
+            "year": "2024",
+            "day": "01",
+            "month": "02"
+         },
+         {
+            "name": "CARNAVAL40",
+            "description": "Coupon 40%",
+            "discount": 40,
+            "year": "2024",
+            "day": "01",
+            "month": "02"
+         },
+         {
+            "name": "MULHER35",
+            "description": "Coupon 35%",
+            "discount": 35,
+            "year": "2024",
+            "day": "09",
+            "month": "04"
+         },
+         {
+            "name": "PASCOA40",
+            "description": "Coupon 40%",
+            "discount": 40,
+            "year": "2024",
+            "day": "05",
+            "month": "04"
+         },
+         {
+            "name": "MAES40",
+            "description": "Coupon 40%",
+            "discount": 40,
+            "year": "2024",
+            "day": "01",
+            "month": "06"
+         },
+         {
+            "name": "AMOR40",
+            "description": "Coupon 40%",
+            "discount": 40,
+            "year": "2024",
+            "day": "01",
+            "month": "07"
+         },
+         {
+            "name": "INVERNO35",
+            "description": "Coupon 35%",
+            "discount": 35,
+            "year": "2024",
+            "day": "01",
+            "month": "08"
+         },
+         {
+            "name": "PAIS45",
+            "description": "Coupon 45%",
+            "discount": 45,
+            "year": "2024",
+            "day": "01",
+            "month": "09"
+         },
+         {
+            "name": "PRIMAVERA45",
+            "description": "Coupon 45%",
+            "discount": 45,
+            "year": "2024",
+            "day": "01",
+            "month": "10"
+         },
+         {
+            "name": "HALLOWEEN40",
+            "description": "Coupon 40%",
+            "discount": 40,
+            "year": "2024",
+            "day": "01",
+            "month": "11"
+         },
+         {
+            "name": "BLACK55",
+            "description": "Coupon 55%",
+            "discount": 55,
+            "year": "2024",
+            "day": "01",
+            "month": "12"
+         },
+         {
+            "name": "NATAL50",
+            "description": "Coupon 50%",
+            "discount": 50,
+            "year": "2024",
+            "day": "01",
+            "month": "01"
+         }
+      ]
    }
 }
 

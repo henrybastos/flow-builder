@@ -11,6 +11,8 @@ export interface Operation {
     value?: string
     flow?: string
     time?: string
+    regex?: string
+    response_slot?: string
     env_var?: string
     input_fields?: InputFields
 }
@@ -32,24 +34,32 @@ export interface Payload {
     env: Object
 }
 
+export interface EnvProps {
+    schema: EnvSchema,
+    template_schema?: object | string,
+    value?: string | Array<string | number | object>
+}
+
 export interface EnvPayload {
-    [key: string]: {
-        schema: EnvSchema,
-        template_schema?: object | string,
-        value?: string | ''
-        values?: Array<string | number | { 
-            [key: string]: string | number | boolean
-        }>
-    }
+    [key: string]: EnvProps
 }
 
 export interface EnvSchema {
     label?: string
     tooltip?: string
     placeholder?: string
-    type?: string
+    type?: InputType
     fields_type?: 'object' | 'array'
     fields?: {
-        [key: string]: EnvSchema
+        [key: string]: EnvProps | EnvSchema
     }
 }
+
+export interface EnvFieldSchema {
+    label?: string
+    tooltip?: string
+    placeholder: string
+    type: InputType
+}
+
+export type InputType = 'text' | 'password' | 'email';

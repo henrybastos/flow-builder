@@ -2,9 +2,7 @@
     import * as Dialog from "$lib/components/ui/dialog";
     import * as AlertDialog from "$lib/components/ui/alert-dialog";
     import Button from "$lib/components/ui/button/button.svelte";
-    import ComposeInput from "$lib/components/compose/ComposeInput.svelte";
-    import ComposeInputList from "$lib/components/compose/ComposeInputList.svelte";
-    import ComposeLabel from "$lib/components/compose/ComposeLabel.svelte";
+    import ComposeComponent from "$lib/components/compose/ComposeComponent.svelte";
 
     export let isEnvPanelOpen = false;
     export let combinedEnvPayload;
@@ -51,7 +49,7 @@
                 tooltip: 'Os banners usados na campanhas (Eduzz ou Kiwify)',
                 placeholder: 'https://site.com/banner-a1b2c3.png'
             },
-            values: []
+            value: []
         }
     }
 
@@ -76,14 +74,11 @@
 
 
     function buildEnv () {
-        let envPayload = {};
-        console.log(envClone);
-
         for (let [name, props] of Object.entries(envClone)) {
-            envPayload[name] = props.value || props.values;
+            combinedEnvPayload[name].value = props.value;
         }
 
-        console.log(envPayload);
+        console.log(combinedEnvPayload);
         changesMade = false;
     }
 </script>
@@ -100,50 +95,12 @@
             <Dialog.Description class="text-base">Todos os valores variáveis utilizados pelos blocos de fluxo</Dialog.Description>
         </Dialog.Header>
 
-        <div class="max-h-[60vh] overflow-y-auto p-1">
-            {#each Object.values(envClone) as data}
-                {#if typeof data.value == 'string'}
-                    <ComposeLabel tooltip={data.schema.tooltip}>{data.schema.label}</ComposeLabel>
-                    <ComposeInput
-                        inputType={data.schema.type}
-                        placeholder={data.schema.placeholder}
-                        on:change={(evt) => watchChanges(() => data.value = evt.target.value)} 
-                    />
-                {:else if Array.isArray(data.values)}
-                    <ComposeLabel tooltip={data.schema.tooltip}>Banners</ComposeLabel>
-                    <ComposeInputList 
-                        listName="Banners" 
-                        labelContent="Banners" 
-                        items={data}
-                        on:change={watchChanges} 
-                    />
-                    <!-- {#if Array.isArray(data.schema.fields)}
-                    {:else}
-                        <ComposeLabel tooltip={data.schema.tooltip}>Banners</ComposeLabel>
-                        <ComposeInputList 
-                            listName="Banners" 
-                            labelContent="Banners" 
-                            items={data}
-                            on:change={watchChanges} 
-                        />
-                    {/if} -->
-                {:else if data.schema.fields}
-                    <ComposeLabel tooltip={data.schema.tooltip} groupType="object">Credenciais</ComposeLabel>
-                    <div class="border border-neutral-800 rounded-md p-3 mt-1 mb-3 last:mb-0">
-                        {#each Object.entries(data.schema.fields) as [field_name, field]}
-                            <ComposeLabel tooltip={field.tooltip}>{ field.label }</ComposeLabel>
-                            <ComposeInput 
-                                inputType={field.type} 
-                                placeholder={field.placeholder} 
-                                on:change={(evt) => watchChanges(() => data.values[field_name] = evt.target.value)}
-                            />
-                        {/each}
-                    </div>
-                {:else}
-                    <h1>INVALID</h1>
-                    <pre>{ JSON.stringify(data, null, 3) }</pre>
-                {/if}
-            {/each}
+        <div class="max-h-[60vh] overflow-y-auto p-1 border-collapse">
+            {#if envClone}    
+                {#each Object.values(envClone) as data}
+                    <ComposeComponent on:change={watchChanges} data={data} />
+                {/each}
+            {/if}
         </div>
 
         <Dialog.Footer class="mt-2">

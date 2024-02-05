@@ -90,6 +90,7 @@ export async function POST ({ request }) {
             _browser = await puppeteer.launch({
                 dumpio: true,
                 headless: false,
+                executablePath: EXECUTABLE_PATHS.CHROME,
                 args: [
                     `--window-size=${ width },${ height + 200 }`,
                 ]
