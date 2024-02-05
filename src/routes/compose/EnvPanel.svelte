@@ -25,7 +25,7 @@
         credentials: {
             schema: {
                 tooltip: 'As credenciais utilizadas pelo usuário no Kronus.',
-                groupType: 'object',
+                fields_type: 'object',
                 fields: {
                     email: {
                         label: 'E-mail',
@@ -79,11 +79,11 @@
         let envPayload = {};
         console.log(envClone);
 
-        // for (let [name, props] of Object.entries(envClone)) {
-        //     envPayload[name] = props.value || props.values;
-        // }
+        for (let [name, props] of Object.entries(envClone)) {
+            envPayload[name] = props.value || props.values;
+        }
 
-        // console.log(envPayload);
+        console.log(envPayload);
         changesMade = false;
     }
 </script>
@@ -94,13 +94,13 @@
     onOutsideClick={() => closeEnvPanel(changesMade)} 
     bind:open={isEnvPanelOpen}
 >
-    <Dialog.Content class="max-w-[60rem]">
+    <Dialog.Content class="max-w-[60rem] max-h-[95vh] overflow-y-auto">
         <Dialog.Header>
             <Dialog.Title class="text-2xl">Painel de variáveis</Dialog.Title>
             <Dialog.Description class="text-base">Todos os valores variáveis utilizados pelos blocos de fluxo</Dialog.Description>
         </Dialog.Header>
 
-        <div class="max-h-[80vh] overflow-y-auto p-1">
+        <div class="max-h-[60vh] overflow-y-auto p-1">
             {#each Object.values(envClone) as data}
                 {#if typeof data.value == 'string'}
                     <ComposeLabel tooltip={data.schema.tooltip}>{data.schema.label}</ComposeLabel>

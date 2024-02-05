@@ -85,7 +85,11 @@
     function combineAllPayloads () {
         let fullPayload = {};
 
-        for (let block of flowBlocks) {
+        // TODO: combineEnv
+        // TODO: combineFlows
+        // TODO: combineConfig
+
+        for (let block of flowBlocksClone) {
             for (let [prop_key, prop_value] of Object.entries(block.payload)) {
                 if (!fullPayload[prop_key]) {
                     if (Array.isArray(prop_value)) {
@@ -96,27 +100,40 @@
                 } 
 
                 // console.log(fullPayload[prop_key].length);
-                if (Array.isArray(prop_value)) {
-                    fullPayload[prop_key] = [
-                        ...(fullPayload[prop_key]),
-                        ...(prop_value)
-                    ]
-                } else {
+                if (!Array.isArray(prop_value)) {
                     fullPayload[prop_key] = {
                         ...(fullPayload[prop_key]),
                         ...(prop_value)
                     }
                 }
-
             }
         }
 
+        fullPayload.flows.main_flow = [];
+
+        for (let block of flowBlocksClone) {
+            fullPayload.flows.main_flow = [
+                ...(fullPayload.flows.main_flow),
+                ...(block.payload.flows.main_flow)
+            ]
+        }
+
+        console.log(fullPayload);
         return structuredClone(fullPayload);
     }
 
     function openFlowBlockDialog (item) {
         currentFlowBlock = item;
         isFlowBlockPanelOpen = true;
+    }
+
+    function openCombinedBlocksDialog () {
+        openFlowBlockDialog({
+            title: 'Fazer campanhas',
+            block_id: '0a9bd0cd-4535-4271-bc83-705a807c2f1e',
+            description: 'Cria e configura as campanhas',
+            payload: combineAllPayloads()
+        });
     }
 
     function openEnvPanel () {
@@ -152,6 +169,7 @@
         </Card.Root>
     </DraggableList>
 
+    <Button class="text-base mt-3" on:click={openCombinedBlocksDialog}>Combinar blocos</Button>
     <Button class="text-base mt-3" on:click={openEnvPanel}>Painel de Variáveis</Button>
 
     <Dialog.Root bind:open={isFlowBlockPanelOpen}>

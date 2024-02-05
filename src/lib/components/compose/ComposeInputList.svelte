@@ -1,10 +1,10 @@
 <script lang="ts">
     import { createEventDispatcher } from "svelte";
-    import Input from "$lib/components/ui/input/input.svelte";
-    import DraggableList from "../DraggableList.svelte";
-    import Button from "$lib/components/ui/button/button.svelte";
-    import { cn } from "$lib/utils";
     import { onMount } from "svelte";
+    import { cn } from "$lib/utils";
+    import Input from "$lib/components/ui/input/input.svelte";
+    import Button from "$lib/components/ui/button/button.svelte";
+    import DraggableList from "../DraggableList.svelte";
     import ComposeLabel from "./ComposeLabel.svelte";
     import ComposeInput from "./ComposeInput.svelte";
 
@@ -22,8 +22,14 @@
         'lista': 'Múltiplos valores ordenados sem nome. Ex.: Banana, Maçã, Pera'
     }
 
-    function onInputChange (evt: Event, index: number) {
+    function updateString (evt: Event, index: number) {
         items.values[index] = (evt.target as HTMLInputElement).value;
+        dispatch('change');
+    }
+
+    function updateStruct (evt: Event, index: number, item: any) {
+        items.values[index][item.key] = (evt.target as HTMLInputElement).value;
+        console.log(items.values);
         dispatch('change');
     }
 
@@ -49,21 +55,22 @@
             <p class="text-base mx-auto text-neutral-500">No items <i class="ti ti-ghost-2-filled"></i></p>    
         {:else}
             <DraggableList on:change isDraggable={!isInputEditable} bind:itemsList={items.values} let:item let:index class="space-y-3">
-                {#if Array.isArray(items.schema.fields)}
-                    <div class="p-4 border border-neutral-700 rounded-lg">
-                        <h1>{ index }</h1>
-                        {#each items.schema.fields as _item, _index (_item.key)}
-                            <ComposeLabel tooltip={_item.tooltip}>{ _item.label }</ComposeLabel>
+                {#if items.schema.fields_type === 'array' && items.schema.fields}
+                    <div class="grid grid-cols-[min-content_auto] p-4 border border-neutral-800 rounded-md">
+                        {#each Object.entries(items.schema.fields) as [_item_key, _item_schema]}
+                            { JSON.stringify(_item_schema, null, 3) }
+                            <!-- <ComposeLabel tooltip={_item_schema.tooltip}>{ _item_schema.label }</ComposeLabel>
                             <ComposeInput 
-                                inputType={_item.type} 
-                                placeholder={_item.placeholder} 
-                                on:change={(evt) => items.values[index][_item.key] = evt?.target.value }
-                            />
+                                bind:value={items.values[index][_item_key]}
+                                inputType={_item_schema.type} 
+                                placeholder={_item_schema.placeholder} 
+                                on:change={(evt) =>  updateStruct(evt, index, _item_schema)}
+                            /> -->
                         {/each}
                     </div>
                 {:else}
                     {#if isInputEditable}    
-                        <Input bind:value={items.values[index]} on:change={(evt) => onInputChange(evt, index)} class="text-base mt-1 first:mt-0 placeholder:text-neutral-500" placeholder={items.schema.placeholder} type="text"/>
+                        <Input bind:value={items.values[index]} on:change={(evt) => updateString(evt, index)} class="text-base mt-1 first:mt-0 placeholder:text-neutral-500" placeholder={items.schema.placeholder} type="text"/>
                     {:else}
                         <Input bind:value={items.values[index]} readonly class="text-base mt-1 first:mt-0 cursor-move placeholder:text-neutral-500" placeholder={items.schema.placeholder} type={inputType}/>
                     {/if}
