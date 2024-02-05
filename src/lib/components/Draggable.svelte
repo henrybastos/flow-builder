@@ -26,7 +26,7 @@
             `rounded-[${ getComputedStyle(node.firstChild)['border-radius'] }]`
         )
 
-        node.addEventListener('drag', () => {
+        node.addEventListener('drag', (evt) => {
             let dragElement = node.getBoundingClientRect();
             if(dragElement.top < 0){ window.scrollBy(0, -10); }
             if(dragElement.bottom > window.innerHeight){ window.scrollBy(0, 10); }
