@@ -1,61 +1,109 @@
 <script lang="ts">
-   import { createEventDispatcher } from "svelte";
-   import type { EnvProps, EnvSchema } from "$lib/types";
    import ComposeInput from "$lib/components/compose/ComposeInput.svelte";
    import ComposeInputList from "$lib/components/compose/ComposeInputList.svelte";
    import ComposeLabel from "$lib/components/compose/ComposeLabel.svelte";
+   import type { EnvPayloadSchema, InputFieldSchema } from "$lib/types";
+
+   import Draggable from "$lib/components/Draggable.svelte";
+   let isOnDrag = false;
+   let dragFromIndex;
+   let dragToIndex;
+   let isDraggable = true;
    
-   const dispatch = createEventDispatcher();
+   export let data: any;
+   export let value: any;
+   export let changesMade;
 
-   function updateString (evt: Event, value: string) {
-      value = evt.target.value;
-      dispatch('change');
+   function updateString (cb: Function) {
+      cb(); changesMade = true;
    }
 
-   function updateObject (evt: Event, value: string) {
-      value[field_name] = (evt.target as HTMLInputElement).value
-      dispatch('change');
-   }
+   //! DRAGGABLE START
+   function handleDragStart ({ detail }) {
+        dragFromIndex = detail.from;
+        isOnDrag = isDraggable;
+    }
 
-   export let data: EnvProps;
+    function handleDragEnd () { isOnDrag = false; }
+
+    function handleDrop ({ detail }) {
+        dragToIndex = detail.to;
+
+        let itemToInsert = value[dragFromIndex];
+        value[dragFromIndex] = { __draggable_item_to_delete__: value[dragFromIndex] };
+        
+        if (dragToIndex === (value.length + 1)) {
+            value.splice(dragToIndex + 1, 0, itemToInsert);
+        } else {
+            value.splice(dragToIndex, 0, itemToInsert);
+        }
+
+        value.splice(value.indexOf(value.find(item => item.__draggable_item_to_delete__)), 1);
+    }
+   //! DRAGGABLE END
 </script>
 
-{#if typeof data.value == 'string'}
-   <ComposeLabel tooltip={data.schema.tooltip}>{data.schema.label}</ComposeLabel>
-   <ComposeInput
-         inputType={data.schema.type}
-         placeholder={data.schema.placeholder}
-         on:change={(evt) => updateString(evt, data.value)} 
-   />
-{:else if data.schema.fields_type === 'array'}
-   <ComposeLabel tooltip={data.schema.tooltip}>{ data.schema.label }</ComposeLabel>
+{#if data?.schema?.fields_type === undefined}
+   <!-- <pre class="p-4 border border-orange-600 rounded-md">{ JSON.stringify(data, null, 3) }</pre> -->
+   {#if data?.schema}
+      <ComposeLabel tooltip={data.schema?.tooltip}>{data.schema.label}</ComposeLabel>
+      <ComposeInput
+            inputType={data.schema.type}
+            placeholder={data.schema.placeholder}
+            on:change={(evt) => updateString(() => value = evt.target.value)} 
+      />
+   {:else}
+      <ComposeLabel tooltip={data?.tooltip}>{data.label}</ComposeLabel>
+      <ComposeInput
+            inputType={data.type}
+            placeholder={data.placeholder}
+            bind:value={value}
+            on:change
+      />
+   {/if}
+{:else if data?.schema?.fields_type === 'array'}
+   <ComposeLabel tooltip={data.schema?.tooltip}>{ data.schema.label }</ComposeLabel>
    <ComposeInputList 
-         listName={data.schema.label} 
-         labelContent={data.schema.label}
-         bind:items={data}
+         schema={data.schema}
+         template_schema={data.template_schema}
+         bind:items={value}
          on:change
+         let:isInputEditable
    >
-      {#each data.value as item}
-         {#each Object.keys(item) as item_key}
-            {#if data?.schema?.fields?.[item_key]?.schema?.fields_type == 'array'}
-               <pre>{ JSON.stringify(data.schema.fields[item_key].schema.fields_type, null, 3) }</pre>
-               <p>list { data.schema.fields[item_key] }</p>
-            {:else}
-               <p>input</p>
-            {/if}
-         {/each}
+      {#each value as item, index}
+         <!-- <DraggableList on:change isDraggable={!isInputEditable} bind:value={value} let:index class="space-y-3"> -->
+               <Draggable 
+                  {isOnDrag} 
+                  on:dragstart={handleDragStart}
+                  on:dragend={handleDragEnd}
+                  on:drop={handleDrop}
+                  activeIndex={dragFromIndex}
+                  lastIndex={value.length}
+                  cardIndex={index}
+               >
+                  <div class={`grid grid-cols-[min-content_auto] p-4 border border-neutral-800 rounded-md`}>
+                     {#each Object.keys(item) as item_key}
+                        <svelte:self 
+                           on:change={(evt) => updateString(() => item[item_key] = evt.target?.value)} 
+                           bind:value={item[item_key]}
+                           bind:data={data.schema.fields[item_key]} 
+                        />
+                     {/each}
+                  </div>
+               </Draggable>
+         <!-- </DraggableList> -->
       {/each}
       <!-- {#if Array.isArray(data?.value) && data?.value?.length === 0}
          <p class="text-base mx-auto text-neutral-500">No items <i class="ti ti-ghost-2-filled"></i></p>    
       {:else}
-         <DraggableList on:change isDraggable={!isInputEditable} bind:itemsList={data.value} let:index class="space-y-3">
+         <DraggableList on:change isDraggable={!isInputEditable} bind:value={data.value} let:index class="space-y-3">
             <div class={`grid grid-cols-[min-content_auto] p-4 border border-neutral-800 rounded-md ${ isInputEditable ? '' : 'cursor-move' }`}>
                <p>AAA</p>
             </div>
          </DraggableList>
       {/if} -->
    </ComposeInputList>
-{:else if data.schema.fields_type === 'object'}
+{:else if data?.schema?.fields_type === 'object'}
    <ComposeLabel tooltip={data.schema.tooltip} groupType="object">Credenciais</ComposeLabel>
    <div class="border border-neutral-800 rounded-md p-3 mt-1 mb-3 last:mb-0">
          {#each Object.entries(data.schema.fields) as [field_name, field]}
@@ -63,7 +111,7 @@
             <ComposeInput 
                inputType={field.type} 
                placeholder={field.placeholder} 
-               on:change={(evt) => updateObject(data.value, evt)}
+               on:change={(evt) => updateObject(evt, data.value, field_name)}
             />
          {/each}
    </div>

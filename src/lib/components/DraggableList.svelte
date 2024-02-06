@@ -15,15 +15,12 @@
         isOnDrag = isDraggable;
     }
 
-    function handleDragEnd () {
-        isOnDrag = false;
-    }
+    function handleDragEnd () { isOnDrag = false; }
 
     function handleDrop ({ detail }) {
         dragToIndex = detail.to;
 
         let itemToInsert = itemsList[dragFromIndex];
-
         itemsList[dragFromIndex] = { __draggable_item_to_delete__: itemsList[dragFromIndex] };
         
         if (dragToIndex === (itemsList.length + 1)) {

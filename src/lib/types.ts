@@ -34,32 +34,30 @@ export interface Payload {
     env: Object
 }
 
-export interface EnvProps {
-    schema: EnvSchema,
-    template_schema?: object | string,
-    value?: string | Array<string | number | object>
-}
-
-export interface EnvPayload {
-    [key: string]: EnvProps
-}
-
-export interface EnvSchema {
-    label?: string
-    tooltip?: string
-    placeholder?: string
-    type?: InputType
-    fields_type?: 'object' | 'array'
-    fields?: {
-        [key: string]: EnvProps | EnvSchema
-    }
-}
-
-export interface EnvFieldSchema {
+export interface InputFieldSchema {
     label?: string
     tooltip?: string
     placeholder: string
     type: InputType
+}
+
+export interface FieldSchema {
+    label: string
+    tooltip?: string
+    fields_type: 'array' | 'object'
+    fields: {
+        [key: string]: EnvPayloadSchema | InputFieldSchema
+    }
+}
+
+export interface EnvPayloadSchema {
+    value: string | Array<string | object>
+    template_schema?: object
+    schema: InputFieldSchema | FieldSchema
+}
+
+export interface EnvPayloadModel {
+    [key: string]: EnvPayloadSchema
 }
 
 export type InputType = 'text' | 'password' | 'email';

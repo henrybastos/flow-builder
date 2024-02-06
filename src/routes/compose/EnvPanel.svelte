@@ -56,6 +56,7 @@
     $: envClone = structuredClone(combinedEnvPayload);
 
     function closeEnvPanel (state = true) {
+        console.log(envClone);
         changesMade = state;
 
         if (changesMade) { 
@@ -67,9 +68,10 @@
         isEnvPanelOpen = false;
     }
 
-    function watchChanges (cb) {
+    function watchChanges (arg) {
+        console.log(envClone, arg?.detail);
         changesMade = true;
-        if (typeof cb == 'function') { cb() };
+        if (typeof arg == 'function') { arg() };
     }
 
 
@@ -96,9 +98,13 @@
         </Dialog.Header>
 
         <div class="max-h-[60vh] overflow-y-auto p-1 border-collapse">
-            {#if envClone}    
+            {#if envClone}
                 {#each Object.values(envClone) as data}
-                    <ComposeComponent on:change={watchChanges} data={data} />
+                    <ComposeComponent 
+                        bind:changesMade={changesMade} 
+                        bind:data={data} 
+                        bind:value={data.value}
+                    />
                 {/each}
             {/if}
         </div>
