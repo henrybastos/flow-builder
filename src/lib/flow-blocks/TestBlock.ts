@@ -1,17 +1,17 @@
-import type { EnvPayload, Payload } from "$lib/types";
+import type { EnvPayloadModel, Payload } from "$lib/types";
 
-const ENV_PAYLOAD: EnvPayload = {
+const ENV_PAYLOAD: EnvPayloadModel = {
    course_home: {
       value: '',
       schema: {
-         label: 'Prop 1 label',
+         label: 'Course home URL',
          tooltip: 'Prop 1 tooltip',
          placeholder: 'Prop 1 placeholder',
          type: 'text'
       }
    },
    modules: {
-      template_schema: { module_title: '', module_lessons: '' },
+      template_schema: { module_title: '', module_lessons: [] },
       schema: {
          label: 'Módulos',
          tooltip: 'My tooltip',
@@ -31,13 +31,13 @@ const ENV_PAYLOAD: EnvPayload = {
                   fields_type: 'array',
                   fields: {
                      lesson_title: {
-                        label: 'Aula 01',
+                        label: 'Título da Aula',
                         tooltip: 'Prop 1 tooltip',
                         placeholder: 'Prop 1 placeholder',
                         type: 'text'
                      },
                      lesson_link: {
-                        label: 'Aula 02',
+                        label: 'Link da Aula',
                         tooltip: 'Prop 1 tooltip',
                         placeholder: 'Prop 1 placeholder',
                         type: 'text'

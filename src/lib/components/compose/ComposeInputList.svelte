@@ -1,47 +1,36 @@
 <script lang="ts">
-    import { createEventDispatcher } from "svelte";
-    import { onMount } from "svelte";
+    import { createEventDispatcher, onMount } from "svelte";
     import { cn } from "$lib/utils";
-    import Input from "$lib/components/ui/input/input.svelte";
     import Button from "$lib/components/ui/button/button.svelte";
-    import DraggableList from "../DraggableList.svelte";
-    import ComposeLabel from "./ComposeLabel.svelte";
-    import ComposeInput from "./ComposeInput.svelte";
     import type { EnvProps } from "$lib/types";
+    import DraggableList from "../DraggableList.svelte";
 
     export let inputType: 'password' | 'text' | 'number' | 'email' = 'text';
-    export let items: EnvProps;
     export let isReadOnly = false;
+    export let items: any[];
+    export let externalStorage = items;
+    export let schema;
+    export let template_schema;
     
+    // $: externalStorage = structuredClone(items);
+
     let isInputEditable = false;
     const dispatch = createEventDispatcher();
 
-    function updateString (evt: Event, index: number) {
-        if (items?.value?.[index]) {
-            items.value[index] = (evt.target as HTMLInputElement).value;
-            dispatch('change');
-        }
-    }
-
-    function updateStruct (evt: Event, index: number, key: string) {
-        items.value[index][key] = (evt.target as HTMLInputElement).value;
-        dispatch('change');
-    }
-
     function addItem () {
-        if (items.value && items.template_schema) {
-            items.value = [
-                ...(items.value),
-                structuredClone(items.template_schema)
-            ]
-        }
+        // dispatch('add_item', items);
+        console.log('<<', items, template_schema);
+        items = [
+            ...(items),
+            structuredClone(template_schema)
+        ]
     }
 </script>
 
 <div class={cn("text-lg", $$restProps.class)}>
     <div class="flex flex-col border border-neutral-800 rounded-md p-3 gap-y-2 mt-1 mb-3 last:mb-0">
-        <slot />
-
+        <!-- <pre>{ JSON.stringify(items, null, 3) }</pre> -->
+        <slot {isInputEditable} />
         {#if !isReadOnly}  
             <div class="pb-2 sticky -bottom-1 bg-neutral-950">
                 <div class="grid grid-cols-2 gap-x-2 mt-2">
