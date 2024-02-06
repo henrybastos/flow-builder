@@ -4,9 +4,9 @@ const ENV_PAYLOAD: EnvPayloadModel = {
    course_home: {
       value: '',
       schema: {
-         label: 'Course home URL',
-         tooltip: 'Prop 1 tooltip',
-         placeholder: 'Prop 1 placeholder',
+         label: 'Página inicial dos módulos',
+         tooltip: 'Área de edição dos módulos',
+         placeholder: 'https://my.nutror.com/cursos/123456/editar/modulos',
          type: 'text'
       }
    },
@@ -14,32 +14,30 @@ const ENV_PAYLOAD: EnvPayloadModel = {
       template_schema: { module_title: '', module_lessons: [] },
       schema: {
          label: 'Módulos',
-         tooltip: 'My tooltip',
+         tooltip: 'Todos os módulos.',
          fields_type: 'array',
          fields: {
             module_title: {
-               label: 'Módulo 01',
-               tooltip: 'Prop 1 tooltip',
-               placeholder: 'Prop 1 placeholder',
+               label: 'Módulo',
+               tooltip: 'O título do módulo',
+               placeholder: 'Módulo 1',
                type: 'text'
             },
             module_lessons: {
                template_schema: { lesson_title: '', lesson_link: '' },
                schema: {
                   label: 'Aulas',
-                  tooltip: 'My tooltip',
+                  tooltip: 'As aulas do módulo',
                   fields_type: 'array',
                   fields: {
                      lesson_title: {
-                        label: 'Título da Aula',
-                        tooltip: 'Prop 1 tooltip',
-                        placeholder: 'Prop 1 placeholder',
+                        label: 'Título da aula',
+                        placeholder: 'Aula 01 - Como se comportar em público',
                         type: 'text'
                      },
                      lesson_link: {
-                        label: 'Link da Aula',
-                        tooltip: 'Prop 1 tooltip',
-                        placeholder: 'Prop 1 placeholder',
+                        label: 'Link da aula',
+                        placeholder: 'https://www.youtube.com/watch?v=_hqMALWpHD0',
                         type: 'text'
                      }
                   }
@@ -54,7 +52,7 @@ const ENV_PAYLOAD: EnvPayloadModel = {
 
 const PAYLOAD: Payload = {
    "env": {
-      "course_home": "https://my.nutror.com/cursos/274841/editar/modulos",
+      "course_home": "",
       "modules": [
          {
             "module_title": "Módulo 1 - MOD 1",
