@@ -11,6 +11,8 @@
     export let externalStorage = items;
     export let schema;
     export let template_schema;
+    export let changesMade;
+    export let canToggleEdit = true;
     
     // $: externalStorage = structuredClone(items);
 
@@ -24,6 +26,7 @@
             ...(items),
             structuredClone(template_schema)
         ]
+        changesMade = true;
     }
 </script>
 
@@ -34,17 +37,19 @@
         {#if !isReadOnly}  
             <div class="pb-2 sticky -bottom-1 bg-neutral-950">
                 <div class="grid grid-cols-2 gap-x-2 mt-2">
-                    <Button on:click={addItem} size="sm" variant="ghost">
+                    <Button class={`${ canToggleEdit ? 'col-span-1' : 'col-span-2' }`} on:click={addItem} size="sm" variant="ghost">
                         <i class="ti ti-plus"></i>
                     </Button>
             
-                    <Button on:click={() => isInputEditable = !isInputEditable} variant="ghost">
-                        {#if isInputEditable}
-                            Organizar <i class="ti ti-arrows-move ml-1"></i>
-                        {:else}
-                            Editar <i class="ti ti-pencil ml-1"></i>
-                        {/if}
-                    </Button>
+                    {#if canToggleEdit}    
+                        <Button on:click={() => isInputEditable = !isInputEditable} variant="ghost">
+                            {#if isInputEditable}
+                                Organizar <i class="ti ti-arrows-move ml-1"></i>
+                            {:else}
+                                Editar <i class="ti ti-pencil ml-1"></i>
+                            {/if}
+                        </Button>
+                    {/if}
                 </div>
             </div>  
         {/if}

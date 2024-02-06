@@ -22,9 +22,7 @@
         // id="card_{cards[index]}:{cards[index + 1]}"
         node.draggable = "true";
 
-        draggableDragOverClassList.push(
-            `rounded-[${ getComputedStyle(node.firstChild)['border-radius'] }]`
-        )
+        // draggableDragOverClassList.push( `rounded-[${ getComputedStyle(node.firstChild)['border-radius'] }]` )
 
         node.addEventListener('drag', (evt) => {
             let dragElement = node.getBoundingClientRect();

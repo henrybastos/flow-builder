@@ -12,6 +12,7 @@
 
     let isFlowBlockPanelOpen = false;
     let isEnvPanelOpen = false;
+    let isAddFlowBlockOpen = false;
 
     let currentFlowBlock = {
         title: '',
@@ -68,9 +69,9 @@
 
     function openCombinedBlocksDialog () {
         combinedPayload = {
-            title: 'Fazer campanhas',
+            title: 'Carga final',
             block_id: '0a9bd0cd-4535-4271-bc83-705a807c2f1e',
-            description: 'Cria e configura as campanhas'
+            description: 'Todos os blocos combinados. Serão executados sequencialmente.'
         };
 
         combinedPayload.payload = combineAllPayloads();
@@ -117,38 +118,67 @@
     <title>Flow Builder • Compose</title>
 </svelte:head>
 
-<main class="flex flex-col p-3 border border-neutral-800 rounded-lg w-[40rem]">
-    <DraggableList bind:itemsList={flowBlocksClone} let:item class="flex flex-col gap-y-3">
-        <Card.Root class="rounded-lg">
-            <Card.Header class="p-4">
-                <Card.Title class="text-xl text-left flex justify-between">
-                    { item.title }
-                    <Button on:click={() => openFlowBlockDialog(item)} variant="outline" size="icon"><i class="ti ti-code text-neutral-500"></i></Button>
-                </Card.Title>
-                <Card.Description class="text-base">{ item.description }</Card.Description>
-            </Card.Header>
-        </Card.Root>
-    </DraggableList>
+<Card.Root class="flex flex-col p-3 border border-neutral-800 rounded-lg w-[40rem]">
+    <Card.Header class="p-1 mb-3">
+        <Card.Title class="text-2xl text-left flex justify-between">Carga combinada</Card.Title>
+        <!-- <Card.Description class="text-base">{ item.description }</Card.Description> -->
+    </Card.Header>
 
-    <Button class="text-base mt-3" on:click={openCombinedBlocksDialog}>Combinar blocos</Button>
-    <Button class="text-base mt-3" on:click={openEnvPanel}>Painel de Variáveis</Button>
-    <Button class="text-base mt-3" on:click={runCombinedPayload}>Executar blocos</Button>
+    <Card.Content class="border border-neutral-800 rounded-lg p-3 mb-3">
+        <DraggableList bind:itemsList={flowBlocksClone} let:item class="flex flex-col gap-y-3">
+            <Card.Root class="rounded-lg">
+                <Card.Header class="p-4">
+                    <Card.Title class="text-xl text-left flex justify-between">
+                        { item.title }
+                        <Button on:click={() => openFlowBlockDialog(item)} variant="outline" size="icon"><i class="ti ti-code text-neutral-500"></i></Button>
+                    </Card.Title>
+                    <Card.Description class="text-base">{ item.description }</Card.Description>
+                </Card.Header>
+            </Card.Root>
+        </DraggableList>
+    
+        <Button class="mt-3 w-full" variant="ghost">
+            <i class="ti ti-plus"></i>
+        </Button>
+    </Card.Content>
 
-    <Dialog.Root bind:open={isFlowBlockPanelOpen}>
-        <Dialog.Content class="max-w-[60rem]">
-            <Dialog.Header>
-                <Dialog.Title>
-                    { currentFlowBlock.title }
-                    {#if currentFlowBlock.block_id}
-                        <span class="text-neutral-500 font-code text-base pl-2">{ currentFlowBlock.block_id }</span>
-                    {/if}
-                </Dialog.Title>
-                <Dialog.Description>{ currentFlowBlock.description }</Dialog.Description>
-            </Dialog.Header>
+    <Card.Footer class="grid grid-cols-2 gap-y-2 gap-x-2 p-0">
+        <Button variant="outline" class="text-base col-span-1" on:click={openCombinedBlocksDialog}>Carga final</Button>
+        <Button variant="outline" class="text-base col-span-1" on:click={openEnvPanel}>Painel de Variáveis</Button>
+        <Button class="text-base col-span-2" on:click={runCombinedPayload}>Executar blocos</Button>
+    </Card.Footer>
+</Card.Root>
 
-            <pre class="max-h-[80vh] overflow-y-auto border border-neutral-700 rounded-lg p-4 font-code">{ JSON.stringify(currentFlowBlock.payload, null, 3) }</pre>
-        </Dialog.Content>
-    </Dialog.Root>
+<Dialog.Root bind:open={isFlowBlockPanelOpen}>
+    <Dialog.Content class="max-w-[60rem]">
+        <Dialog.Header>
+            <Dialog.Title>
+                { currentFlowBlock.title }
+                {#if currentFlowBlock.block_id}
+                    <span class="text-neutral-500 font-code text-base pl-2">{ currentFlowBlock.block_id }</span>
+                {/if}
+            </Dialog.Title>
+            <Dialog.Description>{ currentFlowBlock.description }</Dialog.Description>
+        </Dialog.Header>
 
-    <EnvPanel bind:combinedEnvPayload={combinedEnvPayload} bind:isEnvPanelOpen={isEnvPanelOpen} />
-</main>
+        <pre class="max-h-[80vh] overflow-y-auto border border-neutral-700 rounded-lg p-4 font-code">{ JSON.stringify(currentFlowBlock.payload, null, 3) }</pre>
+    </Dialog.Content>
+</Dialog.Root>
+
+<Dialog.Root bind:open={isAddFlowBlockOpen}>
+    <Dialog.Content class="max-w-[60rem]">
+        <Dialog.Header>
+            <Dialog.Title>
+                { currentFlowBlock.title }
+                {#if currentFlowBlock.block_id}
+                    <span class="text-neutral-500 font-code text-base pl-2">{ currentFlowBlock.block_id }</span>
+                {/if}
+            </Dialog.Title>
+            <Dialog.Description>{ currentFlowBlock.description }</Dialog.Description>
+        </Dialog.Header>
+
+        <pre class="max-h-[80vh] overflow-y-auto border border-neutral-700 rounded-lg p-4 font-code">{ JSON.stringify(currentFlowBlock.payload, null, 3) }</pre>
+    </Dialog.Content>
+</Dialog.Root>
+
+<EnvPanel bind:combinedEnvPayload={combinedEnvPayload} bind:isEnvPanelOpen={isEnvPanelOpen} />
