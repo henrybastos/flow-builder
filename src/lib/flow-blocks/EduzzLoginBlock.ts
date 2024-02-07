@@ -49,13 +49,18 @@ const PAYLOAD: Payload = {
             command: "user_click",
             enabled: true,
             target: "//*/button[@id='signin']"
+         },
+         {
+            command: "wait_for_navigation",
+            enabled: true
          }
       ]
    },
    config: {
       ws_endpoint: "",
       close_browser_on_finish: false,
-      close_browser_on_cancel_request: false
+      close_browser_on_cancel_request: false,
+      headless: true
    }
 }
 

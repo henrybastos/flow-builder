@@ -25,6 +25,7 @@ const EXECUTABLE_PATHS = {
 export async function POST ({ request }) {
     const payload = await request.json();
     let responsePayload = {};
+    console.dir(('SERVER PAYLOAD', payload), { depth: null });
 
     console.log('Calling local endpoint: [::1]:5173/api/run-flow');
 
@@ -89,7 +90,7 @@ export async function POST ({ request }) {
         } else {
             _browser = await puppeteer.launch({
                 dumpio: true,
-                headless: false,
+                headless: payload.config.headless,
                 executablePath: EXECUTABLE_PATHS.CHROME,
                 args: [
                     `--window-size=${ width },${ height + 200 }`,

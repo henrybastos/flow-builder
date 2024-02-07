@@ -2,6 +2,7 @@ export interface PayloadConfig {
     ws_endpoint: string
     close_browser_on_finish: boolean
     close_browser_on_cancel_request: boolean
+    headless: boolean
 }
 
 export interface Operation {

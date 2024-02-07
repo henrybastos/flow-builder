@@ -63,6 +63,7 @@
       <ComposeInput
          inputType={data.schema.type}
          placeholder={data.schema.placeholder}
+         value={value}
          on:change={(evt) => triggerChange(() => (value = evt.target.value))}
       />
    {:else}

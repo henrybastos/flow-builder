@@ -1,6 +1,7 @@
 <script>
 	import "../app.postcss";
 	import { ModeWatcher } from "mode-watcher";
+	import { Toaster } from "svelte-sonner";
 </script>
 
 <svelte:head>
@@ -8,4 +9,5 @@
 </svelte:head>
 
 <ModeWatcher defaultMode="dark" />
+<Toaster />
 <slot />

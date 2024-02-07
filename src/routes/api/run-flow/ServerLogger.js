@@ -15,6 +15,7 @@ export default class ServerLogger {
      */
     static logEvent (_response_event, _response_payload) {
         const message = `event: ${ _response_event }\ndata: ${ JSON.stringify(_response_payload) }\n\n`;
+        console.log(message);
         this.controller.enqueue(message);
     }
 

@@ -1,4 +1,5 @@
 <script>
+    import { SvelteComponent, onMount } from "svelte";
     import * as Card from "$lib/components/ui/card";
     import * as Dialog from "$lib/components/ui/dialog";
     import Button from "$lib/components/ui/button/button.svelte";
@@ -6,13 +7,16 @@
     import EnvPanel from "./EnvPanel.svelte";
     import { FlowBlocks } from "$lib/flow-blocks/FlowBlocks";
     import { initStruct } from "$lib/PayloadStore";
-    import { onMount } from "svelte";
     import { ServerHandler } from "$lib/ServerHandler";
     import { LOGGER, TAGS } from "$lib/LogStore";
+    import { toast } from "svelte-sonner";
+    import LogMessage from "$lib/components/LogMessage.svelte";
+    import { page } from "$app/stores";
 
     let isFlowBlockPanelOpen = false;
     let isEnvPanelOpen = false;
     let isAddFlowBlockOpen = false;
+    let isLogsPanelOpen = false;
 
     let currentFlowBlock = {
         title: '',
@@ -22,6 +26,30 @@
     }
 
     let combinedPayload = {};
+    let flowBlocksClone = structuredClone(FlowBlocks);
+    let combinedEnvPayload;
+    let isPayloadRunning = false;
+    
+    const DEV_MODE = $page.url.searchParams.has('dev_mode');
+    const DEFAULT_ENV_TEST_PAYLOAD = {
+        course_home: "https://my.nutror.com/cursos/448082/editar/modulos",
+        modules: [
+            {
+                module_title: "M TEST 1",
+                module_lessons: [
+                {
+                    lesson_title: "A TEST 1",
+                    lesson_link: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                }
+                ]
+            }
+        ],
+        login_email: "dev@kebook.com.br",
+        login_password: 'yC3-42aXWSt(C"NH'
+    }
+
+    ServerHandler.logger = LOGGER;
+    ServerHandler.logger_tags = TAGS;
 
     function combineAllPayloads () {
         let fullPayload = {};
@@ -37,14 +65,6 @@
 
         function _combineFlows () {
             fullPayload.flows = {};
-            fullPayload.flows.main_flow = [];
-
-            for (let block of flowBlocksClone) {
-                fullPayload.flows.main_flow = [
-                    ...(fullPayload.flows.main_flow),
-                    ...(block.payload.flows.main_flow)
-                ]
-            }
 
             for (let block of flowBlocksClone) {
                 for (let [flow_name, flow_ops] of Object.entries(block.payload.flows)) {
@@ -54,11 +74,21 @@
                     }
                 }
             }
+
+            fullPayload.flows.main_flow = [];
+
+            for (let block of flowBlocksClone) {
+                fullPayload.flows.main_flow = [
+                    ...(fullPayload.flows.main_flow),
+                    ...(block.payload.flows.main_flow)
+                ]
+            }
         }
         
         _combineEnv()
         _combineFlows()
         fullPayload.config = initStruct.config;
+        fullPayload.config.headless = true;
         return structuredClone(fullPayload);
     }
 
@@ -90,27 +120,28 @@
                 ...(combinedEnvPayload),
                 ...(block.env_payload)
             }
+
+            // Sets all env fields to the default value set on the flow block's payload.
+            for (let [env_field, env_value] of Object.entries(block.payload.env)) {
+                combinedEnvPayload[env_field].value = env_value
+            }
         }
 
         isEnvPanelOpen = true;
     }
 
-    let flowBlocksClone = structuredClone(FlowBlocks);
-    let combinedEnvPayload = {};
-
-    onMount(() => {
-        // document.querySelector('body').addEventListener('wheel', () => {
-        //     console.log('Wheeling')
-        // })
-        // window.onwheel = () => console.log('Wheeling');
-    })
-
-    ServerHandler.logger = LOGGER;
-    ServerHandler.logger_tags = TAGS;
-
     async function runCombinedPayload () {
         combinedPayload = combineAllPayloads();
+
+        if (DEFAULT_ENV_TEST_PAYLOAD) { 
+            combinedPayload.env = DEFAULT_ENV_TEST_PAYLOAD 
+            toast.warning("Using DEFAULT_ENV_TEST_PAYLOAD as Env Payload");
+        };
+
+        isPayloadRunning = true;
         await ServerHandler.sendFlowPayload(combinedPayload);
+        toast.success("Blocos executados.");
+        isPayloadRunning = false;
     }
 </script>
 
@@ -120,7 +151,12 @@
 
 <Card.Root class="flex flex-col p-3 border border-neutral-800 rounded-lg w-[40rem]">
     <Card.Header class="p-1 mb-3">
-        <Card.Title class="text-2xl text-left flex justify-between">Carga combinada</Card.Title>
+        <Card.Title class="text-2xl text-left flex justify-between">
+            Carga combinada
+            {#if DEV_MODE}
+                <Button on:click={() => isLogsPanelOpen = true} variant="outline" size="icon"><i class="ti ti-list-details text-neutral-500"></i></Button>
+            {/if}   
+        </Card.Title>
         <!-- <Card.Description class="text-base">{ item.description }</Card.Description> -->
     </Card.Header>
 
@@ -130,14 +166,16 @@
                 <Card.Header class="p-4">
                     <Card.Title class="text-xl text-left flex justify-between">
                         { item.title }
-                        <Button on:click={() => openFlowBlockDialog(item)} variant="outline" size="icon"><i class="ti ti-code text-neutral-500"></i></Button>
+                        {#if DEV_MODE}
+                            <Button on:click={() => openFlowBlockDialog(item)} variant="outline" size="icon"><i class="ti ti-code text-neutral-500"></i></Button>
+                        {/if}   
                     </Card.Title>
                     <Card.Description class="text-base">{ item.description }</Card.Description>
                 </Card.Header>
             </Card.Root>
         </DraggableList>
     
-        <Button class="mt-3 w-full" variant="ghost">
+        <Button on:click={() => isAddFlowBlockOpen = true} class="mt-3 w-full" variant="ghost">
             <i class="ti ti-plus"></i>
         </Button>
     </Card.Content>
@@ -145,14 +183,23 @@
     <Card.Footer class="grid grid-cols-2 gap-y-2 gap-x-2 p-0">
         <Button variant="outline" class="text-base col-span-1" on:click={openCombinedBlocksDialog}>Carga final</Button>
         <Button variant="outline" class="text-base col-span-1" on:click={openEnvPanel}>Painel de Variáveis</Button>
-        <Button class="text-base col-span-2" on:click={runCombinedPayload}>Executar blocos</Button>
+        {#if isPayloadRunning}
+            <Button disabled class="text-base col-span-2" on:click={runCombinedPayload}>
+                <i class="ti ti-loader-2 animate-spin mr-2"></i>
+                Blocos sendo executados
+            </Button>
+        {:else}
+            <Button class="text-base col-span-2" on:click={runCombinedPayload}>Executar blocos</Button>
+        {/if}
     </Card.Footer>
 </Card.Root>
+
+<EnvPanel bind:combinedEnvPayload={combinedEnvPayload} bind:isEnvPanelOpen={isEnvPanelOpen} />
 
 <Dialog.Root bind:open={isFlowBlockPanelOpen}>
     <Dialog.Content class="max-w-[60rem]">
         <Dialog.Header>
-            <Dialog.Title>
+            <Dialog.Title class="text-xl">
                 { currentFlowBlock.title }
                 {#if currentFlowBlock.block_id}
                     <span class="text-neutral-500 font-code text-base pl-2">{ currentFlowBlock.block_id }</span>
@@ -168,12 +215,7 @@
 <Dialog.Root bind:open={isAddFlowBlockOpen}>
     <Dialog.Content class="max-w-[60rem]">
         <Dialog.Header>
-            <Dialog.Title>
-                { currentFlowBlock.title }
-                {#if currentFlowBlock.block_id}
-                    <span class="text-neutral-500 font-code text-base pl-2">{ currentFlowBlock.block_id }</span>
-                {/if}
-            </Dialog.Title>
+            <Dialog.Title class="text-xl">Adicionar bloco</Dialog.Title>
             <Dialog.Description>{ currentFlowBlock.description }</Dialog.Description>
         </Dialog.Header>
 
@@ -181,4 +223,25 @@
     </Dialog.Content>
 </Dialog.Root>
 
-<EnvPanel bind:combinedEnvPayload={combinedEnvPayload} bind:isEnvPanelOpen={isEnvPanelOpen} />
+<Dialog.Root bind:open={isLogsPanelOpen}>
+    <Dialog.Content class="max-w-[90vw]">
+        <Dialog.Header>
+            <Dialog.Title class="text-xl">Logs</Dialog.Title>
+            <Dialog.Description>{ currentFlowBlock.description }</Dialog.Description>
+        </Dialog.Header>
+
+        <div class="console_screen flex-col-reverse overflow-y-auto overflow-x-clip max-h-[36rem] border">
+            {#each Object.entries($LOGGER.messages).reverse() as [msg_key, msg], _ (msg_key)}
+                <!-- <span class="flex flex-row p-3 bg-blue-500">{ msg.time } • { msg.tag.label } { msg.message }</span> -->
+                <LogMessage on:clipboard_copy={() => showToast('Copied to clipboard!', 'success')} data={msg} />
+            {/each}
+
+        </div>
+
+        {#if isPayloadRunning}
+            <p class="font-code font-semibold text-neutral-500"><i class="inline-flex w-fit h-fit ti ti-loader-2 animate-spin mr-1"></i> Processing operations...</p>
+        {:else}
+            <p class="font-code font-semibold text-neutral-500">All operations processed.</p>
+        {/if}
+    </Dialog.Content>
+</Dialog.Root>

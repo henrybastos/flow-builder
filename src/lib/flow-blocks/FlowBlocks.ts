@@ -4,6 +4,6 @@ import { TestBlock } from "./TestBlock";
 
 export const FlowBlocks = [
    TestBlock,
-   // EduzzLoginBlock,
+   EduzzLoginBlock,
    // EduzzCreateMultipleCouponsBlock
 ];
