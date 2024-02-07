@@ -201,10 +201,10 @@ const PAYLOAD: Payload = {
    }
 }
 
-export const TestBlock = {
-   title: 'Test Block',
+export const MyNutrorCreateModulesAndLessonsBlock = {
+   title: 'MyNutror - Criar Módulos e Aulas',
    block_id: '4df6ee4c-f5be-4a65-ba86-3944e670ca2b',
-   description: 'Testa o env',
+   description: 'Cria módulos e aulas em um determinado curso.',
    payload: PAYLOAD,
    env_payload: ENV_PAYLOAD
 }

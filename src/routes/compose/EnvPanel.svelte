@@ -17,7 +17,16 @@
 
     const DEV_MODE = $page.url.searchParams.has('dev_mode');
 
+    // $: envClone = cloneEnv(combinedEnvPayload);
     $: envClone = structuredClone(combinedEnvPayload);
+
+    function cloneEnv (_payload) {
+        let clone = structuredClone(_payload);
+        for (let [key, prop] of Object.entries(clone)) {
+            console.log('PROP', prop);
+        }
+        return clone;
+    }
 
     function closeEnvPanel (state = true) {
         changesMade = state;
@@ -97,12 +106,14 @@
 
         <div class="max-h-[60vh] overflow-y-auto p-1 border-collapse">
             {#if envClone}
-                {#each Object.values(envClone) as data}
-                    <ComposeComponent 
-                        bind:changesMade={changesMade} 
-                        bind:data={data} 
-                        bind:value={data.value}
-                    />
+                {#each Object.entries(envClone) as [key, data]}
+                    {#if !key.match(/(?<=__).*(?=__)/g)}    
+                        <ComposeComponent 
+                            bind:changesMade={changesMade} 
+                            bind:data={data} 
+                            bind:value={data.value}
+                        />
+                    {/if}
                 {/each}
             {/if}
         </div>

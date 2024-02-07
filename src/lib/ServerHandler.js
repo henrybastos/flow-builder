@@ -9,7 +9,8 @@ export class ServerHandler {
         config: {
             ws_endpoint: false,
             close_browser_on_finish: false,
-            close_browser_on_cancel_request: false
+            close_browser_on_cancel_request: false,
+            headless: true
         },
         env: {},
         flows: {

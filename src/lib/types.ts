@@ -13,6 +13,8 @@ export interface Operation {
     flow?: string
     time?: string
     regex?: string
+    expression?: string
+    attr?: string
     response_slot?: string
     env_var?: string
     input_fields?: InputFields
@@ -54,11 +56,11 @@ export interface FieldSchema {
 export interface EnvPayloadSchema {
     value?: string | Array<string | object>
     template_schema?: object
-    schema: InputFieldSchema | FieldSchema
+    schema?: InputFieldSchema | FieldSchema
 }
 
 export interface EnvPayloadModel {
     [key: string]: EnvPayloadSchema
 }
 
-export type InputType = 'text' | 'password' | 'email';
+export type InputType = 'text' | 'password' | 'email' | 'number';

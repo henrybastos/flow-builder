@@ -3,17 +3,16 @@
    import ComposeInputList from "$lib/components/compose/ComposeInputList.svelte";
    import ComposeLabel from "$lib/components/compose/ComposeLabel.svelte";
    import Button from "$lib/components/ui/button/button.svelte";
-   import type { EnvPayloadSchema, InputFieldSchema } from "$lib/types";
 
    import Draggable from "$lib/components/Draggable.svelte";
    let isOnDrag = false;
-   let dragFromIndex;
-   let dragToIndex;
+   let dragFromIndex: number;
+   let dragToIndex: number;
    let isDraggable = true;
 
    export let data: any;
    export let value: any;
-   export let changesMade;
+   export let changesMade: boolean;
 
    function triggerChange(cb: Function) {
       cb();
