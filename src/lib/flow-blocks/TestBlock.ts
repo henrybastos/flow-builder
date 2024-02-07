@@ -41,8 +41,7 @@ const ENV_PAYLOAD: EnvPayloadModel = {
                         type: 'text'
                      }
                   }
-               },
-               value: []
+               }
             }
          }
       },

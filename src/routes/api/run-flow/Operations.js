@@ -295,6 +295,8 @@ export default class Operations {
             message: 'Closing browser...',
             status_message: "info"
         });
+        
+        console.log('Closing browser...');
 
         await this.browser.close();
     }

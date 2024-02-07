@@ -1,5 +1,5 @@
 <script>
-    import { SvelteComponent, onMount } from "svelte";
+    import * as AlertDialog from "$lib/components/ui/alert-dialog";
     import * as Card from "$lib/components/ui/card";
     import * as Dialog from "$lib/components/ui/dialog";
     import Button from "$lib/components/ui/button/button.svelte";
@@ -13,10 +13,13 @@
     import LogMessage from "$lib/components/LogMessage.svelte";
     import { page } from "$app/stores";
 
+    let isPayloadRunning = false;
+
     let isFlowBlockPanelOpen = false;
     let isEnvPanelOpen = false;
     let isAddFlowBlockOpen = false;
     let isLogsPanelOpen = false;
+    let isStopExecutionOpen = false;
 
     let currentFlowBlock = {
         title: '',
@@ -25,10 +28,18 @@
         payload: {}
     }
 
-    let combinedPayload = {};
     let flowBlocksClone = structuredClone(FlowBlocks);
+    let combinedPayload = {};
     let combinedEnvPayload;
-    let isPayloadRunning = false;
+    let errorMessages = [];
+
+    $: {
+        errorMessages = Object.values($LOGGER.messages).filter(msg => msg.tag.label === '[ERROR]');
+        if (!isPayloadRunning && errorMessages.length > 0) {
+            toast.error('Ocorreu um erro durante a execução dos blocos.');
+            errorMessages = [];
+        }
+    };
     
     const DEV_MODE = $page.url.searchParams.has('dev_mode');
     const DEFAULT_ENV_TEST_PAYLOAD = {
@@ -132,6 +143,7 @@
 
     async function runCombinedPayload () {
         combinedPayload = combineAllPayloads();
+        errorMessages = [];
 
         if (DEFAULT_ENV_TEST_PAYLOAD) { 
             combinedPayload.env = DEFAULT_ENV_TEST_PAYLOAD 
@@ -139,8 +151,13 @@
         };
 
         isPayloadRunning = true;
-        await ServerHandler.sendFlowPayload(combinedPayload);
-        toast.success("Blocos executados.");
+        const fetchError = await ServerHandler.sendFlowPayload(combinedPayload);
+        if (fetchError) { console.log('ERROR', fetchError) };
+
+        if (errorMessages.length === 0) {
+            toast.success("Blocos executados.");
+        }
+
         isPayloadRunning = false;
     }
 </script>
@@ -181,16 +198,23 @@
     </Card.Content>
 
     <Card.Footer class="grid grid-cols-2 gap-y-2 gap-x-2 p-0">
-        <Button variant="outline" class="text-base col-span-1" on:click={openCombinedBlocksDialog}>Carga final</Button>
-        <Button variant="outline" class="text-base col-span-1" on:click={openEnvPanel}>Painel de Variáveis</Button>
+        {#if DEV_MODE}
+            <Button variant="outline" class="text-base col-span-1" on:click={openCombinedBlocksDialog}>Carga final</Button>
+            <Button variant="outline" class="text-base col-span-1" on:click={openEnvPanel}>Painel de Variáveis</Button>
+        {:else}
+            <Button variant="outline" class="text-base col-span-2" on:click={openEnvPanel}>Painel de Variáveis</Button>
+        {/if}
+
         {#if isPayloadRunning}
-            <Button disabled class="text-base col-span-2" on:click={runCombinedPayload}>
+            <Button disabled class="text-base col-span-1" on:click={runCombinedPayload}>
                 <i class="ti ti-loader-2 animate-spin mr-2"></i>
-                Blocos sendo executados
+                Carga final sendo executada
             </Button>
         {:else}
-            <Button class="text-base col-span-2" on:click={runCombinedPayload}>Executar blocos</Button>
+            <Button class="text-base col-span-1" on:click={runCombinedPayload}>Executar carga final</Button>
         {/if}
+
+        <Button disabled={!isPayloadRunning} variant="destructive" class="text-base col-span-1" on:click={() => isStopExecutionOpen = true}>Interromper execução</Button>
     </Card.Footer>
 </Card.Root>
 
@@ -245,3 +269,19 @@
         {/if}
     </Dialog.Content>
 </Dialog.Root>
+
+<AlertDialog.Root bind:open={isStopExecutionOpen}>
+    <AlertDialog.Content>
+        <AlertDialog.Header>
+            <AlertDialog.Title>Você gostaria mesmo de interromper a execução?</AlertDialog.Title>
+            <AlertDialog.Description class="text-base">Todas as operações já executadas não serão revertidas, podendo deixar efeitos colaterais.</AlertDialog.Description>
+        </AlertDialog.Header>
+
+        <AlertDialog.Footer>
+            <AlertDialog.Cancel asChild let:builder>
+                <Button variant="destructive" builders={[builder]} on:click={async () => await ServerHandler.closeBrowser()}>Interromper execução</Button>
+            </AlertDialog.Cancel>
+            <AlertDialog.Action>Continuar a execução</AlertDialog.Action>
+          </AlertDialog.Footer>
+    </AlertDialog.Content>
+</AlertDialog.Root>

@@ -14,7 +14,7 @@
     let changesMade = false;
     let isConfirmAlertDialogOpen = false;
     let isEditEnvJsonPanelOpen = false;
-    
+
     const DEV_MODE = $page.url.searchParams.has('dev_mode');
 
     $: envClone = structuredClone(combinedEnvPayload);
@@ -139,12 +139,12 @@
 </AlertDialog.Root>
 
 <Dialog.Root bind:open={isEditEnvJsonPanelOpen}>
-    <Dialog.Content class="min-w-[45rem]">
+    <Dialog.Content class="min-w-[60rem]">
         <Dialog.Header>
             <Dialog.Title>Edit ENV JSON</Dialog.Title>
         </Dialog.Header>
 
-        <Textarea bind:value={envJsonPayloadValue} class="font-code text-base min-h-[10rem]" placeholder={JSON.stringify({ env: [ '...' ] }, null, 3)} />
+        <Textarea bind:value={envJsonPayloadValue} class="font-code text-base min-h-[10rem] h-[75vh]" placeholder={JSON.stringify({ env: [ '...' ] }, null, 3)} />
 
         <Dialog.Footer>
             <Button variant="outline" on:click={() => isEditEnvJsonPanelOpen = false}>Cancel</Button>
