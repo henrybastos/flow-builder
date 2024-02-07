@@ -1,9 +1,11 @@
 import { EduzzLoginBlock } from "./EduzzLoginBlock";
 import { EduzzCreateMultipleCouponsBlock } from "./EduzzCreateMultipleCouponsBlock";
-import { TestBlock } from "./TestBlock";
+import { MyNutrorCreateModulesAndLessonsBlock } from "./MyNutrorCreateModulesAndLessonsBlock";
+import { GoogleAnalyticsCreatePropertyBlock } from "./GoogleAnalyticsCreatePropertyBlock";
 
 export const FlowBlocks = [
-   TestBlock,
+   MyNutrorCreateModulesAndLessonsBlock,
    EduzzLoginBlock,
-   // EduzzCreateMultipleCouponsBlock
+   EduzzCreateMultipleCouponsBlock,
+   GoogleAnalyticsCreatePropertyBlock
 ];

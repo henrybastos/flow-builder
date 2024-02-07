@@ -1,6 +1,6 @@
-import type { EnvPayload, Payload } from "$lib/types";
+import type { EnvPayloadModel, Payload } from "$lib/types";
 
-const ENV_PAYLOAD: EnvPayload = {
+const ENV_PAYLOAD: EnvPayloadModel = {
    product_id: {
       value: '',
       schema: {
@@ -423,17 +423,18 @@ const PAYLOAD: Payload = {
          }
       ]
    },
-   "config": {
-      "ws_endpoint": "",
-      "close_browser_on_finish": false,
-      "close_browser_on_cancel_request": false
+   config: {
+      ws_endpoint: "",
+      close_browser_on_finish: false,
+      close_browser_on_cancel_request: false,
+      headless: true
    }
 }
 
 export const EduzzCreateMultipleCouponsBlock = {
    title: 'Eduzz - Create Multiple Coupons',
    block_id: '4df6ee4c-f5be-4a65-ba86-3944e670ca2b',
-   description: 'Cria cupons na Eduzz',
+   description: 'Cria cupons na Eduzz.',
    payload:PAYLOAD,
    env_payload: ENV_PAYLOAD
 }

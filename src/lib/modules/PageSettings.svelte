@@ -3,6 +3,7 @@
     import { onMount } from "svelte";
     import Modal from "../components/Modal.svelte";
     import Switch from "../components/Switch.svelte";
+    import Button from "$lib/components/ui/button/button.svelte";
 
     export let showGlobalToast;
     export let wsEndpoint;
@@ -65,10 +66,10 @@
     }
 </script>
 
-<button on:click={openModal} class="btn-md">
-    <i class="ti ti-settings text-blue-500"></i>
-    Settings
-</button>
+<Button variant="secondary" on:click={openModal}>
+    <i class="ti ti-settings text-blue-500 mr-2"></i>
+    Process JSON
+</Button>
 
 <Modal bind:this={pageSettingsModal} title="Settings" bind:showDanger>
     <div class="btn-bar">
