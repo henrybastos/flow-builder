@@ -70,7 +70,7 @@ export class ServerHandler {
 
     static async sendFlowPayload (_payload) {
         try {
-            _payload = JSON.parse(_payload);
+            if (typeof _payload === 'string') { _payload = JSON.parse(_payload); }
         } catch (err) {
             this.logger.logMessage('Invalid JSON as payload.', this.logger_tags.error);
         }

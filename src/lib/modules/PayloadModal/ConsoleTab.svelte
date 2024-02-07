@@ -15,7 +15,7 @@
 
     $: logMessages = () => {
         let logs = Object.entries($LOGGER.messages).reverse();
-        logs.map(log => log.match(/RUNNING/gi))
+        // logs.map(log => log.match(/RUNNING/gi))
     };
     
     // {#if msg.tag.label.match(/RUNNING/gi)}
