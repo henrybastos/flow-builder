@@ -52,7 +52,7 @@ export interface FieldSchema {
 }
 
 export interface EnvPayloadSchema {
-    value: string | Array<string | object>
+    value?: string | Array<string | object>
     template_schema?: object
     schema: InputFieldSchema | FieldSchema
 }
