@@ -5,7 +5,7 @@ import { GoogleAnalyticsCreatePropertyBlock } from "./GoogleAnalyticsCreatePrope
 
 export const FlowBlocks = [
    MyNutrorCreateModulesAndLessonsBlock,
-   EduzzLoginBlock,
-   EduzzCreateMultipleCouponsBlock,
-   GoogleAnalyticsCreatePropertyBlock
+   // EduzzLoginBlock,
+   // EduzzCreateMultipleCouponsBlock,
+   // GoogleAnalyticsCreatePropertyBlock
 ];

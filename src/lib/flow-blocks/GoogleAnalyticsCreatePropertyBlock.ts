@@ -80,35 +80,37 @@ const PAYLOAD: Payload = {
       "email": "kebook.programacao.2@gmail.com",
       "password": "4mYR51pz!",
       "prop_name": "otonsafraide.kebook.com.br/cursos/curso-completo-de-tatuagem-metodo-davinci",
-      "category": "Empregos e educação",
-      "brand_url": "otonsafraide.kebook.com.br/cursos/curso-completo-de-tatuagem-metodo-davinci",
-      "__category_options__": [
-         "Artes e entretenimento",
-         "Automóveis e veículos",
-         "Beleza e fitness",
-         "Livros e literatura",
-         "Comércio e indústria",
-         "Computadores e eletrônicos",
-         "Finanças",
-         "Comidas e bebidas",
-         "Jogos",
-         "Saúde",
-         "Casa e jardim",
-         "Internet e telecomunicações",
-         "Empregos e educação",
-         "Lei e governo",
-         "Notícias",
-         "Comunidades on-line",
-         "Pessoas e sociedade",
-         "Animais de estimação e animais",
-         "Serviços imobiliários",
-         "Referência",
-         "Ciência",
-         "Compras",
-         "Esportes",
-         "Viagens",
-         "Outras atividades comerciais"
-      ]
+      "category": {
+         "value": "Empregos e educação",
+         "__options__": [
+            "Artes e entretenimento",
+            "Automóveis e veículos",
+            "Beleza e fitness",
+            "Livros e literatura",
+            "Comércio e indústria",
+            "Computadores e eletrônicos",
+            "Finanças",
+            "Comidas e bebidas",
+            "Jogos",
+            "Saúde",
+            "Casa e jardim",
+            "Internet e telecomunicações",
+            "Empregos e educação",
+            "Lei e governo",
+            "Notícias",
+            "Comunidades on-line",
+            "Pessoas e sociedade",
+            "Animais de estimação e animais",
+            "Serviços imobiliários",
+            "Referência",
+            "Ciência",
+            "Compras",
+            "Esportes",
+            "Viagens",
+            "Outras atividades comerciais"
+         ]
+      },
+      "brand_url": "otonsafraide.kebook.com.br/cursos/curso-completo-de-tatuagem-metodo-davinci"
    },
    "flows": {
       "main_flow": [
@@ -327,7 +329,7 @@ const PAYLOAD: Payload = {
             "command": "type",
             "enabled": true,
             "target": "//*/input[@debug-id=\"search-input\"]",
-            "value": "%category%"
+            "value": "%category.value%"
          },
          {
             "command": "wait_seconds",

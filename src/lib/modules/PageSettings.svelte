@@ -68,7 +68,7 @@
 
 <Button variant="secondary" on:click={openModal}>
     <i class="ti ti-settings text-blue-500 mr-2"></i>
-    Process JSON
+    Settings
 </Button>
 
 <Modal bind:this={pageSettingsModal} title="Settings" bind:showDanger>
