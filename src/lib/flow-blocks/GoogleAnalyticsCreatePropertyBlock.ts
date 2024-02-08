@@ -33,8 +33,35 @@ const ENV_PAYLOAD: EnvPayloadModel = {
       "schema": {
          "label": "Category",
          "tooltip": "Category tooltip",
-         "placeholder": "Category placeholder",
-         "type": "text"
+         "placeholder": "Selecione uma categoria",
+         "fields_type": "select",
+         "options": [
+            "Artes e entretenimento",
+            "Automóveis e veículos",
+            "Beleza e fitness",
+            "Livros e literatura",
+            "Comércio e indústria",
+            "Computadores e eletrônicos",
+            "Finanças",
+            "Comidas e bebidas",
+            "Jogos",
+            "Saúde",
+            "Casa e jardim",
+            "Internet e telecomunicações",
+            "Empregos e educação",
+            "Lei e governo",
+            "Notícias",
+            "Comunidades on-line",
+            "Pessoas e sociedade",
+            "Animais de estimação e animais",
+            "Serviços imobiliários",
+            "Referência",
+            "Ciência",
+            "Compras",
+            "Esportes",
+            "Viagens",
+            "Outras atividades comerciais"
+         ]
       }
    },
    "brand_url": {
@@ -45,34 +72,7 @@ const ENV_PAYLOAD: EnvPayloadModel = {
          "placeholder": "Brand_url placeholder",
          "type": "text"
       }
-   },
-   "__category_options__": [
-      "Artes e entretenimento",
-      "Automóveis e veículos",
-      "Beleza e fitness",
-      "Livros e literatura",
-      "Comércio e indústria",
-      "Computadores e eletrônicos",
-      "Finanças",
-      "Comidas e bebidas",
-      "Jogos",
-      "Saúde",
-      "Casa e jardim",
-      "Internet e telecomunicações",
-      "Empregos e educação",
-      "Lei e governo",
-      "Notícias",
-      "Comunidades on-line",
-      "Pessoas e sociedade",
-      "Animais de estimação e animais",
-      "Serviços imobiliários",
-      "Referência",
-      "Ciência",
-      "Compras",
-      "Esportes",
-      "Viagens",
-      "Outras atividades comerciais"
-   ]
+   }
 };
 
 const PAYLOAD: Payload = {

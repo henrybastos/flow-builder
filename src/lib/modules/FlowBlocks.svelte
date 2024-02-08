@@ -39,6 +39,7 @@ export const @@block_filename@ = {
                 schemaFields[key] = value;
             } else {
                 const label = [key.charAt(0).toUpperCase(), key.slice(1)].join('');
+                
                 if (typeof value === 'string') {
                     schemaFields[key] = {
                         ...(appendValue && {value: ''}),
@@ -49,9 +50,19 @@ export const @@block_filename@ = {
                         type: 'text'
                         }
                     };
-                } else {
-                    if (Array.isArray(value)) {
-                        schemaFields[key] = {
+                } else if (value?.__options__) {
+                    schemaFields[key] = {
+                        ...(appendValue && {value: value.value}),
+                        schema: {
+                            label: label,
+                            tooltip: `${label} tooltip`,
+                            placeholder: label,
+                            fields_type: 'select',
+                            options: value.__options__
+                        },
+                    };
+                } else if (Array.isArray(value)) {
+                    schemaFields[key] = {
                         template_schema: Object.fromEntries(Object.keys(scanSchema(value, false)).map(key => [key, ''])),
                         schema: {
                             label: label,
@@ -60,11 +71,9 @@ export const @@block_filename@ = {
                             fields: scanSchema(value, false)
                         },
                         ...(appendValue && {value: []}),
-                        };
-                    }
+                    };
                 }
             }
-
         }
 
         return schemaFields;
@@ -84,7 +93,7 @@ export const @@block_filename@ = {
         let schemaFileContent = {};
 
         schemaFileContent.block_name = newBlockName;
-        schemaFileContent.block_filename = `${newBlockName.replace(/[\\/\:\*\?\<\>\|!@#$%¨&\s-]/gi, '')}Block`;
+        schemaFileContent.block_filename = newBlockName ? `${newBlockName.replace(/[\\/\:\*\?\<\>\|!@#$%¨&\s-]/gi, '')}Block` : 'NewBlock';
         schemaFileContent.block_id = crypto.randomUUID();
         schemaFileContent.env_payload = JSON.stringify(scanSchema(parsedEnvPayload.env), null, 3);
         schemaFileContent.payload = JSON.stringify(parsedEnvPayload, null, 3);

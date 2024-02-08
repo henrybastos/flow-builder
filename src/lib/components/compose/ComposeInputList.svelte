@@ -1,9 +1,7 @@
 <script lang="ts">
-    import { createEventDispatcher, onMount } from "svelte";
     import { cn } from "$lib/utils";
+    import * as Tooltip from "$lib/components/ui/tooltip";
     import Button from "$lib/components/ui/button/button.svelte";
-    import type { EnvProps } from "$lib/types";
-    import DraggableList from "../DraggableList.svelte";
 
     export let inputType: 'password' | 'text' | 'number' | 'email' = 'text';
     export let isReadOnly = false;
@@ -14,29 +12,53 @@
     export let changesMade;
     export let canToggleEdit = true;
     
-    // $: externalStorage = structuredClone(items);
-
     let isInputEditable = false;
-    const dispatch = createEventDispatcher();
+    let startHold;
 
     function addItem () {
-        // dispatch('add_item', items);
-        console.log('<<', items, template_schema);
         items = [
             ...(items),
             structuredClone(template_schema)
         ]
         changesMade = true;
     }
+
+    function clearItems () {
+        items = [];
+        changesMade = true;
+    }
+
+    function hold (node) {
+        // Time to hold for to trigger the action
+        const elapsedTime = 2;
+
+        node.addEventListener("mousedown", () => {
+            console.log('Start holding...');
+            
+            startHold = new Date(); // Record the startHold time
+            
+            setTimeout(function(){ 
+                // If there is a start time and its now at least 2 seconds past that...
+                if(startHold && (new Date() > startHold.setSeconds(startHold.getSeconds() + elapsedTime))){
+                    clearItems();
+                    startHold = null;
+                }
+            }, elapsedTime * 1000);
+        });
+
+        node.addEventListener("mouseup", function() {
+            startHold = null; // Cancel the time
+            console.log('End holding.');
+        });
+    }
 </script>
 
 <div class={cn("text-lg", $$restProps.class)}>
     <div class="flex flex-col border border-neutral-800 rounded-md p-3 gap-y-2 mt-1 mb-3 last:mb-0">
-        <!-- <pre>{ JSON.stringify(items, null, 3) }</pre> -->
         <slot {isInputEditable} />
         {#if !isReadOnly}  
             <div class="pb-2 sticky -bottom-1 bg-neutral-950">
-                <div class="grid grid-cols-2 gap-x-2 mt-2">
+                <div class="grid grid-cols-3 gap-x-2 mt-2">
                     <Button class={`${ canToggleEdit ? 'col-span-1' : 'col-span-2' }`} on:click={addItem} size="sm" variant="ghost">
                         <i class="ti ti-plus"></i>
                     </Button>
@@ -50,33 +72,26 @@
                             {/if}
                         </Button>
                     {/if}
+
+                    <!-- Gambiarration T _ T -->
+                    <Tooltip.Root>
+                        <Tooltip.Trigger tabindex={-1} asChild let:builder>
+                            <Button builders={[builder]} class="text-sm col-span-1 overflow-hidden" size="sm" variant="destructive">
+                                {#if startHold}
+                                <button class="w-[200rem] h-[6rem] cursor-wait" use:hold>
+                                        <i class="flex h-fit w-fit mx-auto ti ti-loader-2 animate-spin text-neutral-400"></i>
+                                    </button>
+                                {:else}
+                                    <button class="w-[200rem] h-[6rem] cursor-help" use:hold>Limpar lista</button>
+                                {/if}
+                            </Button>
+                        </Tooltip.Trigger>
+                        <Tooltip.Content>
+                            <p class="text-sm">Clique e segure para remover todos os itens da lista</p>
+                        </Tooltip.Content>
+                    </Tooltip.Root>
                 </div>
             </div>  
         {/if}
     </div>
 </div>
-
-
-<!-- <DraggableList on:change isDraggable={!isInputEditable} bind:itemsList={items.value} let:index class="space-y-3">
-    {#if items.schema.fields_type === 'array'}
-        <div class={`grid grid-cols-[min-content_auto] p-4 border border-neutral-800 rounded-md ${ isInputEditable ? '' : 'cursor-move' }`}>
-            {#each Object.entries(items.schema.fields) as [_item_key, _item_schema]}
-                <ComposeLabel tooltip={_item_schema.tooltip}>{ _item_schema.label }</ComposeLabel>
-                <ComposeInput 
-                    bind:value={items.value[index][_item_key]}
-                    inputType={_item_schema.type} 
-                    placeholder={_item_schema.placeholder} 
-                    on:change={(evt) =>  updateStruct(evt, index, _item_key)}
-                    readonly={!isInputEditable}
-                />
-            {/each}
-            
-        </div>
-    {:else}
-        {#if isInputEditable}
-            <Input bind:value={items.value[index]} on:change={(evt) => updateString(evt, index)} class="text-base mt-1 first:mt-0 placeholder:text-neutral-500" placeholder={items.schema.placeholder} type="text"/>
-        {:else}
-            <Input bind:value={items.value[index]} readonly class="text-base mt-1 first:mt-0 cursor-default placeholder:text-neutral-500" placeholder={items.schema.placeholder} type={inputType}/>
-        {/if}
-    {/if}
-</DraggableList> -->

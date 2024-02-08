@@ -3,10 +3,11 @@
    import LogMessage from "$lib/components/LogMessage.svelte";
    import { LOGGER } from "$lib/LogStore";
    
-   let errorMessages = [];
+   export let errorMessages = [];
    
    export let isPanelOpen = false;
    export let isPayloadRunning;
+   export let toast;
 
    $: {
       errorMessages = Object.values($LOGGER.messages).filter(msg => msg.tag.label === '[ERROR]');

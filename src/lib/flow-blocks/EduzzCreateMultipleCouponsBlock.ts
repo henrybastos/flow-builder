@@ -284,6 +284,11 @@ const PAYLOAD: Payload = {
    "flows": {
       "main_flow": [
          {
+            "command": "goto",
+            "enabled": true,
+            "target": "https://my2.eduzz.com/coupons/"
+         },
+         {
             "command": "click",
             "enabled": true,
             "target": "//*/button/*[text()='Criar cupom']"
@@ -432,7 +437,7 @@ const PAYLOAD: Payload = {
 }
 
 export const EduzzCreateMultipleCouponsBlock = {
-   title: 'Eduzz - Create Multiple Coupons',
+   title: 'Eduzz - Criar múltiplos cupons',
    block_id: '4df6ee4c-f5be-4a65-ba86-3944e670ca2b',
    description: 'Cria cupons na Eduzz.',
    payload:PAYLOAD,
