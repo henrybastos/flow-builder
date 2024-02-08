@@ -142,6 +142,13 @@ export async function POST ({ request }) {
             case 'set_env':
                 Operations.set_env(_operation, _env);
                 break;
+            case 'eval_expression':
+                for (let [key, value] of Object.entries(await Operations[_operation.command](_operation))) {
+                    responsePayload[key] = value;
+                }
+                EnvHandler.setResponsePayload(responsePayload);
+                console.log(responsePayload);
+                break;
             default:
                 if (_operation?.response_slot) {
                     responsePayload[_operation.response_slot] = await Operations[_operation.command](_operation);

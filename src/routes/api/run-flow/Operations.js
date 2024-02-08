@@ -67,6 +67,43 @@ export default class Operations {
     }    
 
     /**
+     * Code extracted from https://stackoverflow.com/questions/52497252/puppeteer-wait-until-page-is-completely-loaded
+     * by Anand Mahajan and Arel
+     * @param {import type { Page } from "puppeteer";} page 
+     * @param {number} timeout 
+     */
+    static async _waitTillHTMLRendered (page, timeout = 30000) {
+        const checkDurationMsecs = 1000;
+        const maxChecks = timeout / checkDurationMsecs;
+        let lastHTMLSize = 0;
+        let checkCounts = 1;
+        let countStableSizeIterations = 0;
+        const minStableSizeIterations = 3;
+      
+        while(checkCounts++ <= maxChecks){
+          let html = await page.content();
+          let currentHTMLSize = html.length; 
+      
+          let bodyHTMLSize = await page.evaluate(() => document.body.innerHTML.length);
+      
+          console.log('last: ', lastHTMLSize, ' <> curr: ', currentHTMLSize, " body html size: ", bodyHTMLSize);
+      
+          if(lastHTMLSize != 0 && currentHTMLSize == lastHTMLSize) 
+            countStableSizeIterations++;
+          else 
+            countStableSizeIterations = 0; //reset the counter
+      
+          if(countStableSizeIterations >= minStableSizeIterations) {
+            console.log("Page rendered fully..");
+            break;
+          }
+      
+          lastHTMLSize = currentHTMLSize;
+          await page.waitForTimeout(checkDurationMsecs);
+        }  
+      }
+
+    /**
      * Sets the page which the operation will work with.
      * @param {import('puppeteer').Page} _page 
      */
@@ -385,11 +422,29 @@ export default class Operations {
 
     static async eval_expression ({ expression }) {
         await this._injectFunctions();
+
+        ServerLogger.logEvent("operation_log", {
+            message: `Waiting for DOM changes...`,
+            status_message: "info"
+        })
+        await this._waitTillHTMLRendered(await this.curr_page, 5000);
+
         ServerLogger.logEvent("operation_log", {
             message: `Evaluating expression: ${ expression }`,
             status_message: "info"
         })
+
+        let expressionReturnValue = await this.curr_page.evaluate(expression);
+
+        ServerLogger.logEvent("operation_log", {
+            message: `Expression return value: ${ expressionReturnValue }`,
+            status_message: "info"
+        })
+
+        console.log('Expression return value:', expressionReturnValue);
+
+        // if (typeof expressionReturnValue === 'object') { expressionReturnValue = JSON.stringify(expressionReturnValue) }
         
-        await this.curr_page.evaluate(expression);
+        return expressionReturnValue || 'Invalid expression return value.';
     }
 }

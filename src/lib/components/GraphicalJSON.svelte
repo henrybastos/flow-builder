@@ -13,7 +13,7 @@
 {#if !isCollapsed}    
     <div transition:slide={{ duration: 400 }} class="gui_object">
         {#each Object.entries(values) as [key, value], index}
-            {#if typeof value === 'string'}
+            {#if typeof value === 'string' || typeof value === 'number'}
                 <span class="gui_object_value">
                     <span class="text-neutral-500 mr-2">{ index }</span>
                     { Array.isArray(values) ? `${ value }` : `${ key } : ${ value }` }
