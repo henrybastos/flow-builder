@@ -6,6 +6,7 @@
     import TooltipText from "$lib/components/compose/TooltipText.svelte";
     import Textarea from "$lib/components/ui/textarea/textarea.svelte";
     import { page } from "$app/stores";
+    import { toast } from "svelte-sonner";
 
     export let isEnvPanelOpen = false;
     export let combinedEnvPayload;
@@ -80,6 +81,7 @@
             console.log(combinedEnvPayload);
             isEditEnvJsonPanelOpen = false;
         } catch (err) {
+            toast.error('Valores inválidos')
             console.error('Unable to parse new Env Payload', envJsonPayloadValue);
         }
     }
@@ -91,8 +93,8 @@
     onOutsideClick={() => closeEnvPanel(changesMade)} 
     bind:open={isEnvPanelOpen}
 >
-    <Dialog.Content class="max-w-[60rem] max-h-[95vh] overflow-y-auto">
-        <Dialog.Header>
+    <Dialog.Content class="max-w-[60rem]">
+        <Dialog.Header class="h-min">
             <Dialog.Title class="text-xl">
                 Painel de variáveis
                 {#if DEV_MODE}
@@ -104,8 +106,8 @@
             <Dialog.Description class="text-base">Todos os valores variáveis utilizados pelos blocos de fluxo</Dialog.Description>
         </Dialog.Header>
 
-        <div class="max-h-[60vh] overflow-y-auto p-1 border-collapse">
-            {#if envClone}
+        <div class="h-[60vh] overflow-y-auto p-1 border-collapse">
+            {#if Object.keys(envClone).length > 0}
                 {#each Object.entries(envClone) as [key, data]}
                     {#if !key.match(/(?<=__).*(?=__)/g)}    
                         <ComposeComponent 
@@ -115,6 +117,10 @@
                         />
                     {/if}
                 {/each}
+            {:else}
+                <p class="text-base w-full text-center text-neutral-500">
+                    Nada pra preencher. Yay! <i class="ti ti-cactus"></i>
+                </p>
             {/if}
         </div>
 

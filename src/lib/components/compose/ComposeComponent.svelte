@@ -2,6 +2,7 @@
    import ComposeInput from "$lib/components/compose/ComposeInput.svelte";
    import ComposeInputList from "$lib/components/compose/ComposeInputList.svelte";
    import ComposeLabel from "$lib/components/compose/ComposeLabel.svelte";
+   import ComposeSelect from "./ComposeSelect.svelte";
    import Button from "$lib/components/ui/button/button.svelte";
 
    import Draggable from "$lib/components/Draggable.svelte";
@@ -84,6 +85,7 @@
       bind:items={value}
       bind:changesMade={changesMade}
       on:change
+      on:clear_items={() => value = []}
       canToggleEdit={false}
    >
       {#if value.length === 0}
@@ -132,6 +134,8 @@
          />
       {/each}
    </div>
+{:else if data?.schema?.fields_type === "select"}
+   <ComposeSelect on:change={({ detail }) => triggerChange(() => data.value = detail.value)} label="Categoria" options={data.schema.options}/>
 {:else}
    <h1>INVALID</h1>
    <pre>{JSON.stringify(data, null, 3)}</pre>

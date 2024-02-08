@@ -6,7 +6,6 @@
    import Button from "$lib/components/ui/button/button.svelte";
    import DraggableList from "$lib/components/DraggableList.svelte";
    import EnvPanel from "./EnvPanel.svelte";
-   import { FlowBlocks } from "$lib/flow-blocks/FlowBlocks";
    import { initStruct } from "$lib/PayloadStore";
    import { ServerHandler } from "$lib/ServerHandler";
    import { toast } from "svelte-sonner";
@@ -22,6 +21,7 @@
    let isAddFlowBlockOpen = false;
    let isLogsPanelOpen = false;
    let isStopExecutionOpen = false;
+   let errorMessages;
 
    let currentFlowBlock = {
       title: "",
@@ -30,11 +30,12 @@
       payload: {},
    };
 
-   let flowBlocksClone = structuredClone(FlowBlocks);
+   let flowBlocksList = [];
    let combinedPayload = {};
-   let combinedEnvPayload;
+   let combinedEnvPayload = {};
 
    const DEV_MODE = $page.url.searchParams.has("dev_mode");
+   const USE_DEFAULT_ENV_TEST_PAYLOAD = false;
    const DEFAULT_ENV_TEST_PAYLOAD = {
       course_home: "https://my.nutror.com/cursos/448082/editar/modulos",
       modules: [
@@ -59,7 +60,7 @@
       let fullPayload = {};
 
       function _combineEnv() {
-         for (let block of flowBlocksClone) {
+         for (let block of flowBlocksList) {
             fullPayload.env = {
                ...fullPayload.env,
                ...block.payload.env,
@@ -70,10 +71,8 @@
       function _combineFlows() {
          fullPayload.flows = {};
 
-         for (let block of flowBlocksClone) {
-            for (let [flow_name, flow_ops] of Object.entries(
-               block.payload.flows,
-            )) {
+         for (let block of flowBlocksList) {
+            for (let [flow_name, flow_ops] of Object.entries(block.payload.flows)) {
                fullPayload.flows = {
                   ...fullPayload.flows,
                   [flow_name]: flow_ops,
@@ -83,7 +82,7 @@
 
          fullPayload.flows.main_flow = [];
 
-         for (let block of flowBlocksClone) {
+         for (let block of flowBlocksList) {
             fullPayload.flows.main_flow = [
                ...fullPayload.flows.main_flow,
                ...block.payload.flows.main_flow,
@@ -106,7 +105,6 @@
    function openCombinedBlocksDialog() {
       combinedPayload = {
          title: "Carga final",
-         block_id: "0a9bd0cd-4535-4271-bc83-705a807c2f1e",
          description:
             "Todos os blocos combinados. Serão executados sequencialmente.",
       };
@@ -118,20 +116,25 @@
             combinedPayload.payload.env[field_name] = field_value.value;
          }
       }
+
       openFlowBlockDialog(combinedPayload);
    }
 
    function openEnvPanel() {
-      for (let block of FlowBlocks) {
-         combinedEnvPayload = {
-            ...combinedEnvPayload,
-            ...block.env_payload,
-         };
+      let loadDefaultValues = Object.keys(combinedEnvPayload).length === 0;
 
-         // Sets all env fields to the default value set on the flow block's payload.
-         for (let [env_field, env_value] of Object.entries(block.payload.env)) {
-            combinedEnvPayload[env_field].value = env_value;
-         }
+      for (let block of flowBlocksList) {
+            combinedEnvPayload = {
+               ...combinedEnvPayload,
+               ...block.env_payload,
+            };
+
+            if (loadDefaultValues) {
+               // Sets all env fields to the default value set on the flow block's payload.
+               for (let [env_field, env_value] of Object.entries(block.payload.env)) {
+                  combinedEnvPayload[env_field].value = env_value;
+               }
+            }
       }
 
       isEnvPanelOpen = true;
@@ -141,7 +144,7 @@
       combinedPayload = combineAllPayloads();
       errorMessages = [];
 
-      if (DEFAULT_ENV_TEST_PAYLOAD) {
+      if (USE_DEFAULT_ENV_TEST_PAYLOAD) {
          combinedPayload.env = DEFAULT_ENV_TEST_PAYLOAD;
          toast.warning("Using DEFAULT_ENV_TEST_PAYLOAD as Env Payload");
       }
@@ -157,6 +160,20 @@
       }
 
       isPayloadRunning = false;
+   }
+
+   function removeFlowBlock (index) {
+      flowBlocksList = flowBlocksList.filter((_,i) => i != index)
+      let newCombinedEnvPayload = {}
+      
+      // Filters what's left in the flowBlocksList, preserving inputed values
+      for (let block of flowBlocksList) {
+         for (let [env, props] of Object.entries(block.env_payload)) {
+            newCombinedEnvPayload[env] = combinedEnvPayload[env]
+         }
+      }
+
+      combinedEnvPayload = newCombinedEnvPayload;
    }
 </script>
 
@@ -175,30 +192,42 @@
       <Card.Header class="p-1 mb-3">
          <Card.Title class="text-2xl text-left flex justify-between">
             Carga combinada
-            {#if DEV_MODE}
-               <Button on:click={() => (isLogsPanelOpen = true)} variant="outline" size="icon">
-                  <i class="ti ti-list-details text-neutral-500"></i>
-               </Button>
-            {/if}
+            <Button on:click={() => (isLogsPanelOpen = true)} variant="outline" size="icon">
+               <i class="ti ti-list-details text-neutral-500"></i>
+            </Button>
          </Card.Title>
          <!-- <Card.Description class="text-base">{ item.description }</Card.Description> -->
       </Card.Header>
 
       <Card.Content class="border border-neutral-800 rounded-lg p-3 mb-3">
+         {#if flowBlocksList.length === 0}
+            <div class="flex flex-col items-center">
+               <i class="ti ti-zoom-question text-neutral-500"></i>
+               <p class="text-neutral-500">Nenhum bloco para executar. Adicione um clicando no botão abaixo.</p>
+            </div>
+         {/if}
          <DraggableList
-            bind:itemsList={flowBlocksClone}
+            bind:itemsList={flowBlocksList}
             let:item
+            let:index
             class="flex flex-col gap-y-3"
          >
             <Card.Root class="rounded-lg">
                <Card.Header class="p-4">
                   <Card.Title class="text-xl text-left flex justify-between">
                      {item.title}
-                     {#if DEV_MODE}
-                        <Button on:click={() => openFlowBlockDialog(item)} variant="outline" size="icon">
-                           <i class="ti ti-code text-neutral-500"></i>
+
+                     <div class="space-x-2">
+                        {#if DEV_MODE}
+                           <Button on:click={() => openFlowBlockDialog(item)} variant="outline" size="icon">
+                              <i class="ti ti-code text-neutral-500"></i>
+                           </Button>
+                        {/if}
+
+                        <Button on:click={() => removeFlowBlock(index)} variant="destructive" size="icon">
+                           <i class="ti ti-x"></i>
                         </Button>
-                     {/if}
+                     </div>
                   </Card.Title>
                   <Card.Description class="text-base"
                      >{item.description}</Card.Description
@@ -217,15 +246,12 @@
       </Card.Content>
 
       <Card.Footer class="grid grid-cols-2 gap-y-2 gap-x-2 p-0">
-         {#if DEV_MODE}
-            <Button variant="outline" class="text-base col-span-1" on:click={openCombinedBlocksDialog}>Carga final</Button
-            >
-            <Button variant="outline" class="text-base col-span-1" on:click={openEnvPanel}>Painel de Variáveis</Button
-            >
-         {:else}
-            <Button variant="outline" class="text-base col-span-2" on:click={openEnvPanel}>Painel de Variáveis</Button
-            >
-         {/if}
+         <Button variant="outline" class="text-base col-span-1" on:click={openCombinedBlocksDialog}>
+            Carga final
+         </Button>
+         <Button disabled={flowBlocksList.length === 0} variant="outline" class="text-base col-span-1" on:click={openEnvPanel}>
+            Painel de Variáveis
+         </Button>
 
          {#if isPayloadRunning}
             <Button class="text-base col-span-1" disabled on:click={runCombinedPayload}>
@@ -233,7 +259,7 @@
                Carga final sendo executada
             </Button>
          {:else}
-            <Button class="text-base col-span-1" on:click={runCombinedPayload}
+            <Button disabled={flowBlocksList.length === 0} class="text-base col-span-1" on:click={runCombinedPayload}
                >Executar carga final</Button
             >
          {/if}
@@ -280,6 +306,6 @@
    bind:flowBlock={currentFlowBlock}
 />
 
-<AddFlowBlockPanel bind:isPanelOpen={isAddFlowBlockOpen} />
+<AddFlowBlockPanel bind:flowBlocksList={flowBlocksList} bind:isPanelOpen={isAddFlowBlockOpen} />
 
-<PayloadLogsPanel bind:isPanelOpen={isLogsPanelOpen} bind:isPayloadRunning />
+<PayloadLogsPanel {toast} bind:errorMessages bind:isPanelOpen={isLogsPanelOpen} bind:isPayloadRunning />
