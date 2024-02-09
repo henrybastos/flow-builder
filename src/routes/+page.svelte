@@ -23,6 +23,7 @@
     import { Button } from '$lib/components/ui/button';
     import { VERSION } from '$lib/store';
     import FlowBlocks from '$lib/modules/FlowBlocks.svelte';
+    import { toast } from 'svelte-sonner';
 
     // import Button from '$lib/components/ui/button/button.svelte';
     // import { toggleMode } from 'mode-watcher';
@@ -126,7 +127,7 @@
         </DropdownMenu.Root>
     
         <div class="inline-flex gap-x-2 items-center">
-            <FlowBlocks />
+            <FlowBlocks {toast} />
 
             <PresetsModal on:preset_loaded={onPresetLoadedHandler} {showGlobalToast}/>
 

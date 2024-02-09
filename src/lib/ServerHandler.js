@@ -57,6 +57,7 @@ export class ServerHandler {
                 case 'system':
                     this.closeBrowserPayload.config.ws_endpoint = sse_event.data.message.match(/(?<=WS Endpoint:\s?).*/gi)[0].trim();
                     console.log('Close browser endpoint found and set', this.closeBrowserPayload.config);
+                    this.logger.logMessage(sse_event.data.message, this.logger_tags[sse_event.data.status_message]);
                     break;
                 default:
                     this.logger.logMessage(sse_event.data.message, this.logger_tags[sse_event.data.status_message]);

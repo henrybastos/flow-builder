@@ -1,12 +1,15 @@
 <script>
     import * as Dialog from "$lib/components/ui/dialog";
     import * as AlertDialog from "$lib/components/ui/alert-dialog";
+    import * as Tabs from "$lib/components/ui/tabs";
     import Button from "$lib/components/ui/button/button.svelte";
     import ComposeComponent from "$lib/components/compose/ComposeComponent.svelte";
     import TooltipText from "$lib/components/compose/TooltipText.svelte";
     import Textarea from "$lib/components/ui/textarea/textarea.svelte";
+    import { ServerHandler } from '$lib/ServerHandler.js';
     import { page } from "$app/stores";
     import { toast } from "svelte-sonner";
+    import { LOGGER, TAGS } from "$lib/LogStore";
 
     export let isEnvPanelOpen = false;
     export let combinedEnvPayload;
@@ -15,11 +18,16 @@
     let changesMade = false;
     let isConfirmAlertDialogOpen = false;
     let isEditEnvJsonPanelOpen = false;
+    let activeTab;
 
     const DEV_MODE = $page.url.searchParams.has('dev_mode');
 
+    ServerHandler.logger = LOGGER;
+    ServerHandler.logger_tags = TAGS;
+
     // $: envClone = cloneEnv(combinedEnvPayload);
     $: envClone = structuredClone(combinedEnvPayload);
+    $: responsePayload = JSON.stringify(JSON.parse(ServerHandler.responsePayload), null ,3);
 
     function cloneEnv (_payload) {
         let clone = structuredClone(_payload);
@@ -97,47 +105,61 @@
         <Dialog.Header class="h-min">
             <Dialog.Title class="text-xl">
                 Painel de variáveis
-                {#if DEV_MODE}
-                    <TooltipText text="Edit ENV JSON">
-                        <Button class="ml-3" on:click={openEditEnvJsonPanel} variant="outline" size="icon"><i class="ti ti-code text-neutral-500"></i></Button>
-                    </TooltipText>
-                {/if}   
+                <TooltipText text="Edit ENV JSON">
+                    <Button class="ml-3" on:click={openEditEnvJsonPanel} variant="outline" size="icon"><i class="ti ti-code text-neutral-500"></i></Button>
+                </TooltipText>
             </Dialog.Title>
             <Dialog.Description class="text-base">Todos os valores variáveis utilizados pelos blocos de fluxo</Dialog.Description>
         </Dialog.Header>
 
-        <div class="h-[60vh] overflow-y-auto p-1 border-collapse">
-            {#if Object.keys(envClone).length > 0}
-                {#each Object.entries(envClone) as [key, data]}
-                    {#if !key.match(/(?<=__).*(?=__)/g)}    
-                        <ComposeComponent 
-                            bind:changesMade={changesMade} 
-                            bind:data={data} 
-                            bind:value={data.value}
-                        />
+        <Tabs.Root value="input_tab" onValueChange={(tab_value) => activeTab = tab_value}>
+            <Tabs.List class="grid grid-cols-2 w-full">
+                <Tabs.Trigger class="col-span-1" value="input_tab">Entrada</Tabs.Trigger>
+                <Tabs.Trigger class="col-span-1" value="output_tab">Saída</Tabs.Trigger>
+            </Tabs.List>
+
+            <Tabs.Content data-active-tab={activeTab} value="input_tab" class="data-[active-tab=input\_tab]:flex flex-col h-[60vh] justify-between">
+                <div class="overflow-y-auto p-1 border-collapse">
+                    {#if Object.keys(envClone).length > 0}
+                        {#each Object.entries(envClone) as [key, data]}
+                            {#if !key.match(/(?<=__).*(?=__)/g)}    
+                                <ComposeComponent 
+                                    bind:changesMade={changesMade} 
+                                    bind:data={data} 
+                                    bind:value={data.value}
+                                />
+                            {/if}
+                        {/each}
+                    {:else}
+                        <p class="text-base w-full text-center text-neutral-500">
+                            Nada pra preencher. Yay! <i class="ti ti-cactus"></i>
+                        </p>
                     {/if}
-                {/each}
-            {:else}
-                <p class="text-base w-full text-center text-neutral-500">
-                    Nada pra preencher. Yay! <i class="ti ti-cactus"></i>
-                </p>
-            {/if}
-        </div>
+                </div>
 
-        <Dialog.Footer class="mt-2">
-            <Button variant="outline" on:click={() => closeEnvPanel(changesMade)}>Cancelar</Button>
+                <div class="flex flex-row-reverse gap-x-2">
+                    <Button variant="outline" on:click={() => closeEnvPanel(changesMade)}>Cancelar</Button>
+                    
+                    <Button disabled={!changesMade} on:click={buildEnv} class="relative">
+                        {#if changesMade}    
+                            <span class="absolute flex h-3 w-3 -top-1 -right-1">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-3 w-3 bg-orange-500"></span>
+                            </span>
+                        {/if}
+                        Salvar dados
+                    </Button>
+                </div>
+            </Tabs.Content>
             
-            <Button disabled={!changesMade} on:click={buildEnv} class="relative">
-                {#if changesMade}    
-                    <span class="absolute flex h-3 w-3 -top-1 -right-1">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-3 w-3 bg-orange-500"></span>
-                    </span>
-                {/if}
-                Salvar dados
-            </Button>
+            <Tabs.Content data-active-tab={activeTab} value="output_tab" class="data-[active-tab=output\_tab]:flex flex-col h-[60vh] justify-between">
+                <Textarea bind:value={responsePayload} class="font-code text-base min-h-[10rem] h-[50vh] resize-none" placeholder="..." />
 
-        </Dialog.Footer>
+                <div class="flex flex-row-reverse gap-x-2">
+                    <Button variant="outline" on:click={() => closeEnvPanel(changesMade)}>Copiar saída</Button>
+                </div>
+            </Tabs.Content>
+        </Tabs.Root>
     </Dialog.Content>
 </Dialog.Root>
 
@@ -161,7 +183,7 @@
             <Dialog.Title>Edit ENV JSON</Dialog.Title>
         </Dialog.Header>
 
-        <Textarea bind:value={envJsonPayloadValue} class="font-code text-base min-h-[10rem] h-[75vh]" placeholder={JSON.stringify({ env: [ '...' ] }, null, 3)} />
+        <Textarea bind:value={envJsonPayloadValue} class="font-code text-base min-h-[10rem] h-[75vh] resize-none" placeholder={JSON.stringify({ env: [ '...' ] }, null, 3)} />
 
         <Dialog.Footer>
             <Button variant="outline" on:click={() => isEditEnvJsonPanelOpen = false}>Cancel</Button>
