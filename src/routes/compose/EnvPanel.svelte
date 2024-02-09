@@ -18,7 +18,7 @@
     let changesMade = false;
     let isConfirmAlertDialogOpen = false;
     let isEditEnvJsonPanelOpen = false;
-    let activeTab;
+    let activeTab = "input_tab";
 
     const DEV_MODE = $page.url.searchParams.has('dev_mode');
 
@@ -93,6 +93,11 @@
             console.error('Unable to parse new Env Payload', envJsonPayloadValue);
         }
     }
+
+    function copyResponsePayloadToClipboard () {
+        window.navigator.clipboard.writeText(responsePayload);
+        toast.success('Saída copiada para a Área de Transferência!');
+    }
 </script>
 
 <Dialog.Root 
@@ -112,7 +117,7 @@
             <Dialog.Description class="text-base">Todos os valores variáveis utilizados pelos blocos de fluxo</Dialog.Description>
         </Dialog.Header>
 
-        <Tabs.Root value="input_tab" onValueChange={(tab_value) => activeTab = tab_value}>
+        <Tabs.Root bind:value={activeTab} onValueChange={(tab_value) => activeTab = tab_value}>
             <Tabs.List class="grid grid-cols-2 w-full">
                 <Tabs.Trigger class="col-span-1" value="input_tab">Entrada</Tabs.Trigger>
                 <Tabs.Trigger class="col-span-1" value="output_tab">Saída</Tabs.Trigger>
@@ -138,8 +143,6 @@
                 </div>
 
                 <div class="flex flex-row-reverse gap-x-2">
-                    <Button variant="outline" on:click={() => closeEnvPanel(changesMade)}>Cancelar</Button>
-                    
                     <Button disabled={!changesMade} on:click={buildEnv} class="relative">
                         {#if changesMade}    
                             <span class="absolute flex h-3 w-3 -top-1 -right-1">
@@ -149,6 +152,8 @@
                         {/if}
                         Salvar dados
                     </Button>
+
+                    <Button variant="outline" on:click={() => closeEnvPanel(changesMade)}>Cancelar</Button>
                 </div>
             </Tabs.Content>
             
@@ -156,7 +161,7 @@
                 <Textarea bind:value={responsePayload} class="font-code text-base min-h-[10rem] h-[50vh] resize-none" placeholder="..." />
 
                 <div class="flex flex-row-reverse gap-x-2">
-                    <Button variant="outline" on:click={() => closeEnvPanel(changesMade)}>Copiar saída</Button>
+                    <Button variant="default" on:click={copyResponsePayloadToClipboard}>Copiar saída</Button>
                 </div>
             </Tabs.Content>
         </Tabs.Root>
