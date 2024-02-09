@@ -9,7 +9,9 @@
     export let isOnDrag = false;
     export let lastIndex;
     export let activeIndex;
+    export let isDraggable = true;
 
+    let draggableElement;
     let lastDraggedOver;
     let draggableDragOverClassList = [
         'outline-neutral-500',
@@ -17,6 +19,8 @@
         'outline-double',
         'outline-2'
     ];
+
+    // $: if (draggableElement) { draggableElement.setAttribute('draggable', isDraggable ? "false" : "true"); };
 
     function draggable (node) {
         // id="card_{cards[index]}:{cards[index + 1]}"
@@ -70,7 +74,7 @@
 <div>
     {#if showFirst} <DraggableSlot class="mb-2" on:dragend on:drop slotIndex={hoverSlotIndex} /> {/if}
 
-    <div use:draggable card-index={cardIndex}> <slot /> </div>
+    <div bind:this={draggableElement} use:draggable card-index={cardIndex}> <slot /> </div>
 
     {#if showLast} <DraggableSlot class="mt-2" on:drop slotIndex={hoverSlotIndex + 1} /> {/if}
 </div>

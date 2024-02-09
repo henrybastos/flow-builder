@@ -23,8 +23,8 @@ const ENV_PAYLOAD: EnvPayloadModel = {
 
 const PAYLOAD: Payload = {
    env: {
-      login_email: '',
-      login_password: ''
+      login_email: 'Onzemotoreseletricos@gmail.com',
+      login_password: 'kEBOOK2023$'
    },
    flows: {
       main_flow: [

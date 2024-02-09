@@ -13,15 +13,23 @@
    import FlowBlockPayloadViewerPanel from "./FlowBlockPayloadViewerPanel.svelte";
    import AddFlowBlockPanel from "./AddFlowBlockPanel.svelte";
    import PayloadLogsPanel from "./PayloadLogsPanel.svelte";
+   import DevSettingsPanel from "./DevSettingsPanel.svelte";
+   import { onMount } from "svelte";
+   import Skeleton from "$lib/components/ui/skeleton/skeleton.svelte";
 
    let isPayloadRunning = false;
+   let isPageLoading = true;
 
    let isFlowBlockPanelOpen = false;
    let isEnvPanelOpen = false;
    let isAddFlowBlockOpen = false;
    let isLogsPanelOpen = false;
    let isStopExecutionOpen = false;
-   let errorMessages;
+   let isDevSettingsPanelOpen = false;
+   let defaultDevSettings = {
+      headless: true
+   }
+   let devSettings = defaultDevSettings;
 
    let currentFlowBlock = {
       title: "",
@@ -102,22 +110,28 @@
       isFlowBlockPanelOpen = true;
    }
 
+   function updateEnvPayload () {
+      if (combinedEnvPayload) {
+         for (let [field_name, field_value] of Object.entries(combinedEnvPayload)) {
+            console.log(combinedPayload, field_value);
+            combinedPayload.env[field_name] = field_value.value;
+         }
+      }
+   }
+
    function openCombinedBlocksDialog() {
-      combinedPayload = {
+      let combinedPayloadCard = {
          title: "Carga final",
          description:
             "Todos os blocos combinados. Serão executados sequencialmente.",
       };
 
-      combinedPayload.payload = combineAllPayloads();
+      combinedPayload = combineAllPayloads();
+      combinedPayloadCard.payload = combinedPayload;
 
-      if (combinedEnvPayload) {
-         for (let [field_name, field_value] of Object.entries(combinedEnvPayload)) {
-            combinedPayload.payload.env[field_name] = field_value.value;
-         }
-      }
+      updateEnvPayload();
 
-      openFlowBlockDialog(combinedPayload);
+      openFlowBlockDialog(combinedPayloadCard);
    }
 
    function openEnvPanel() {
@@ -142,22 +156,20 @@
 
    async function runCombinedPayload() {
       combinedPayload = combineAllPayloads();
-      errorMessages = [];
 
       if (USE_DEFAULT_ENV_TEST_PAYLOAD) {
          combinedPayload.env = DEFAULT_ENV_TEST_PAYLOAD;
          toast.warning("Using DEFAULT_ENV_TEST_PAYLOAD as Env Payload");
       }
 
-      isPayloadRunning = true;
-      const fetchError = await ServerHandler.sendFlowPayload(combinedPayload);
-      if (fetchError) {
-         console.log("ERROR", fetchError);
+      if (DEV_MODE) {
+         combinedPayload.config.headless = devSettings.headless;
       }
 
-      if (errorMessages.length === 0) {
-         toast.success("Blocos executados.");
-      }
+      isPayloadRunning = true;
+      updateEnvPayload();
+      const fetchError = await ServerHandler.sendFlowPayload(combinedPayload);
+      if (fetchError) { console.log("ERROR", fetchError); }
 
       isPayloadRunning = false;
    }
@@ -175,6 +187,10 @@
 
       combinedEnvPayload = newCombinedEnvPayload;
    }
+
+   onMount(() => {
+      isPageLoading = false;
+   });
 </script>
 
 <svelte:head>
@@ -191,84 +207,113 @@
    >
       <Card.Header class="p-1 mb-3">
          <Card.Title class="text-2xl text-left flex justify-between">
-            Carga combinada
-            <Button on:click={() => (isLogsPanelOpen = true)} variant="outline" size="icon">
-               <i class="ti ti-list-details text-neutral-500"></i>
-            </Button>
+            {#if isPageLoading}
+               <div class="flex flex-row w-full justify-between">
+                  <Skeleton class="w-[20rem] rounded h-[2rem]" />
+                  <Skeleton class="w-[2rem] rounded h-[2rem]" />
+               </div>
+            {:else}
+               Carga combinada
+
+               <div class="space-x-1">
+                  <Button on:click={() => (isLogsPanelOpen = true)} variant="outline" size="icon">
+                     <i class="ti ti-list-details text-neutral-500"></i>
+                  </Button>
+                  {#if DEV_MODE}   
+                     <Button on:click={() => (isDevSettingsPanelOpen = true)} variant="outline" size="icon">
+                        <i class="ti ti-settings-code text-neutral-500"></i>
+                     </Button>
+                  {/if}
+               </div>
+            {/if}
          </Card.Title>
          <!-- <Card.Description class="text-base">{ item.description }</Card.Description> -->
       </Card.Header>
 
       <Card.Content class="border border-neutral-800 rounded-lg p-3 mb-3">
-         {#if flowBlocksList.length === 0}
-            <div class="flex flex-col items-center">
-               <i class="ti ti-zoom-question text-neutral-500"></i>
-               <p class="text-neutral-500">Nenhum bloco para executar. Adicione um clicando no botão abaixo.</p>
+         {#if isPageLoading}
+            <div class="flex flex-col w-full space-y-3">
+               <Skeleton class="w-full rounded h-[6rem]" />
+               <Skeleton class="w-full rounded h-[2rem]" />
             </div>
-         {/if}
-         <DraggableList
-            bind:itemsList={flowBlocksList}
-            let:item
-            let:index
-            class="flex flex-col gap-y-3"
-         >
-            <Card.Root class="rounded-lg">
-               <Card.Header class="p-4">
-                  <Card.Title class="text-xl text-left flex justify-between">
-                     {item.title}
+         {:else}
+            {#if flowBlocksList.length === 0}
+               <div class="flex flex-col items-center">
+                  <i class="ti ti-zoom-question text-neutral-500"></i>
+                  <p class="text-neutral-500">Nenhum bloco para executar. Adicione um clicando no botão abaixo.</p>
+               </div>
+            {/if}
+            <DraggableList
+               bind:itemsList={flowBlocksList}
+               let:item
+               let:index
+               class="flex flex-col gap-y-3"
+            >
+               <Card.Root class="rounded-lg">
+                  <Card.Header class="p-4">
+                     <Card.Title class="text-xl text-left flex justify-between">
+                        {item.title}
 
-                     <div class="space-x-2">
-                        {#if DEV_MODE}
-                           <Button on:click={() => openFlowBlockDialog(item)} variant="outline" size="icon">
-                              <i class="ti ti-code text-neutral-500"></i>
+                        <div class="space-x-2">
+                           {#if DEV_MODE}
+                              <Button on:click={() => openFlowBlockDialog(item)} variant="outline" size="icon">
+                                 <i class="ti ti-code text-neutral-500"></i>
+                              </Button>
+                           {/if}
+
+                           <Button on:click={() => removeFlowBlock(index)} variant="destructive" size="icon">
+                              <i class="ti ti-x"></i>
                            </Button>
-                        {/if}
+                        </div>
+                     </Card.Title>
+                     <Card.Description class="text-base"
+                        >{item.description}</Card.Description
+                     >
+                  </Card.Header>
+               </Card.Root>
+            </DraggableList>
 
-                        <Button on:click={() => removeFlowBlock(index)} variant="destructive" size="icon">
-                           <i class="ti ti-x"></i>
-                        </Button>
-                     </div>
-                  </Card.Title>
-                  <Card.Description class="text-base"
-                     >{item.description}</Card.Description
-                  >
-               </Card.Header>
-            </Card.Root>
-         </DraggableList>
-
-         <Button
-            on:click={() => (isAddFlowBlockOpen = true)}
-            class="mt-3 w-full"
-            variant="ghost"
-         >
-            <i class="ti ti-plus"></i>
-         </Button>
+            <Button
+               on:click={() => (isAddFlowBlockOpen = true)}
+               class="mt-3 w-full"
+               variant="ghost"
+            >
+               <i class="ti ti-plus"></i>
+            </Button>
+         {/if}
       </Card.Content>
 
       <Card.Footer class="grid grid-cols-2 gap-y-2 gap-x-2 p-0">
-         <Button variant="outline" class="text-base col-span-1" on:click={openCombinedBlocksDialog}>
-            Carga final
-         </Button>
-         <Button disabled={flowBlocksList.length === 0} variant="outline" class="text-base col-span-1" on:click={openEnvPanel}>
-            Painel de Variáveis
-         </Button>
-
-         {#if isPayloadRunning}
-            <Button class="text-base col-span-1" disabled on:click={runCombinedPayload}>
-               <i class="ti ti-loader-2 animate-spin mr-2"></i>
-               Carga final sendo executada
-            </Button>
+         {#if isPageLoading}
+            <Skeleton class="h-[1.75rem] col-span-1" />
+            <Skeleton class="h-[1.75rem] col-span-1" />
+            <Skeleton class="h-[1.75rem] col-span-1" />
+            <Skeleton class="h-[1.75rem] col-span-1" />
          {:else}
-            <Button disabled={flowBlocksList.length === 0} class="text-base col-span-1" on:click={runCombinedPayload}
-               >Executar carga final</Button
-            >
-         {/if}
+            <Button variant="outline" class="text-base col-span-1" on:click={openCombinedBlocksDialog}>
+               Carga final
+            </Button>
+            <Button disabled={flowBlocksList.length === 0} variant="outline" class="text-base col-span-1" on:click={openEnvPanel}>
+               Painel de Variáveis
+            </Button>
 
-         <Button disabled={!isPayloadRunning} variant="destructive" class="text-base col-span-1"
-            on:click={() => (isStopExecutionOpen = true)}
-         >
-            Interromper execução
-         </Button>
+            {#if isPayloadRunning}
+               <Button class="text-base col-span-1" disabled on:click={runCombinedPayload}>
+                  <i class="ti ti-loader-2 animate-spin mr-2"></i>
+                  Carga final sendo executada
+               </Button>
+            {:else}
+               <Button disabled={flowBlocksList.length === 0} class="text-base col-span-1" on:click={runCombinedPayload}
+                  >Executar carga final</Button
+               >
+            {/if}
+
+            <Button disabled={!isPayloadRunning} variant="destructive" class="text-base col-span-1"
+               on:click={() => (isStopExecutionOpen = true)}
+            >
+               Interromper execução
+            </Button>
+         {/if}
       </Card.Footer>
    </Card.Root>
 </main>
@@ -308,4 +353,6 @@
 
 <AddFlowBlockPanel bind:flowBlocksList={flowBlocksList} bind:isPanelOpen={isAddFlowBlockOpen} />
 
-<PayloadLogsPanel {toast} bind:errorMessages bind:isPanelOpen={isLogsPanelOpen} bind:isPayloadRunning />
+<PayloadLogsPanel {toast} bind:isPanelOpen={isLogsPanelOpen} bind:isPayloadRunning />
+
+<DevSettingsPanel bind:devSettings bind:isPanelOpen={isDevSettingsPanelOpen} {defaultDevSettings} />

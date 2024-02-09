@@ -2,20 +2,59 @@
    import * as Dialog from "$lib/components/ui/dialog";
    import LogMessage from "$lib/components/LogMessage.svelte";
    import { LOGGER } from "$lib/LogStore";
-   
-   export let errorMessages = [];
+   import * as Collapsible from "$lib/components/ui/collapsible";
+    import Button from "$lib/components/ui/button/button.svelte";
    
    export let isPanelOpen = false;
    export let isPayloadRunning;
    export let toast;
+   let logsGroups = [];
+
+   $: triggerToasts(isPayloadRunning);
 
    $: {
-      errorMessages = Object.values($LOGGER.messages).filter(msg => msg.tag.label === '[ERROR]');
-      if (!isPayloadRunning && errorMessages.length > 0) {
-         toast.error('Ocorreu um erro durante a execução dos blocos.');
-         errorMessages = [];
-      }
-   };
+        const loggerMessages = Object.values($LOGGER.messages);
+        const lastMessage = loggerMessages[loggerMessages.length - 1];
+        
+        if (lastMessage) {
+            if (lastMessage.tag.type === 'running') {
+                logsGroups = [ [lastMessage], ...logsGroups ]
+            } else {
+                logsGroups[0] = [
+                    ...logsGroups[0],
+                    lastMessage
+                ];
+            }
+        }
+   }
+
+   function triggerToasts (_isPayloadRunning) {
+        if (!_isPayloadRunning) {
+            for (let messages of logsGroups.slice(-1)) {
+                for (let msg of messages) {
+                    console.log(msg);
+                    switch (msg.tag.type) {
+                        case 'error':
+                            toast.error('Ocorreu um erro durante a execução dos blocos.');
+                            break;
+                        case 'success':
+                            toast.success('Carga executada com sucesso!');
+                            break;
+                        case 'warning':
+                            toast.warning('Um aviso foi adicionado nos logs.');
+                            break;
+                    }
+                }
+            }
+
+            toast.info("Blocos executados.");
+        }
+   }
+
+   function generateLogDownloadPayload (index) {
+        const formattedLogs = logsGroups[index].map(log => `${ log.date } ${ log.time } ${ log.tag.label } ${ log.message }`).join('\n');
+        return `data:text/json;charset=utf-8,${ encodeURIComponent(formattedLogs)}`;
+   }
 </script>
 
 <Dialog.Root bind:open={isPanelOpen}>
@@ -26,11 +65,45 @@
        </Dialog.Header>
 
        <div class="console_screen flex-col-reverse overflow-y-auto overflow-x-clip max-h-[36rem] border">
-           {#each Object.entries($LOGGER.messages).reverse() as [msg_key, msg], _ (msg_key)}
-               <!-- <span class="flex flex-row p-3 bg-blue-500">{ msg.time } • { msg.tag.label } { msg.message }</span> -->
-               <LogMessage data={msg} />
-           {/each}
+            {#if logsGroups.length === 0}
+                <p class="w-full text-neutral-500 text-center">No logs yet</p>
+            {:else}
+                {#each logsGroups as logGroup, index}
+                    <Collapsible.Root class="border border-neutral-700 rounded-md p-2 m-2 group/collapsible">
+                        <Collapsible.Trigger class="flex flex-row w-full justify-between px-1">
+                            <div class="inline-flex space-x-2">
+                                {#if isPayloadRunning && index === 0}
+                                    <i class="ti ti-loader animate-spin"></i>
+                                {/if}
+                                <LogMessage data={logGroup[0]} />
+                            </div>
 
+                            <div class="inline-flex space-x-2">
+                                <p>{ logGroup.length }</p>
+                                <i class="ti ti-chevron-down group-data-[state=open]/collapsible:rotate-180"></i>
+                            </div>
+                        </Collapsible.Trigger>
+
+                        <Collapsible.Content class="p-3 max-w-full overflow-x-auto space-y-1">
+                            {#if isPayloadRunning && index === 0}
+                                <Button disabled variant="ghost">Waiting for execution to end</Button>
+                            {:else}
+                                <Button 
+                                    variant="ghost"
+                                    href={generateLogDownloadPayload(index)} 
+                                    download={`logs_${ new Date().toLocaleTimeString() }_${ new Date().toLocaleDateString() }.json`}
+                                >
+                                    Download logs
+                                </Button>
+                            {/if}
+
+                            {#each logGroup.slice(1) as msg, _ (Math.random().toString().slice(8))}
+                                <LogMessage data={msg} />
+                            {/each}
+                        </Collapsible.Content>
+                    </Collapsible.Root>
+                {/each}
+            {/if}
        </div>
 
        {#if isPayloadRunning}
