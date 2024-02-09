@@ -9,5 +9,5 @@
 </svelte:head>
 
 <ModeWatcher defaultMode="dark" />
-<Toaster />
+<Toaster expand richColors visibleToasts={6}/>
 <slot />

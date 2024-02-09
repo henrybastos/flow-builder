@@ -420,6 +420,10 @@ export default class Operations {
     //     }
     // }
 
+    /**
+     * Evaluate Expression
+     * @returns If an object is returned, it is forward to the Response Payload accordingly.
+     */
     static async eval_expression ({ expression }) {
         await this._injectFunctions();
 
