@@ -3,7 +3,6 @@
     import * as Tooltip from "$lib/components/ui/tooltip";
     import Button from "$lib/components/ui/button/button.svelte";
 
-    export let inputType: 'password' | 'text' | 'number' | 'email' = 'text';
     export let isReadOnly = false;
     export let items: any[];
     export let externalStorage = items;
@@ -12,7 +11,7 @@
     export let changesMade;
     export let canToggleEdit = true;
     
-    let isInputEditable = false;
+    export let isInputEditable = false;
     let startHold;
 
     function addItem () {
@@ -78,7 +77,7 @@
                         <Tooltip.Trigger tabindex={-1} asChild let:builder>
                             <Button builders={[builder]} class="text-sm col-span-1 overflow-hidden" size="sm" variant="destructive">
                                 {#if startHold}
-                                <button class="w-[200rem] h-[6rem] cursor-wait" use:hold>
+                                    <button class="w-[200rem] h-[6rem] cursor-wait" use:hold>
                                         <i class="flex h-fit w-fit mx-auto ti ti-loader-2 animate-spin text-neutral-400"></i>
                                     </button>
                                 {:else}

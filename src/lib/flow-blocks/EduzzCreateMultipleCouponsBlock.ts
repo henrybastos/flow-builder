@@ -40,7 +40,7 @@ const ENV_PAYLOAD: EnvPayloadModel = {
                label: 'Valor do desconto',
                tooltip: 'Ex.: 40',
                placeholder: '40',
-               type: 'number'
+               type: 'text'
             },
             year: {
                label: 'Ano limite',

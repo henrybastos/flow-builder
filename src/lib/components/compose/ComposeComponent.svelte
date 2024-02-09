@@ -10,10 +10,13 @@
    let dragFromIndex: number;
    let dragToIndex: number;
    let isDraggable = true;
-
+   
+   export let isInputEditable = true;
    export let data: any;
    export let value: any;
    export let changesMade: boolean;
+
+   $: isInputReadonly = !isInputEditable
 
    function triggerChange(cb: Function) {
       cb();
@@ -52,6 +55,11 @@
       changesMade = true;
    }
    //===================================================/
+
+   function removeItemFromList (index) {
+      value = value.filter((_,i) => i != index);
+      changesMade = true;
+   }
 </script>
 
 {#if data?.schema?.fields_type === undefined}
@@ -64,6 +72,7 @@
          inputType={data.schema.type}
          placeholder={data.schema.placeholder}
          value={value}
+         bind:readonly={isInputReadonly}
          on:change={(evt) => triggerChange(() => (value = evt.target.value))}
       />
    {:else}
@@ -72,6 +81,7 @@
          inputType={data.type}
          placeholder={data.placeholder}
          bind:value
+         bind:readonly={isInputReadonly}
          on:change
       />
    {/if}
@@ -86,7 +96,8 @@
       bind:changesMade={changesMade}
       on:change
       on:clear_items={() => value = []}
-      canToggleEdit={false}
+      canToggleEdit={true}
+      bind:isInputEditable
    >
       {#if value.length === 0}
          <p class="text-base mx-auto text-neutral-500">
@@ -94,15 +105,7 @@
          </p>
       {:else}
          {#each value as item, index}
-            <Draggable
-               {isOnDrag}
-               on:dragstart={handleDragStart}
-               on:dragend={handleDragEnd}
-               on:drop={handleDrop}
-               activeIndex={dragFromIndex}
-               lastIndex={value.length}
-               cardIndex={index}
-            >
+            {#if isInputEditable}
                <div class={`grid grid-cols-[min-content_auto] p-4 border border-neutral-800 rounded-md`} >
                   {#each Object.keys(item) as item_key}
                      <svelte:self
@@ -112,11 +115,33 @@
                         bind:data={data.schema.fields[item_key]}
                      />
                   {/each}
-                  <Button on:click={() => value = value.filter((v,i) => i != index)} class="col-span-full ml-auto uppercase mt-2 h-7 w-7" variant="destructive" size="icon">
-                     <i class="ti ti-x"></i>
-                  </Button>
                </div>
-            </Draggable>
+            {:else}
+               <Draggable
+                  {isOnDrag}
+                  on:dragstart={handleDragStart}
+                  on:dragend={handleDragEnd}
+                  on:drop={handleDrop}
+                  activeIndex={dragFromIndex}
+                  lastIndex={value.length}
+                  cardIndex={index}
+               >
+                  <div class={`grid grid-cols-[min-content_auto] p-4 border border-neutral-800 rounded-md ${ isInputEditable ? 'cursor-default' : 'cursor-move' }`} >
+                     {#each Object.keys(item) as item_key}
+                        <svelte:self
+                           on:change={(evt) => triggerChange(() => (item[item_key] = evt.target?.value))}
+                           bind:changesMade={changesMade}
+                           bind:value={item[item_key]}
+                           bind:data={data.schema.fields[item_key]}
+                           bind:isInputEditable
+                        />
+                     {/each}
+                     <Button on:click={() => removeItemFromList(index)} class="col-span-full ml-auto uppercase mt-2 h-7 w-7" variant="destructive" size="icon">
+                        <i class="ti ti-x"></i>
+                     </Button>
+                  </div>
+               </Draggable>
+            {/if}
          {/each}
       {/if}
    </ComposeInputList>

@@ -1,7 +1,7 @@
 <script lang="ts">
     import Input from "$lib/components/ui/input/input.svelte";
 
-    export let inputType: 'password' | 'text' | 'number' | 'email' = 'text';
+    export let inputType: 'password' | 'text' | 'email' = 'text';
     export let placeholder: string;
     export let value: string = '';
     export let readonly = false;

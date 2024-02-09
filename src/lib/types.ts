@@ -69,4 +69,4 @@ export interface EnvPayloadModel {
    [key: string]: EnvPayloadSchema
 }
 
-export type InputType = 'text' | 'password' | 'email' | 'number';
+export type InputType = 'text' | 'password' | 'email';
