@@ -6,14 +6,20 @@ export class ServerHandler {
     static isFLowAPILoading = false;
     static responsePayload = JSON.stringify({ response: 'Nothing to display :D' });
     static closeBrowserPayload = {
-        "config": {
-            "ws_endpoint": false,
-            "close_browser_on_finish": false,
-            "close_browser_on_cancel_request": false
+        config: {
+            ws_endpoint: false,
+            close_browser_on_finish: false,
+            close_browser_on_cancel_request: false,
+            headless: true
         },
-        "env": {},
-        "flows": {
-            "main_flow": [{ "command": "close_browser" }]
+        env: {},
+        flows: {
+            main_flow: [
+                {
+                    command: 'close_browser',
+                    enabled: true
+                }
+            ]
         }
     }
 
@@ -48,29 +54,34 @@ export class ServerHandler {
                     // console.dir(this.responsePayload, { depth: null });
                     this.logger.logMessage(sse_event.data.message, this.logger_tags[sse_event.data.status_message]);
                     break;
+                case 'system':
+                    this.closeBrowserPayload.config.ws_endpoint = sse_event.data.message.match(/(?<=WS Endpoint:\s?).*/gi)[0].trim();
+                    console.log('Close browser endpoint found and set', this.closeBrowserPayload.config);
+                    this.logger.logMessage(sse_event.data.message, this.logger_tags[sse_event.data.status_message]);
+                    break;
                 default:
                     this.logger.logMessage(sse_event.data.message, this.logger_tags[sse_event.data.status_message]);
-                break;
+                    break;
             }
         }
     
         await this.loopReader(_reader);
     }
     
-    static async closeBrowserOnCancelRequest () {
-        await fetch('http://localhost:5173/api/run-flow', {
+    static async closeBrowser () {
+        await fetch('/api/run-flow', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify( this.closeBrowserPayload )
         });
-        console.warn('Close!');
+        console.warn('Closing browser...');
     }
 
     static async sendFlowPayload (_payload) {
         try {
-            _payload = JSON.parse(_payload);
+            if (typeof _payload === 'string') { _payload = JSON.parse(_payload); }
         } catch (err) {
             this.logger.logMessage('Invalid JSON as payload.', this.logger_tags.error);
         }
@@ -86,7 +97,7 @@ export class ServerHandler {
                     this.logger_tags.running
                 );
 
-                const response = await fetch('http://localhost:5173/api/run-flow', {
+                const response = await fetch('/api/run-flow', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -115,6 +126,7 @@ export class ServerHandler {
             } catch (err) {
                 console.error(err);
                 this.logger.logMessage('Fetch error. Something went wrong.', this.logger_tags.error);
+                return err;
             }
         } else {
             this.logger.logMessage('Main Flow cannot be empty. Nothing to run.', this.logger_tags.error);

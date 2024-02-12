@@ -24,7 +24,7 @@
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
-<fieldset class={`${ $$restProps?.class || '' }`}> 
+<fieldset class={`nstd ${ $$restProps?.class || '' }`}> 
     {#if isFieldsetCollapsed}
         <span on:click={toggleFieldsetSize} class="font-medium text-lg text-center text-neutral-500 hover:text-neutral-400 cursor-pointer">{ fieldsetCollapsedPlaceholder }</span>
     {/if}
