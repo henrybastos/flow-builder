@@ -1,7 +1,12 @@
 import puppeteer from "puppeteer-extra";
 import pluginStealth from 'puppeteer-extra-plugin-stealth';
 import { EnvHandler } from "$lib/EnvHandler";
+import puppeteer from "puppeteer-extra";
+import pluginStealth from 'puppeteer-extra-plugin-stealth';
+import { EnvHandler } from "$lib/EnvHandler";
 
+import ServerLogger from "./ServerLogger"
+import Operations from "./Operations";
 import ServerLogger from "./ServerLogger"
 import Operations from "./Operations";
 
@@ -17,6 +22,10 @@ import Operations from "./Operations";
  */
 
 const logCommands = false;
+const EXECUTABLE_PATHS = {
+    CHROME: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    OPERA_GX: 'C:/Users/kebook.programacao.2/AppData/Local/Programs/Opera GX/opera.exe'
+}
 const EXECUTABLE_PATHS = {
     CHROME: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
     OPERA_GX: 'C:/Users/kebook.programacao.2/AppData/Local/Programs/Opera GX/opera.exe'
@@ -45,7 +54,27 @@ export async function POST ({ request }) {
         }
     });  
 
+    const stream = new ReadableStream({
+        async start(controller) {
+            ServerLogger._setController(controller);
+            const { browser } = await _startEngine();
+
+            if (!payload.config.ws_endpoint) {
+
+                ServerLogger.logEvent('system', {
+                    message: `WS Endpoint: ${ browser.wsEndpoint() }`,
+                    status_message: 'info'
+                });
+            }
+
+            await _execStream(browser);
+        }
+    });  
+
     async function _startEngine () {
+        // Avoids unwanted detection
+        puppeteer.use(pluginStealth());
+        const browser = await _connectOrLaunchBrowser();
         // Avoids unwanted detection
         puppeteer.use(pluginStealth());
         const browser = await _connectOrLaunchBrowser();
@@ -97,7 +126,28 @@ export async function POST ({ request }) {
             console.log(`Attempting to connect at ${ payload.config.ws_endpoint }...`);
             _browser = await puppeteer.connect({ browserWSEndpoint: payload.config.ws_endpoint });
             console.log(`Browser connected at ${ payload.config.ws_endpoint }`);
+    async function _connectOrLaunchBrowser () {
+        let _browser;
+        const width = 1366;
+        const height = 720;
+
+        if (payload.config.ws_endpoint) {
+            console.log(`Attempting to connect at ${ payload.config.ws_endpoint }...`);
+            _browser = await puppeteer.connect({ browserWSEndpoint: payload.config.ws_endpoint });
+            console.log(`Browser connected at ${ payload.config.ws_endpoint }`);
         } else {
+            _browser = await puppeteer.launch({
+                dumpio: true,
+                headless: false,
+                executablePath: EXECUTABLE_PATHS.CHROME,
+                args: [
+                    `--window-size=${ width },${ height + 200 }`,
+                ]
+            });
+            console.log(`New browser launched: ${ _browser.wsEndpoint() }`);
+        }
+
+        return _browser;
             _browser = await puppeteer.launch({
                 dumpio: true,
                 headless: false,
@@ -117,6 +167,11 @@ export async function POST ({ request }) {
 
         for (const _scoped_env of replacedEnv) {
             await runFlow(payload.flows[flow], _scoped_env);
+    async function _runFlowForEach ({ env_var, flow }, _env) {
+        const replacedEnv = EnvHandler.checkPlaceholders(env_var, _env);
+
+        for (const _scoped_env of replacedEnv) {
+            await runFlow(payload.flows[flow], _scoped_env);
         }
     }
 
@@ -125,11 +180,19 @@ export async function POST ({ request }) {
             return;
         }
         
+        if (!_operation.enabled) {
+            return;
+        }
+        
         if (logCommands) {
             console.log(_operation);
         }
         
+        
         for (const [_input_name, _input_value] of Object.entries(_operation)) {
+            if (EnvHandler.ENV_VARIABLES_INPUT_ALLOWLIST.includes(_input_name)) {
+                _operation[_input_name] = EnvHandler.checkPlaceholders(_input_value, _env);
+            }
             if (EnvHandler.ENV_VARIABLES_INPUT_ALLOWLIST.includes(_input_name)) {
                 _operation[_input_name] = EnvHandler.checkPlaceholders(_input_value, _env);
             }
@@ -139,19 +202,36 @@ export async function POST ({ request }) {
         console.log(`Operation: ${ _operation.command }`);
 
         // Calls the operation
+        
+        Operations._setPayload(payload);
+        console.log(`Operation: ${ _operation.command }`);
+
+        // Calls the operation
         switch (_operation.command) {
             case 'check_element':
+                await runFlow(payload.flows[await Operations.checkElement(_operation)], _env);
                 await runFlow(payload.flows[await Operations.checkElement(_operation)], _env);
                 break;
             case 'run_flow':
                 await runFlow(payload.flows[_operation.flow], _env);
+                await runFlow(payload.flows[_operation.flow], _env);
                 break;
             case 'run_flow_for_each':
+                await _runFlowForEach(_operation, _env)
                 await _runFlowForEach(_operation, _env)
                 break;
             case 'set_env':
                 Operations.set_env(_operation, _env);
+            case 'set_env':
+                Operations.set_env(_operation, _env);
                 break;
+            default:
+                if (_operation?.response_slot) {
+                    responsePayload[_operation.response_slot] = await Operations[_operation.command](_operation);
+                    EnvHandler.setResponsePayload(responsePayload);
+                } else {
+                    await Operations[_operation.command](_operation);
+                }
             default:
                 if (_operation?.response_slot) {
                     responsePayload[_operation.response_slot] = await Operations[_operation.command](_operation);
@@ -171,6 +251,47 @@ export async function POST ({ request }) {
         }
     }
 
+    async function _execStream (browser) {
+        try {  
+            EnvHandler.setGlobalEnv(payload.env);
+            await runFlow(payload.flows.main_flow, payload.env);
+    
+            if (!payload.config.ws_endpoint && payload.config.close_browser_on_finish) {
+                await browser.close();
+            }
+
+            console.log('RESPONSE PAYLOAD', responsePayload);
+            
+            ServerLogger.logEvent('response', {
+                message: 'All operations done.',
+                status_code: 200,
+                status_message: 'success',
+                ws_endpoint: browser.wsEndpoint(),
+                payload: responsePayload
+            });
+
+            ServerLogger.closeStream();
+        } catch (err) {
+            console.log(err);
+
+            ServerLogger.logEvent('error', {
+                message: `${ err.name } :: ${ err.message }`,
+                status_code: 500,
+                status_message: 'error'
+            });
+            
+            ServerLogger.closeStream();
+        }
+    }   
+    
+    return new Response(stream, {
+        headers: {
+            'Cache-Control': 'no-cache',
+            'Content-Type': 'text/event-stream',
+            'Access-Control-Allow-Origin': '*',
+            'Connection': 'keep-alive',
+        }
+    });   
     async function _execStream (browser) {
         try {  
             EnvHandler.setGlobalEnv(payload.env);
