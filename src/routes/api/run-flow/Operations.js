@@ -9,9 +9,17 @@ export default class Operations {
         download_blob: async (filename, link) => {
             // Hoping it resolves CORS problems
             
+<<<<<<< HEAD
             console.log('Fetching url...');
             const response = await fetch(link);
             console.log('Converting to blob...');
+=======
+            let startTime = Date.now();
+
+            console.log(`[${ new Date().toLocaleTimeString() }] Fetching url...`);
+            const response = await fetch(link);
+            console.log(`[${ new Date().toLocaleTimeString() }] Converting to blob...`);
+>>>>>>> dc35e9a7242ae3eafc721c93d775b0582ccfc6fc
             const blobImage = await response.blob();
             const href = URL.createObjectURL(blobImage);
             
@@ -20,13 +28,25 @@ export default class Operations {
             anchor.setAttribute('href', href);
             
             document.querySelector('body').appendChild(anchor);
+<<<<<<< HEAD
             console.log('Downloading...');
             anchor.click();
             console.log('Done');
+=======
+            console.log(`[${ new Date().toLocaleTimeString() }] Downloading...`);
+            anchor.click();
+
+            let elapsedTime = Math.ceil(Date.now() - startTime);
+            let formattedElapsedTime = `${ Math.floor((elapsedTime / 1000) / 60) }m ${ Math.floor((elapsedTime / 1000) % 60) }s ${ Math.floor(elapsedTime % 1000) }ms`
+
+            console.log(`[${ new Date().toLocaleTimeString() }] Done`);
+            console.log(`Elapsed time: ${ formattedElapsedTime }`);
+>>>>>>> dc35e9a7242ae3eafc721c93d775b0582ccfc6fc
         },
         download_yt_video: async (filename) => {
             const ytPayload = JSON.parse(x("//*/script[contains(text(), 'var ytInitialPlayerResponse')]").innerText
                     .replace('var ytInitialPlayerResponse = ', '')
+<<<<<<< HEAD
                     .replace(/;var head.*/, ''))
 
             const [fhd, hd] = ytPayload.streamingData.adaptiveFormats.filter(({ height }) => height == 1080 || height == 720).map(({ url, height, width }) => {
@@ -36,6 +56,21 @@ export default class Operations {
                 }
             });
 
+=======
+                    .replace(/(;$|;var (meta|head).*)/, ''))
+
+            console.log();
+
+            const [hd] = ytPayload.streamingData.formats.filter(({ qualityLabel }) => qualityLabel == '720p').map(({ url, quality, audioQuality, fps }) => {
+                return {
+                    fps,
+                    audioQuality,
+                    quality,
+                    url: decodeURIComponent(url)
+                }
+            });
+            // console.log(hd);
+>>>>>>> dc35e9a7242ae3eafc721c93d775b0582ccfc6fc
             goto(hd.url);
             // await download_blob(filename, fhd.url);
             // return fhd.url;
