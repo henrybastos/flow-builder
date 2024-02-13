@@ -1,4 +1,5 @@
 <script>
+    import * as Collapsible from "$lib/components/ui/collapsible";
     import LogMessage from "$lib/components/LogMessage.svelte";
     import { slide } from "svelte/transition";
     import { LOGGER } from "$lib/LogStore";
@@ -11,6 +12,25 @@
             danger_confirm: 'Clear' 
         });
     }
+
+    $: logMessages = () => {
+        let logs = Object.entries($LOGGER.messages).reverse();
+        // logs.map(log => log.match(/RUNNING/gi))
+    };
+    
+    // {#if msg.tag.label.match(/RUNNING/gi)}
+    //     <Collapsible.Root>
+    //         <Collapsible.Trigger>
+    //             <LogMessage on:clipboard_copy={() => showToast('Copied to clipboard!', 'success')} data={msg} />
+    //         </Collapsible.Trigger>
+    //         <Collapsible.Content>
+    //             <p>Log</p>
+    //             <!-- <svelte:self /> -->
+    //         </Collapsible.Content>
+    //     </Collapsible.Root>
+    // {:else}
+    //     <p>Content</p>
+    // {/if}
 </script>
 
 <section transition:slide={{ duration: 400 }}>

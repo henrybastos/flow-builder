@@ -6,6 +6,7 @@
     import PayloadTab from "./PayloadTab.svelte";
     import ConsoleTab from "./ConsoleTab.svelte";
     import ResponsePayloadTab from "./ResponseTab.svelte";
+    import Button from "$lib/components/ui/button/button.svelte";
 
     export let showGlobalToast;
     export let payloadModalTextearea;
@@ -24,10 +25,10 @@
     }
 </script>
 
-<button on:click={() => payloadModal.open()} class="btn-md">
-    <i class="ti ti-script text-blue-500"></i>
+<Button variant="secondary" on:click={() => payloadModal.open()}>
+    <i class="ti ti-script text-blue-500 mr-2"></i>
     Process JSON
-</button>
+</Button>
 
 <Modal 
     title="Payload" 

@@ -16,10 +16,18 @@
     import AddFlowModal from '$lib/modules/AddFlowModal.svelte';
     import ToastsWrapper from "$lib/components/ToastsWrapper.svelte";
     import UpdateCurrentPresetModal from '$lib/modules/UpdateCurrentPresetModal.svelte';
+    import * as DropdownMenu from '$lib/components/ui/dropdown-menu'
     import Flow from '$lib/modules/Flow.svelte';
     import { CURRENT_PRESET_NAME } from '$lib/PresetsStore';
     import { transformToJSON } from '$lib/utils';
+    import { Button } from '$lib/components/ui/button';
+    import { VERSION } from '$lib/store';
+    import FlowBlocks from '$lib/modules/FlowBlocks.svelte';
+    import { toast } from 'svelte-sonner';
 
+    // import Button from '$lib/components/ui/button/button.svelte';
+    // import { toggleMode } from 'mode-watcher';
+    
     let showGlobalToast;
     let loadedPresetName = '';
     let pageSettingsWSEndpoint;
@@ -64,8 +72,22 @@
         console.log(detail);
     }
 
+    /**
+     * Loads a default payload code to the Code Mirror editor.
+     */
+    function loadDefaultPayload () {
+        console.log('Default payload loaded');
+        payloadModalTextearea = `${ transformToJSON($PAYLOAD) }\n\n\n\n\n\n\n\n\n\n\n\n\n\n`;
+    }
+
+    function loadBlankPayload () {
+        PAYLOAD.loadBlankPayload();
+        payloadModalTextearea = `${ transformToJSON($PAYLOAD) }\n\n\n\n\n\n\n\n\n\n\n\n\n\n`;
+        console.log('Blank payload loaded');
+    }
+    
     function onPayloadModalOpen() {
-        payloadModalTextearea = transformToJSON($PAYLOAD);
+        loadDefaultPayload();
         // codeMirrorValue = transformToJSON($PAYLOAD);
         // codeMirrorValue = 'var 1 = "Hello!;"';
     }
@@ -81,14 +103,32 @@
 
 <svelte:head>
     <title>Flow Builder</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 </svelte:head>
 
 <header class="fixed w-full bg-neutral-900">
     <div class="flex flex-row justify-between items-center py-3 px-4 w-full">
-        <h3>Flow Builder</h3>
+        <!-- <h3>Flow Builder</h3> -->
+        <DropdownMenu.Root>
+            <DropdownMenu.Trigger asChild let:builder>
+                <Button builders={[builder]} variant="ghost" size="icon">
+                    <i class="ti ti-menu-2"></i>
+                </Button>
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Content class="w-[16rem]">
+                <DropdownMenu.Label>Flow Builder</DropdownMenu.Label>
+                <DropdownMenu.Separator />
+                <DropdownMenu.Group>
+                    <DropdownMenu.Item on:click={loadBlankPayload}>
+                        <i class="ti ti-file mr-2"></i>
+                        <span>New flow</span>
+                    </DropdownMenu.Item>
+                </DropdownMenu.Group>
+            </DropdownMenu.Content>
+        </DropdownMenu.Root>
     
-        <div class="inline-flex gap-x-2">
+        <div class="inline-flex gap-x-2 items-center">
+            <FlowBlocks {toast} />
+
             <PresetsModal on:preset_loaded={onPresetLoadedHandler} {showGlobalToast}/>
 
             {#if $CURRENT_PRESET_NAME}
@@ -101,12 +141,11 @@
     
             <PayloadModal on:open={onPayloadModalOpen} bind:payloadModalTextearea={payloadModalTextearea} {showGlobalToast} />
 
-            <!-- <button 
-                class="bg-transparent border-none p-3" 
-                on:click={async () => await FLOW_PRESETS.loadAllPresetsFromLibrary()}
-            >
-                Load all presets
-            </button> -->
+            <!-- <Button on:click={toggleMode} variant="outline" size="icon">
+                <i class="ti ti-moon h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"></i>
+                <i class="ti ti-sun absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100"></i>
+                <span class="sr-only">Toggle theme</span>
+            </Button> -->
         </div>
     </div>
 
@@ -121,23 +160,5 @@
     {/each}
     
     <ToastsWrapper bind:showGlobalToast={showGlobalToast}/>
-    <p class="text-center text-neutral-500 mb-4">Powered by Tailwind, SvelteKit and Puppeteer</p>
+    <p class="text-center text-neutral-500 mb-4">Powered by Tailwind, SvelteKit and Puppeteer • { VERSION }</p>
 </main>
-
-<!-- <style lang="postcss">
-    :global(.cm-editor .cm-line) {
-        @apply bg-neutral-900;
-    }
-    
-    :global(.cm-editor .cm-content) { 
-        @apply font-code bg-neutral-900;
-    }
-
-    :global(.cm-editor .cm-cursorLayer .cm-cursor) { 
-        @apply border-blue-500;
-    }
-
-    :global(.cm-focused .cm-selectionBackground), :global(::selection) { 
-        @apply bg-blue-500;
-    }
-</style> -->

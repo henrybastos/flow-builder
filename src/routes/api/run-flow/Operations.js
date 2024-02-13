@@ -1,25 +1,32 @@
 import ServerLogger from "./ServerLogger"
+import { scrape_attr } from "$lib/operations/scrapeAttribute";
 
 export default class Operations {
     static pages = [];
+    static logger = ServerLogger;
+
+    static scrape_attr = scrape_attr;
+
     static __flow_builder_are_funcs_injected__ = false;
     static __flow_builder_injection_funcs__ = {
         x: (path) => document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue,
+        xxx: (path) => {
+            const nodesSnapshot = document.evaluate(path, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+            let elements = [];
+            for (let i = 0; i < nodesSnapshot.snapshotLength; i++) {
+                elements.push(nodesSnapshot.snapshotItem(i));
+            }
+            return elements;
+        },
         goto: (href) => { window.location.href = href },
         download_blob: async (filename, link) => {
             // Hoping it resolves CORS problems
             
-<<<<<<< HEAD
-            console.log('Fetching url...');
-            const response = await fetch(link);
-            console.log('Converting to blob...');
-=======
             let startTime = Date.now();
 
             console.log(`[${ new Date().toLocaleTimeString() }] Fetching url...`);
             const response = await fetch(link);
             console.log(`[${ new Date().toLocaleTimeString() }] Converting to blob...`);
->>>>>>> dc35e9a7242ae3eafc721c93d775b0582ccfc6fc
             const blobImage = await response.blob();
             const href = URL.createObjectURL(blobImage);
             
@@ -28,11 +35,6 @@ export default class Operations {
             anchor.setAttribute('href', href);
             
             document.querySelector('body').appendChild(anchor);
-<<<<<<< HEAD
-            console.log('Downloading...');
-            anchor.click();
-            console.log('Done');
-=======
             console.log(`[${ new Date().toLocaleTimeString() }] Downloading...`);
             anchor.click();
 
@@ -41,22 +43,10 @@ export default class Operations {
 
             console.log(`[${ new Date().toLocaleTimeString() }] Done`);
             console.log(`Elapsed time: ${ formattedElapsedTime }`);
->>>>>>> dc35e9a7242ae3eafc721c93d775b0582ccfc6fc
         },
         download_yt_video: async (filename) => {
             const ytPayload = JSON.parse(x("//*/script[contains(text(), 'var ytInitialPlayerResponse')]").innerText
                     .replace('var ytInitialPlayerResponse = ', '')
-<<<<<<< HEAD
-                    .replace(/;var head.*/, ''))
-
-            const [fhd, hd] = ytPayload.streamingData.adaptiveFormats.filter(({ height }) => height == 1080 || height == 720).map(({ url, height, width }) => {
-                return {
-                    format: `${width}x${height}`,
-                    url: decodeURIComponent(url)
-                }
-            });
-
-=======
                     .replace(/(;$|;var (meta|head).*)/, ''))
 
             console.log();
@@ -70,12 +60,48 @@ export default class Operations {
                 }
             });
             // console.log(hd);
->>>>>>> dc35e9a7242ae3eafc721c93d775b0582ccfc6fc
             goto(hd.url);
             // await download_blob(filename, fhd.url);
             // return fhd.url;
         }
     }    
+
+    /**
+     * Code extracted from https://stackoverflow.com/questions/52497252/puppeteer-wait-until-page-is-completely-loaded
+     * by Anand Mahajan and Arel
+     * @param {import type { Page } from "puppeteer";} page 
+     * @param {number} timeout 
+     */
+    static async _waitTillHTMLRendered (page, timeout = 30000) {
+        const checkDurationMsecs = 1000;
+        const maxChecks = timeout / checkDurationMsecs;
+        let lastHTMLSize = 0;
+        let checkCounts = 1;
+        let countStableSizeIterations = 0;
+        const minStableSizeIterations = 3;
+      
+        while(checkCounts++ <= maxChecks){
+          let html = await page.content();
+          let currentHTMLSize = html.length; 
+      
+          let bodyHTMLSize = await page.evaluate(() => document.body.innerHTML.length);
+      
+          console.log('last: ', lastHTMLSize, ' <> curr: ', currentHTMLSize, " body html size: ", bodyHTMLSize);
+      
+          if(lastHTMLSize != 0 && currentHTMLSize == lastHTMLSize) 
+            countStableSizeIterations++;
+          else 
+            countStableSizeIterations = 0; //reset the counter
+      
+          if(countStableSizeIterations >= minStableSizeIterations) {
+            console.log("Page rendered fully..");
+            break;
+          }
+      
+          lastHTMLSize = currentHTMLSize;
+          await page.waitForTimeout(checkDurationMsecs);
+        }  
+      }
 
     /**
      * Sets the page which the operation will work with.
@@ -114,12 +140,17 @@ export default class Operations {
         await this.curr_page.goto(target, { waitUntil: 'networkidle0' });
     }
 
-    static async wait_for_selector (_target, timeout = 15000 ) {
-        await this.curr_page.waitForSelector(`xpath/${ _target }`, { timeout });
+    static async wait_for_selector ({ target, timeout = 15000 }) {
+        await this.curr_page.waitForSelector(`xpath/${ target }`, { timeout });
+
+        ServerLogger.logEvent('operation_log', {
+            message: `Waiting for element ${ target } has ended.`,
+            status_message: "info"
+        });
     }
 
     static async getElement (_target) {
-        await this.wait_for_selector(_target, this.payload?.wait_timeout);
+        await this.wait_for_selector({ target: _target, timeout: this.payload?.wait_timeout });
         return await this.curr_page.$$(`xpath/${ _target }`);
     }
 
@@ -165,17 +196,6 @@ export default class Operations {
         return await element.evaluate(dom_el => dom_el.select());
     }
 
-    static async scrape_attr ({ target, attr }) {
-        const [element] = await this.getElement(target);
-
-        ServerLogger.logEvent('operation_log', {
-            message: `Scrapping ${ attr } from ${ target }`,
-            status_message: 'info'
-        });
-
-        return await element.evaluate((dom_el, _attr) => dom_el[_attr], attr);
-    }
-
     static async scrape_multiple_attr ({ target, attr }) {
         const elements = await this.getElement(target);
         let scraped_attributes = [];
@@ -206,8 +226,9 @@ export default class Operations {
 
     // Disabled because of eval
     // eslint-disable-next-line no-unused-vars
-    static async set_env ({ env_var, value }, _env) {
-        eval(`_env.${ env_var } = value`);
+    static async set_env ({ env_query, value }, _env) {
+        eval(`_env.${ env_query } = value`);
+        console.log('ENV', _env);
         return _env;
     }
 
@@ -311,6 +332,8 @@ export default class Operations {
             message: 'Closing browser...',
             status_message: "info"
         });
+        
+        console.log('Closing browser...');
 
         await this.browser.close();
     }
@@ -367,11 +390,23 @@ export default class Operations {
         }, link, filename);
     }
 
-    static async set_iframe_as_page ({ name }) {
-        this.curr_page = await this.curr_page.frames.find(frame => frame.name() === name);
+    static async attach_to_iframe ({ name }) {
+        console.log('FRAMES', this.curr_page.frames());
+        const frame = await this.curr_page.frames().find((frame) => frame.name().match(name) || frame.url().match(name));
 
+        console.log('IFRAME', frame);
+        this.curr_page = frame;
         ServerLogger.logEvent('operation_log', {
-            message: `The PAGE was set to an iframe called ${ name }`,
+            message: `The iFrame ${ frame.url() } was set as the current page.`,
+            status_message: 'info'
+        });
+    }
+
+    static async detach_from_iframe () {
+        console.log('PAGE TYPE', typeof this.curr_page);
+        this.curr_page = this.curr_page.page();
+        ServerLogger.logEvent('operation_log', {
+            message: `The iFrame was detached.`,
             status_message: 'info'
         });
     }
@@ -385,13 +420,35 @@ export default class Operations {
     //     }
     // }
 
+    /**
+     * Evaluate Expression
+     * @returns If an object is returned, it is forward to the Response Payload accordingly.
+     */
     static async eval_expression ({ expression }) {
         await this._injectFunctions();
+
+        ServerLogger.logEvent("operation_log", {
+            message: `Waiting for DOM changes...`,
+            status_message: "info"
+        })
+        await this._waitTillHTMLRendered(await this.curr_page, 5000);
+
         ServerLogger.logEvent("operation_log", {
             message: `Evaluating expression: ${ expression }`,
             status_message: "info"
         })
+
+        let expressionReturnValue = await this.curr_page.evaluate(expression);
+
+        ServerLogger.logEvent("operation_log", {
+            message: `Expression return value: ${ expressionReturnValue }`,
+            status_message: "info"
+        })
+
+        console.log('Expression return value:', expressionReturnValue);
+
+        // if (typeof expressionReturnValue === 'object') { expressionReturnValue = JSON.stringify(expressionReturnValue) }
         
-        await this.curr_page.evaluate(expression);
+        return expressionReturnValue || 'Invalid expression return value.';
     }
 }

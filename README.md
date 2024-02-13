@@ -70,13 +70,15 @@ The `env` object receives all the environment variables. They are used internall
       "puppeteer_website": "https://pptr.dev"
    },
    "flows": {
-      "main_flow": {
-         "goto": {
+      "main_flow": [
+         {
             "command": "goto",
-            "url": "%puppeteer_website%"
+            "enabled": true,
+            "target": "%puppeteer_website%"
          }
-      }
-}
+      ]
+   },
+   "config": "{ ... }"
 }
 ```
 

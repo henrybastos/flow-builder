@@ -1,6 +1,7 @@
 <script>
     import CodeMirror from "svelte-codemirror-editor";
     import { json } from "@codemirror/lang-json";
+    import { onMount } from "svelte";
     export let value;
 
     const codeMirrorStyle = {

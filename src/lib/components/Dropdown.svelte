@@ -19,7 +19,7 @@
 
     /**
      * Closes the dropdown if user clicks anywhere but the Dropdown button.
-     * @param evt Used to identify the element's Kronus Magick Tools Identifier (KMT ID).
+     * @param evt Used to identify the element's Debug ID.
      */
     function handleWindowClick (evt) {
         if (evt.target.getAttribute('data-kmt-id') !== 'dropdown') {

@@ -5,7 +5,8 @@ export const initStruct = {
     config: {
         ws_endpoint: false,
         close_browser_on_finish: false,
-        close_browser_on_cancel_request: false
+        close_browser_on_cancel_request: false,
+        headless: false
     },
     env: {},
     flows: {
@@ -79,6 +80,7 @@ function createPayload () {
                 }
             }
         }),
+        loadBlankPayload: () => set(initStruct),
         loadPayload: (_custom_payload) => set(_custom_payload),
         addFlow: (_flow_name) => update((_payload) => {
             return {
