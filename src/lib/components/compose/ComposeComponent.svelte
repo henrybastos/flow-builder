@@ -160,7 +160,7 @@
       {/each}
    </div>
 {:else if data?.schema?.fields_type === "select"}
-   <ComposeSelect on:change={({ detail }) => triggerChange(() => data.value = detail.value)} label="Categoria" options={data.schema.options}/>
+   <ComposeSelect on:change={({ detail }) => triggerChange(() => data.value = detail.value)} label={data.schema.label} options={data.schema.options}/>
 {:else}
    <h1>INVALID</h1>
    <pre>{JSON.stringify(data, null, 3)}</pre>

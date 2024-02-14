@@ -14,8 +14,6 @@
             block
         ]
 
-        console.log(flowBlocksList);
-
         isPanelOpen = false;
     }
 </script>

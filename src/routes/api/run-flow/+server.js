@@ -79,14 +79,17 @@ export async function POST ({ request }) {
         const width = 1366;
         const height = 720;
 
+        console.log();
+
         if (payload.config.ws_endpoint) {
             console.log(`Attempting to connect at ${ payload.config.ws_endpoint }...`);
             _browser = await puppeteer.connect({ browserWSEndpoint: payload.config.ws_endpoint });
             console.log(`Browser connected at ${ payload.config.ws_endpoint }`);
         } else {
             _browser = await puppeteer.launch({
-                // dumpio: true,
+                dumpio: true,
                 headless: payload.config.headless,
+                ...(import.meta.env.VITE_PUPPETEER_EXECUTABLE_PATH && {executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe'}),
                 args: [
                     `--window-size=${ width },${ height + 200 }`,
                 ]

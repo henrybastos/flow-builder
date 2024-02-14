@@ -18,7 +18,19 @@ async function eval_expression ({ expression }) {
 
     let expressionReturnValue = await this.curr_page.evaluate(expression);
 
-    // if (typeof expressionReturnValue === 'object') { expressionReturnValue = JSON.stringify(expressionReturnValue) }
+    console.log('EVAL RESULT', expressionReturnValue);
+
+    if (typeof expressionReturnValue === 'object') {
+        this.logger.logEvent("operation_log", {
+            message: `Expression result: ${ JSON.stringify(expressionReturnValue) }`,
+            status_message: "info"
+        })
+    } else {
+        this.logger.logEvent("operation_log", {
+            message: `Expression result: ${ expressionReturnValue }`,
+            status_message: "info"
+        })
+    }
     
     return expressionReturnValue || 'Invalid expression return value.';
 }

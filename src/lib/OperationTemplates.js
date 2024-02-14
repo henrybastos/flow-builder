@@ -64,8 +64,8 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = {
             attr: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.attr
         }
     },
-    type: {
-        command: 'type',
+    keyboard_type: {
+        command: 'keyboard_type',
         enabled: true,
         label: 'Type',
         icon: 'ti-keyboard',

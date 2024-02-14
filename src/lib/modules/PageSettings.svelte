@@ -64,6 +64,10 @@
     function preventFromClosingPage () {
         PAYLOAD.setConfig('prevent_from_closing', detail);
     }
+
+    function toggleHeadlessMode ({ detail }) {
+        PAYLOAD.setConfig('headless', detail) 
+    }
 </script>
 
 <Button variant="secondary" on:click={openModal}>
@@ -114,6 +118,11 @@
                 <!-- {#if $PAYLOAD.config.ws_endpoint}
                     <p class="text-neutral-400">User already can't close the browser due to Web Socket usage.</p>
                 {/if} -->
+            </span>
+            
+            <span class="col-start-1 col-end-2 whitespace-nowrap mr-4 my-auto transition-all text-lg">Headless mode</span>
+            <span class="inline-flex gap-x-3">
+                <Switch on:toggle={toggleHeadlessMode} />
             </span>
         </div>
     </div>

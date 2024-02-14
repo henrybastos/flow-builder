@@ -14,8 +14,7 @@ npm dev
 
 To overide the browser used by puppeteer, use the .env file:
 ```env
-PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-PUPPETEER_EXECUTABLE_PATH=path-to-browser/browser.exe
+VITE_PUPPETEER_EXECUTABLE_PATH=path-to-browser/browser.exe
 ```
 
 ### Flow Builder presets
