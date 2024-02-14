@@ -6,6 +6,7 @@ import {
     download_blob, 
     download_yt_video
 } from "$lib/operations/_flowBuilderFuncs";
+
 import scrape_attr from "$lib/operations/scrapeAttribute";
 import goto from "$lib/operations/goto";
 import wait_for_selector from "$lib/operations/waitForSelector";
@@ -102,7 +103,7 @@ export default class Operations {
         
             let bodyHTMLSize = await page.evaluate(() => document.body.innerHTML.length);
         
-            console.log('last: ', lastHTMLSize, ' <> curr: ', currentHTMLSize, " body html size: ", bodyHTMLSize);
+            console.log('[DOM LOADING] last: ', lastHTMLSize, ' <> curr: ', currentHTMLSize, " body html size: ", bodyHTMLSize);
         
             if(lastHTMLSize != 0 && currentHTMLSize == lastHTMLSize) 
             countStableSizeIterations++;
@@ -110,7 +111,7 @@ export default class Operations {
             countStableSizeIterations = 0; //reset the counter
         
             if(countStableSizeIterations >= minStableSizeIterations) {
-            console.log("Page rendered fully..");
+            console.log("[DOM LOADING] Page rendered fully..");
             break;
             }
         
@@ -128,15 +129,14 @@ export default class Operations {
      * @param {{ target: string, success_flow: string, error_flow: string }} operation 
      * @returns The name of the flow (success or error).
      */
-    static async checkElement ({ target, success_flow, error_flow }) {
-        console.log('CHECK.FLOWS', target, success_flow, error_flow);
+    static async check_element ({ target, success_flow, error_flow }) {
         try {
             await this.getElement(target);
-            console.log(`Running flow: ${ success_flow }`);
+            console.log(`Running success flow: ${ success_flow }`);
             return success_flow;
         } catch (err) {
             console.log(err);
-            console.log(`Running flow: ${ error_flow }`);
+            console.log(`Running error flow: ${ error_flow }`);
             return error_flow;
         }
     }

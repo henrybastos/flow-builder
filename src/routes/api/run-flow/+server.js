@@ -17,17 +17,13 @@ import Operations from "./Operations";
  */
 
 const logCommands = false;
-const EXECUTABLE_PATHS = {
-    CHROME: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
-    OPERA_GX: 'C:/Users/kebook.programacao.2/AppData/Local/Programs/Opera GX/opera.exe'
-}
 
 export async function POST ({ request }) {
     const payload = await request.json();
     let responsePayload = {};
     console.dir(('SERVER PAYLOAD', payload), { depth: null });
 
-    console.log('Calling local endpoint: [::1]:5173/api/run-flow');
+    console.log('Calling local endpoint: /api/run-flow');
 
     const stream = new ReadableStream({
         async start(controller) {
@@ -89,9 +85,8 @@ export async function POST ({ request }) {
             console.log(`Browser connected at ${ payload.config.ws_endpoint }`);
         } else {
             _browser = await puppeteer.launch({
-                dumpio: true,
+                // dumpio: true,
                 headless: payload.config.headless,
-                executablePath: EXECUTABLE_PATHS.CHROME,
                 args: [
                     `--window-size=${ width },${ height + 200 }`,
                 ]
@@ -131,7 +126,7 @@ export async function POST ({ request }) {
         // Calls the operation
         switch (_operation.command) {
             case 'check_element':
-                await runFlow(payload.flows[await Operations.checkElement(_operation)], _env);
+                await runFlow(payload.flows[await Operations.check_element(_operation)], _env);
                 break;
             case 'run_flow':
                 await runFlow(payload.flows[_operation.flow], _env);

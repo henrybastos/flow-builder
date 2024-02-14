@@ -10,6 +10,20 @@ pnpm dev
 npm dev
 ```
 
+# Setup
+
+To overide the browser used by puppeteer, use the .env file:
+```env
+PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+PUPPETEER_EXECUTABLE_PATH=path-to-browser/browser.exe
+```
+
+### Flow Builder presets
+The presets loaded into Flow Builder are located at `public/presets`.
+
+### Flow Composer blocks
+The flow blocks loaded into Flow Composer are located at `src/lib/flows-blocks`.
+
 # Payload, Flows and Operations
 
 For the automation to work, the server-side receives a POST request with the following JSON:

@@ -6,7 +6,7 @@
    const dispatch = createEventDispatcher();
 
    export let options;
-   export let placeholder = 'Selecione uma opção';
+   export let placeholder = options[0].label || 'Selecione uma opção';
    export let tooltip = '';
    export let label;
 </script>

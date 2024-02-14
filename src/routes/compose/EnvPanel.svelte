@@ -32,7 +32,6 @@
     function cloneEnv (_payload) {
         let clone = structuredClone(_payload);
         for (let [key, prop] of Object.entries(clone)) {
-            console.log('PROP', prop);
         }
         return clone;
     }
@@ -70,7 +69,6 @@
         if (typeof envJsonPayloadValue === 'string') { envJsonPayloadValue = JSON.parse(envJsonPayloadValue) };
 
         for (let [name, prop] of Object.entries(combinedEnvPayload)) {
-            console.log(envJsonPayloadValue, prop);
             envJsonPayloadValue[name] = prop.value;
         }
 
@@ -86,7 +84,6 @@
             for (let [name, prop] of Object.entries(newEnvPayload)) {
                 combinedEnvPayload[name].value = prop;
             }
-            console.log(combinedEnvPayload);
             isEditEnvJsonPanelOpen = false;
         } catch (err) {
             toast.error('Valores inválidos')

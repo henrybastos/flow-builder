@@ -1,6 +1,7 @@
 <script>
    import { VERSION } from "$lib/store.js";
    import { LOGGER, TAGS } from "$lib/LogStore";
+   import { onMount } from "svelte";
    import * as AlertDialog from "$lib/components/ui/alert-dialog";
    import * as Card from "$lib/components/ui/card";
    import Button from "$lib/components/ui/button/button.svelte";
@@ -14,12 +15,10 @@
    import AddFlowBlockPanel from "./AddFlowBlockPanel.svelte";
    import PayloadLogsPanel from "./PayloadLogsPanel.svelte";
    import DevSettingsPanel from "./DevSettingsPanel.svelte";
-   import { onMount } from "svelte";
    import Skeleton from "$lib/components/ui/skeleton/skeleton.svelte";
 
    let isPayloadRunning = false;
    let isPageLoading = true;
-
    let isFlowBlockPanelOpen = false;
    let isEnvPanelOpen = false;
    let isAddFlowBlockOpen = false;
@@ -113,7 +112,6 @@
    function updateEnvPayload () {
       if (combinedEnvPayload) {
          for (let [field_name, field_value] of Object.entries(combinedEnvPayload)) {
-            console.log(combinedPayload, field_value);
             combinedPayload.env[field_name] = field_value.value;
          }
       }
@@ -166,12 +164,27 @@
          combinedPayload.config.headless = devSettings.headless;
       }
 
-      isPayloadRunning = true;
-      updateEnvPayload();
-      const fetchError = await ServerHandler.sendFlowPayload(combinedPayload);
-      if (fetchError) { console.log("ERROR", fetchError); }
+      const sendPayloadPromise = new Promise(async (resolve, reject) => {
+         updateEnvPayload();
+         const fetchError = await ServerHandler.sendFlowPayload(combinedPayload);
+         
+         if (fetchError) { 
+            console.log("ERROR", fetchError);
+            isPayloadRunning = false;
+            reject(fetchError);
+         }
 
-      isPayloadRunning = false;
+         isPayloadRunning = false;
+         resolve();
+      })
+
+      isPayloadRunning = true;
+
+      toast.promise(sendPayloadPromise, {
+         loading: 'Executando carga...',
+         success: 'Carga executada',
+         error: 'Ocorreu um erro. Cheque os logs.'
+      });
    }
 
    function removeFlowBlock (index) {
@@ -194,17 +207,13 @@
 </script>
 
 <svelte:head>
-   <title>Flow Builder • Compose</title>
+   <title>Flow Composer</title>
 </svelte:head>
 
 <main class="flex flex-col items-center mt-3">
-   <span class="flex text-neutral-500 font-semibold"
-      >Flow Builder // Compose • {VERSION}</span
-   >
+   <span class="flex text-neutral-500 font-semibold">Flow Composer • {VERSION}</span>
 
-   <Card.Root
-      class="flex flex-col p-3 border border-neutral-800 rounded-lg w-[40rem] mt-3"
-   >
+   <Card.Root class="flex flex-col p-3 border border-neutral-800 rounded-lg w-[40rem] mt-3">
       <Card.Header class="p-1 mb-3">
          <Card.Title class="text-2xl text-left flex justify-between">
             {#if isPageLoading}
@@ -216,8 +225,8 @@
                Carga combinada
 
                <div class="space-x-1">
-                  <Button on:click={() => (isLogsPanelOpen = true)} variant="outline" size="icon">
-                     <i class="ti ti-list-details text-neutral-500"></i>
+                  <Button class="text-base" on:click={() => (isLogsPanelOpen = true)} variant="outline">
+                     Logs
                   </Button>
                   {#if DEV_MODE}   
                      <Button on:click={() => (isDevSettingsPanelOpen = true)} variant="outline" size="icon">
@@ -344,15 +353,8 @@
    </AlertDialog.Content>
 </AlertDialog.Root>
 
+<FlowBlockPayloadViewerPanel bind:isPanelOpen={isFlowBlockPanelOpen} bind:flowBlock={currentFlowBlock}/>
 <EnvPanel bind:combinedEnvPayload bind:isEnvPanelOpen />
-
-<FlowBlockPayloadViewerPanel
-   bind:isPanelOpen={isFlowBlockPanelOpen}
-   bind:flowBlock={currentFlowBlock}
-/>
-
 <AddFlowBlockPanel bind:flowBlocksList={flowBlocksList} bind:isPanelOpen={isAddFlowBlockOpen} />
-
 <PayloadLogsPanel {toast} bind:isPanelOpen={isLogsPanelOpen} bind:isPayloadRunning />
-
 <DevSettingsPanel bind:devSettings bind:isPanelOpen={isDevSettingsPanelOpen} {defaultDevSettings} />

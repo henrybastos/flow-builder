@@ -1,8 +1,8 @@
 <script>
    import * as Dialog from "$lib/components/ui/dialog";
+   import * as Collapsible from "$lib/components/ui/collapsible";
    import LogMessage from "$lib/components/LogMessage.svelte";
    import { LOGGER } from "$lib/LogStore";
-   import * as Collapsible from "$lib/components/ui/collapsible";
     import Button from "$lib/components/ui/button/button.svelte";
    
    export let isPanelOpen = false;
@@ -32,13 +32,9 @@
         if (!_isPayloadRunning) {
             for (let messages of logsGroups.slice(-1)) {
                 for (let msg of messages) {
-                    console.log(msg);
                     switch (msg.tag.type) {
                         case 'error':
                             toast.error('Ocorreu um erro durante a execução dos blocos.');
-                            break;
-                        case 'success':
-                            toast.success('Carga executada com sucesso!');
                             break;
                         case 'warning':
                             toast.warning('Um aviso foi adicionado nos logs.');
@@ -86,13 +82,14 @@
 
                         <Collapsible.Content class="p-3 max-w-full overflow-x-auto space-y-1">
                             {#if isPayloadRunning && index === 0}
-                                <Button disabled variant="ghost">Waiting for execution to end</Button>
+                                <Button disabled variant="outline">Waiting for execution to end</Button>
                             {:else}
                                 <Button 
-                                    variant="ghost"
+                                    variant="outline"
                                     href={generateLogDownloadPayload(index)} 
                                     download={`logs_${ new Date().toLocaleTimeString() }_${ new Date().toLocaleDateString() }.json`}
                                 >
+                                    <i class="ti ti-file-download mr-2"></i>
                                     Download logs
                                 </Button>
                             {/if}
