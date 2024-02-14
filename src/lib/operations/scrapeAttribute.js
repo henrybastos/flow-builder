@@ -1,4 +1,4 @@
-export async function scrape_attr ({ target, attr }) {
+async function scrape_attr ({ target, attr }) {
     const [element] = await this.getElement(target);
 
     this.logger.logEvent('operation_log', {
@@ -8,3 +8,5 @@ export async function scrape_attr ({ target, attr }) {
 
     return await element.evaluate((dom_el, _attr) => dom_el[_attr], attr);
 }
+
+export default scrape_attr;
