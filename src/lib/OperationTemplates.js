@@ -272,4 +272,59 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = {
         label: 'Detach from IFrame',
         icon: 'ti-box-padding'
     },
+    new_page: {
+        command: 'new_page',
+        enabled: true,
+        label: 'New page',
+        icon: 'ti-folder-plus',
+        input_fields: {
+            page_id: {
+                type: 'text',
+                label: 'Page (ID)',
+                placeholder: 'Titan Page',
+                value: ''
+            }
+        }
+    },
+    select_page: {
+        command: 'select_page',
+        enabled: true,
+        label: 'Select page',
+        icon: 'ti-folders',
+        input_fields: {
+            page_id: {
+                type: 'text',
+                label: 'Page (ID)',
+                placeholder: 'Titan Page',
+                value: ''
+            }
+        }
+    },
+    wait_for_element: {
+        command: 'wait_for_element',
+        enabled: true,
+        label: 'Wait for element',
+        icon: 'ti-folders',
+        input_fields: {
+            target: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.target,
+            response_slot: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.response_slot,
+            timeout: {
+                type: 'text',
+                label: 'Timeout (ms)',
+                placeholder: '15000',
+                value: ''
+            }
+        }
+    },
+    branch_eval: {
+        command: 'branch_eval',
+        enabled: true,
+        label: 'Branch Evaluate',
+        icon: 'ti-terminal',
+        input_fields: {
+            expression: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.expression,
+            success_flow: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.success_flow,
+            error_flow: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.error_flow          
+        }
+    }
 };

@@ -109,6 +109,9 @@ Nested environment variables can be used through dot notation:
 
 `var1_1` can be accessed through `%var1.var1_1%` (or `%$$env.var1.var1_1%` for the absolute path).
 
+# Flow Builder Wiki
+Access the wiki for more information: [Flow Builder Wiki](https://github.com/henrybastos/flow-builder/wiki)
+
 
 ```bash
 # a cute cat fo u :)
@@ -128,4 +131,3 @@ Nested environment variables can be used through dot notation:
 ⣾⣿⣿⣿⣿⣿⣿⣿⣿⣳⢿⡱⢃⠤⠁⡀⠀⠀⠀⠀⢀⠈⢀⠈⠀⠀⠀⠀⠀⠀
 ⣿⣿⣿⣿⣿⣟⡻⣝⠞⣭⠲⡉⢋⠤⢁⠀⠈⠀⠄⠁⠀⠀⡀⠠⠀     
 ```
-

@@ -31,8 +31,21 @@ async function eval_expression ({ expression }) {
             status_message: "info"
         })
     }
+
+    if (expressionReturnValue?.error) {
+        this.logger.logEvent("operation_log", {
+            message: `[EVAL EXECPTION]: ${ expressionReturnValue.error }`,
+            status_message: "error"
+        })
+
+        return expressionReturnValue.error;
+    }
+
+    if (typeof expressionReturnValue === 'string' || typeof expressionReturnValue === 'number' || typeof expressionReturnValue === 'boolean') { 
+        expressionReturnValue = { [Math.random().toString().slice(3, 12)]: expressionReturnValue }
+    }
     
-    return expressionReturnValue || 'Invalid expression return value.';
+    return expressionReturnValue || { error: 'Invalid expression return value.' };
 }
 
 export default eval_expression;

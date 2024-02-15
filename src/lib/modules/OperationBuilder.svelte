@@ -15,6 +15,8 @@
         }
     })
 
+    const ALLOWED_DROPDOWN_OPERATIONS = ['run_flow', 'run_flow_for_each', 'check_element', 'branch_eval'];
+
     const OPERATION_CONFIG_OPTIONS = [
         {
             name: 'remove',
@@ -86,7 +88,7 @@
                 {:else if field.type === 'dropdown'}
                     <Dropdown 
                         options={ 
-                            ['run_flow', 'run_flow_for_each', 'check_element'].includes(operation.command)
+                            ALLOWED_DROPDOWN_OPERATIONS.includes(operation.command)
                             ? Object.keys($PAYLOAD.flows).map(_flow => ({ value: _flow, label: _flow }))
                             : field.options
                         }

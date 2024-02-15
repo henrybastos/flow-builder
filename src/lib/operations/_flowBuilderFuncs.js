@@ -11,6 +11,32 @@ export const xxx = (path) => {
 
 export const goto = (href) => { window.location.href = href };
 
+export const async_eval = async (maxAttempts = 5, interval = 5000, cb) => {
+    let attempt = 0;
+    
+    const result = await new Promise((resolve) => {
+       const timeInterval = setInterval(() => {
+          attempt++;
+          console.log(`Attempt ${attempt} of ${maxAttempts}`);
+ 
+          const cbResolve = (value) => {
+            clearInterval(timeInterval);
+            resolve(value);
+          }
+
+          if (cb) { cb(cbResolve) }
+ 
+          if (attempt >= maxAttempts) {
+             clearInterval(timeInterval);
+             resolve({ error: 'Max attempts reached.' });
+          }
+       }, interval)
+    });
+ 
+    console.log('[ASYNC EVAL RESULT]', result);
+    return result || 'Empty response from async_eval Promise.'
+ }
+
 export const download_blob = async (filename, link) => {
     // Hoping it resolves CORS problems
     

@@ -13,7 +13,8 @@ export class EnvHandler {
       'time',
       'value',
       'filename',
-      'expression'
+      'expression',
+      'page_id'
    ];
 
    static setGlobalEnv (_env) {

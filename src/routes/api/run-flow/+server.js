@@ -68,7 +68,7 @@ export async function POST ({ request }) {
         //     return false;
         // }, false)`);
 
-        Operations._setPage(page);
+        Operations._setMainPage(page);
         Operations._setBrowser(browser);
 
         return { page, browser };
@@ -131,6 +131,9 @@ export async function POST ({ request }) {
             case 'check_element':
                 await runFlow(payload.flows[await Operations.check_element(_operation)], _env);
                 break;
+            case 'branch_eval':
+                await runFlow(payload.flows[await Operations.branch_eval(_operation)], _env);
+                break;
             case 'run_flow':
                 await runFlow(payload.flows[_operation.flow], _env);
                 break;
@@ -141,7 +144,7 @@ export async function POST ({ request }) {
                 Operations.set_env(_operation, _env);
                 break;
             case 'eval_expression':
-                for (let [key, value] of Object.entries(await Operations[_operation.command](_operation))) {
+                for (let [key, value] of Object.entries(await Operations.eval_expression(_operation))) {
                     responsePayload[key] = value;
                 }
                 EnvHandler.setResponsePayload(responsePayload);

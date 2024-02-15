@@ -33,6 +33,7 @@
     "@lezer/highlight": "^1.2.0",
     "bits-ui": "^0.15.1",
     "clsx": "^2.1.0",
+    "highlight.js": "^11.9.0",
     "lucide-svelte": "^0.314.0",
     "mode-watcher": "^0.1.2",
     "puppeteer": "^21.3.4",

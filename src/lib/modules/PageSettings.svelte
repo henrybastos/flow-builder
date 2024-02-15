@@ -122,7 +122,7 @@
             
             <span class="col-start-1 col-end-2 whitespace-nowrap mr-4 my-auto transition-all text-lg">Headless mode</span>
             <span class="inline-flex gap-x-3">
-                <Switch on:toggle={toggleHeadlessMode} />
+                <Switch checked={$PAYLOAD.config.headless} on:toggle={toggleHeadlessMode} />
             </span>
         </div>
     </div>

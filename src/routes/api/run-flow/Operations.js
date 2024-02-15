@@ -4,7 +4,8 @@ import {
     xxx, 
     goto as goto_fn, 
     download_blob, 
-    download_yt_video
+    download_yt_video,
+    async_eval
 } from "$lib/operations/_flowBuilderFuncs";
 
 import scrape_attr from "$lib/operations/scrapeAttribute";
@@ -32,6 +33,11 @@ import detach_from_iframe from "$lib/operations/detachFromIframe";
 import attach_to_iframe from "$lib/operations/attachToIframe";
 import eval_expression from "$lib/operations/evalExpression";
 import chrome_picker_set_color from "$lib/operations/chromePickerSetColor";
+import new_page from "$lib/operations/newPage";
+import select_page from "$lib/operations/selectPage";
+import wait_for_element from "$lib/operations/waitForElement";
+import check_element from "$lib/operations/checkElement";
+import branch_eval from "$lib/operations/branchEval";
 
 /**
  * Comprise all Flow Builder Operations, like goto, scrape, eval etc.
@@ -42,28 +48,36 @@ import chrome_picker_set_color from "$lib/operations/chromePickerSetColor";
  * - function_name: Actual operation;
  */
 export default class Operations {
+    /** @type {Array<{ page: import('puppeteer').Page; }>} */
     static pages = [];
     static logger = ServerLogger;
 
     // static __flow_builder_are_funcs_injected__ = false;
     static _flowBuilderInjectionFuncs = {
-        x: x,
-        xxx: xxx,
+        x,
+        xxx,
         goto: goto_fn,
-        download_blob: download_blob,
-        download_yt_video: download_yt_video
+        download_blob,
+        download_yt_video,
+        async_eval
     }
 
     /**
      * Sets the page which the operation will work with.
      * @param {import('puppeteer').Page} _page 
      */
-    static _setPage (_page) {
+    static _setMainPage (_page) {
+        /** @type {import('puppeteer').Page} */
         this.curr_page = _page;
-        console.log('SET PAGE');
+        this.pages[0] = {
+            id: 'Main Page',
+            page: _page
+        };
+        console.log('SET MAIN PAGE');
     }
 
     static _setBrowser (_browser) {
+        /** @type {import('puppeteer').Browser} */
         this.browser = _browser;
     }
 
@@ -78,6 +92,12 @@ export default class Operations {
                 console.log('[FUNC INJECTION]: Injecting function', fn_name);
                 // console.log(`[FUNC] ${fn_name} :: const ${ fn_name } = ${ fn_func }`);
                 /** Injects the functions into the page, so it can be used with evaluate */
+                // if (fn_func instanceof (async () => {}).constructor) {
+                //     await this.curr_page.evaluate(`const ${ fn_name } = async ${ fn_func }`);
+                // } else {
+                //     await this.curr_page.evaluate(`const ${ fn_name } = ${ fn_func }`);
+                // }
+
                 await this.curr_page.evaluate(`const ${ fn_name } = ${ fn_func }`);
             }
         }
@@ -118,29 +138,15 @@ export default class Operations {
             lastHTMLSize = currentHTMLSize;
             await page.waitForTimeout(checkDurationMsecs);
         }  
-    };
+    }
 
-    static async getElement (_target) {
-        await this.wait_for_selector({ target: _target, timeout: this.payload?.wait_timeout });
+    static async getElement (_target, _timeout = 15000) {
+        await this.wait_for_selector({ target: _target, timeout: _timeout });
         return await this.curr_page.$$(`xpath/${ _target }`);
     }
 
-    /**
-     * @param {{ target: string, success_flow: string, error_flow: string }} operation 
-     * @returns The name of the flow (success or error).
-     */
-    static async check_element ({ target, success_flow, error_flow }) {
-        try {
-            await this.getElement(target);
-            console.log(`Running success flow: ${ success_flow }`);
-            return success_flow;
-        } catch (err) {
-            console.log(err);
-            console.log(`Running error flow: ${ error_flow }`);
-            return error_flow;
-        }
-    }
-
+    
+    static check_element = check_element;
     static goto = goto;
     static scrape_attr = scrape_attr;
     static wait_for_selector = wait_for_selector;
@@ -163,7 +169,11 @@ export default class Operations {
     static extract_param_from_url = extract_param_from_url;
     static extract_route_from_url = extract_route_from_url;
     static download_image = download_image;
+    static eval_expression = eval_expression;
     static attach_to_iframe = attach_to_iframe;
     static detach_from_iframe = detach_from_iframe;
-    static eval_expression = eval_expression;
+    static new_page = new_page;
+    static select_page = select_page;
+    static wait_for_element = wait_for_element;
+    static branch_eval = branch_eval;
 }
