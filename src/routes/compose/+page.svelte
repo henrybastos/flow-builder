@@ -133,20 +133,29 @@
    }
 
    function openEnvPanel() {
+      console.log(flowBlocksList);
       let loadDefaultValues = Object.keys(combinedEnvPayload).length === 0;
 
       for (let block of flowBlocksList) {
+         let hasEnvPayload = Object.keys(block.env_payload).length > 0;
+
+         if (hasEnvPayload) {
             combinedEnvPayload = {
                ...combinedEnvPayload,
                ...block.env_payload,
             };
-
-            if (loadDefaultValues) {
+   
+            if (loadDefaultValues && combinedEnvPayload) {
                // Sets all env fields to the default value set on the flow block's payload.
                for (let [env_field, env_value] of Object.entries(block.payload.env)) {
-                  combinedEnvPayload[env_field].value = env_value;
+                  // Ignores private env vars that starts with a _
+                  // e.g.: _admin_password
+                  if (!env_field.match(/^_.*/g)) {
+                     combinedEnvPayload[env_field].value = env_value;
+                  }
                }
             }
+         }
       }
 
       isEnvPanelOpen = true;
@@ -163,6 +172,8 @@
       if (DEV_MODE) {
          combinedPayload.config.headless = devSettings.headless;
       }
+
+      combinedPayload.config.close_browser_on_finish = true;
 
       const sendPayloadPromise = new Promise(async (resolve, reject) => {
          updateEnvPayload();

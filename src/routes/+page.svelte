@@ -22,7 +22,7 @@
     import { transformToJSON } from '$lib/utils';
     import { Button } from '$lib/components/ui/button';
     import { VERSION } from '$lib/store';
-    import FlowBlocks from '$lib/modules/FlowBlocks.svelte';
+    import GenSchema from '$lib/modules/GenSchema.svelte';
     import { toast } from 'svelte-sonner';
 
     // import Button from '$lib/components/ui/button/button.svelte';
@@ -127,7 +127,7 @@
         </DropdownMenu.Root>
     
         <div class="inline-flex gap-x-2 items-center">
-            <FlowBlocks {toast} />
+            <GenSchema {toast} />
 
             <PresetsModal on:preset_loaded={onPresetLoadedHandler} {showGlobalToast}/>
 

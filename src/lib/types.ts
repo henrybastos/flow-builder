@@ -23,6 +23,7 @@ export interface Operation {
    response_slot?: string
    env_var?: string
    input_fields?: InputFields
+   page_id?: string
 }
 
 export interface InputFields {

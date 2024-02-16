@@ -138,7 +138,7 @@
 
     <div class="btn-bar">
         {#if ServerHandler.isFLowAPILoading}
-            <button disabled={ServerHandler.isRequestCanceled} on:click={() => ServerHandler.isRequestCanceled = true} class="btn-md w-full mt-4">
+            <button disabled={ServerHandler.isRequestCanceled} on:click={async () => await ServerHandler.closeBrowser()} class="btn-md w-full mt-4">
                 <span class="w-full inline-flex justify-center">
                     {#if ServerHandler.isRequestCanceled}
                         <i class="ti ti-loader-2 text-neutral-400 animate-spin-icon mr-2"></i>

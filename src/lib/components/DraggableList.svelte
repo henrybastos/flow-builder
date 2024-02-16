@@ -30,7 +30,7 @@
         }
 
         itemsList.splice(itemsList.indexOf(itemsList.find(item => item.__draggable_item_to_delete__)), 1);
-        dispatch('change');
+        dispatch('drop', detail);
     }
 </script>
 

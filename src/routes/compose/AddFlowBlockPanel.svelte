@@ -3,10 +3,16 @@
     import * as Card from "$lib/components/ui/card";
     import { FlowBlocks } from "$lib/flow-blocks/FlowBlocks";
     import Button from "$lib/components/ui/button/button.svelte";
+    import Badge from "$lib/components/ui/badge/badge.svelte";
 
     export let isPanelOpen = false;
     export let flowBlocksList;
     // export let openFlowBlockDialog;
+
+    const tags_color = {
+        kiwify: 'bg-emerald-500',
+        eduzz: 'bg-amber-500'
+    }
 
     function addBlock (block) {
         flowBlocksList = [
@@ -30,7 +36,15 @@
                 <Card.Root class="rounded-lg">
                     <Card.Header class="p-4">
                         <Card.Title class="text-xl text-left flex justify-between">
-                            {block.title}
+                            <div class="space-x-2">
+                                <h3 class="inline-flex">{block.title}</h3>
+    
+                                {#if block.tags}
+                                    {#each block.tags as tag}
+                                        <Badge class="{ tags_color[tag] } uppercase font-bold">{ tag }</Badge>
+                                    {/each}
+                                {/if}
+                            </div>
     
                             <div class="space-x-2">
         

@@ -69,6 +69,7 @@ export class ServerHandler {
     }
     
     static async closeBrowser () {
+        this.isRequestCanceled = true;
         await fetch('/api/run-flow', {
             method: 'POST',
             headers: {
@@ -90,8 +91,10 @@ export class ServerHandler {
             this.isFLowAPILoading = true;
             this.isRequestCanceled = false;
             
+            let startTime = Date.now();
+            let fetchError;
+
             try {
-                let startTime = Date.now();
                 this.logger.logMessage(
                     `${ this.currentPresetName ? `[PRESET # ${ this.currentPresetName }] ` : '' } Calling API...`, 
                     this.logger_tags.running
@@ -114,24 +117,25 @@ export class ServerHandler {
                 // if ($PAYLOAD.config.close_browser_on_cancel_request) {
                 //     await closeBrowserOnCancelRequest();
                 // }
-    
-                if (this.isRequestCanceled === true) {
-                    this.logger.logMessage('Request canceled by the user.', this.logger_tags.warning);
-                } else {
-                    this.logger.logMessage('Finished', this.logger_tags.info);
-                }
-                let elapsedTime = Math.ceil(Date.now() - startTime);
-                let formattedElapsedTime = `${ Math.floor((elapsedTime / 1000) / 60) }m ${ Math.floor((elapsedTime / 1000) % 60) }s ${ Math.floor(elapsedTime % 1000) }ms`
-                this.logger.logMessage(`${ formattedElapsedTime }`, this.logger_tags.timer);
             } catch (err) {
                 console.error(err);
                 this.logger.logMessage('Fetch error. Something went wrong.', this.logger_tags.error);
-                return err;
+                // fetchError = err;
             }
+
+            if (this.isRequestCanceled === true) {
+                this.logger.logMessage('Request canceled by the user.', this.logger_tags.warning);
+            } else {
+                this.logger.logMessage('Finished', this.logger_tags.info);
+            }
+            let elapsedTime = Math.ceil(Date.now() - startTime);
+            let formattedElapsedTime = `${ Math.floor((elapsedTime / 1000) / 60) }m ${ Math.floor((elapsedTime / 1000) % 60) }s ${ Math.floor(elapsedTime % 1000) }ms`
+            this.logger.logMessage(`${ formattedElapsedTime }`, this.logger_tags.timer);
         } else {
             this.logger.logMessage('Main Flow cannot be empty. Nothing to run.', this.logger_tags.error);
         }
     
+        this.isRequestCanceled === false;
         this.isFLowAPILoading = false;
     }
 }

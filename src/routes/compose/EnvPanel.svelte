@@ -25,7 +25,6 @@
     ServerHandler.logger = LOGGER;
     ServerHandler.logger_tags = TAGS;
 
-    // $: envClone = cloneEnv(combinedEnvPayload);
     $: envClone = structuredClone(combinedEnvPayload);
     $: responsePayload = JSON.stringify(JSON.parse(ServerHandler.responsePayload), null ,3);
 
@@ -124,7 +123,7 @@
                 <div class="overflow-y-auto p-1 border-collapse">
                     {#if Object.keys(envClone).length > 0}
                         {#each Object.entries(envClone) as [key, data]}
-                            {#if !key.match(/(?<=__).*(?=__)/g)}    
+                            {#if !key.match(/^_.*/g)}    
                                 <ComposeComponent 
                                     bind:changesMade={changesMade} 
                                     bind:data={data} 
