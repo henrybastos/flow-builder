@@ -13,28 +13,33 @@ export const goto = (href) => { window.location.href = href };
 
 export const async_eval = async (maxAttempts = 5, interval = 5000, cb) => {
     let attempt = 0;
-    
-    const result = await new Promise((resolve) => {
-       const timeInterval = setInterval(() => {
-          attempt++;
-          console.log(`Attempt ${attempt} of ${maxAttempts}`);
- 
-          const cbResolve = (value) => {
-            clearInterval(timeInterval);
-            resolve(value);
-          }
+    let evalReturnValue = 'No response from async_eval Promise.';
 
-          if (cb) { cb(cbResolve) }
+    if (cb) { 
+        evalReturnValue = await new Promise((resolve) => {
+           const timeInterval = setInterval(() => {
+              attempt++;
+              console.log(`Attempt ${attempt} of ${maxAttempts}`);
+     
+              const cbResolve = (value) => {
+                clearInterval(timeInterval);
+                resolve(value);
+              }
+
+              const cbError = cb(cbResolve);
+     
+              if (attempt >= maxAttempts) {
+                 clearInterval(timeInterval);
+                 resolve({ error: `Max attempts reached. ${ cbError || '' }` });
+              }
+           }, interval)
+        });
+    } else {
+        evalReturnValue = 'No callback function found to execute on the async_eval function.'
+    }
  
-          if (attempt >= maxAttempts) {
-             clearInterval(timeInterval);
-             resolve({ error: 'Max attempts reached.' });
-          }
-       }, interval)
-    });
- 
-    console.log('[ASYNC EVAL RESULT]', result);
-    return result || 'Empty response from async_eval Promise.'
+    console.log('[ASYNC EVAL RESULT]', evalReturnValue);
+    return evalReturnValue;
  }
 
 export const download_blob = async (filename, link) => {
@@ -63,23 +68,23 @@ export const download_blob = async (filename, link) => {
     console.log(`Elapsed time: ${ formattedElapsedTime }`);
 }
 
-export const download_yt_video = async (filename) => {
-    const ytPayload = JSON.parse(x("//*/script[contains(text(), 'var ytInitialPlayerResponse')]").innerText
-            .replace('var ytInitialPlayerResponse = ', '')
-            .replace(/(;$|;var (meta|head).*)/, ''))
+// export const download_yt_video = async (filename) => {
+//     const ytPayload = JSON.parse(x("//*/script[contains(text(), 'var ytInitialPlayerResponse')]").innerText
+//             .replace('var ytInitialPlayerResponse = ', '')
+//             .replace(/(;$|;var (meta|head).*)/, ''))
 
-    console.log();
+//     console.log();
 
-    const [hd] = ytPayload.streamingData.formats.filter(({ qualityLabel }) => qualityLabel == '720p').map(({ url, quality, audioQuality, fps }) => {
-        return {
-            fps,
-            audioQuality,
-            quality,
-            url: decodeURIComponent(url)
-        }
-    });
-    // console.log(hd);
-    goto(hd.url);
-    // await download_blob(filename, fhd.url);
-    // return fhd.url;
-}
+//     const [hd] = ytPayload.streamingData.formats.filter(({ qualityLabel }) => qualityLabel == '720p').map(({ url, quality, audioQuality, fps }) => {
+//         return {
+//             fps,
+//             audioQuality,
+//             quality,
+//             url: decodeURIComponent(url)
+//         }
+//     });
+//     console.log(hd);
+//     goto(hd.url);
+//     await download_blob(filename, fhd.url);
+//     return fhd.url;
+// }

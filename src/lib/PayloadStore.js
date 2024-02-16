@@ -8,7 +8,11 @@ export const initStruct = {
         close_browser_on_cancel_request: false,
         headless: false
     },
-    env: {},
+    env: {
+        pages: {
+            main_page: 'main_page'
+        }
+    },
     flows: {
         main_flow: {}
     }

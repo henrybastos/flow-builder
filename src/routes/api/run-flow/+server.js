@@ -144,11 +144,11 @@ export async function POST ({ request }) {
                 Operations.set_env(_operation, _env);
                 break;
             case 'eval_expression':
-                for (let [key, value] of Object.entries(await Operations.eval_expression(_operation))) {
+                for (let [key, value] of Object.entries(await Operations.eval_expression(_operation) || {})) {
                     responsePayload[key] = value;
                 }
+
                 EnvHandler.setResponsePayload(responsePayload);
-                console.log(responsePayload);
                 break;
             default:
                 if (_operation?.response_slot) {

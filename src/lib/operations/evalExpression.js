@@ -20,32 +20,46 @@ async function eval_expression ({ expression }) {
 
     console.log('EVAL RESULT', expressionReturnValue);
 
-    if (typeof expressionReturnValue === 'object') {
+    if (expressionReturnValue) {
+        if (expressionReturnValue?._expose_key) {
+            // Filters out the _expose_key
+            const filteredObject = Object.fromEntries(
+                Object.entries(structuredClone(expressionReturnValue)).filter(([ key, value ]) => key !== '_expose_key' && { [key]: value })
+            );
+
+            // Adding the _expose_key object, exposes the expressionReturnValue to the browser to be used with eval_expression;
+            const exposeEvalExpression = `const ${ expressionReturnValue?._expose_key } = ${ JSON.stringify(filteredObject) }`;
+            await this.curr_page.evaluate(exposeEvalExpression);
+            await this.curr_page.evaluate(`console.log("[FB_SYS] Exposed key: ${expressionReturnValue?._expose_key}")`);
+            console.log(exposeEvalExpression);
+            expressionReturnValue = filteredObject;
+        }
+
+        if (expressionReturnValue?.error) {
+            this.logger.logEvent("operation_log", {
+                message: `[EVAL EXECPTION]: ${ expressionReturnValue.error }`,
+                status_message: "error"
+            })
+
+            return expressionReturnValue;
+        } 
+
+        let logMessage;
+        
+        if (typeof expressionReturnValue === 'object') {
+            logMessage = JSON.stringify(expressionReturnValue);
+        } else if (['string', 'number', 'boolean'].includes(typeof expressionReturnValue)) { 
+            logMessage = expressionReturnValue;
+            expressionReturnValue = { [Math.random().toString().slice(3, 12)]: expressionReturnValue }
+        } 
+
         this.logger.logEvent("operation_log", {
-            message: `Expression result: ${ JSON.stringify(expressionReturnValue) }`,
+            message: `Expression result: ${ logMessage }`,
             status_message: "info"
         })
-    } else {
-        this.logger.logEvent("operation_log", {
-            message: `Expression result: ${ expressionReturnValue }`,
-            status_message: "info"
-        })
-    }
 
-    if (expressionReturnValue?.error) {
-        this.logger.logEvent("operation_log", {
-            message: `[EVAL EXECPTION]: ${ expressionReturnValue.error }`,
-            status_message: "error"
-        })
-
-        return expressionReturnValue.error;
+        return expressionReturnValue;
     }
-
-    if (typeof expressionReturnValue === 'string' || typeof expressionReturnValue === 'number' || typeof expressionReturnValue === 'boolean') { 
-        expressionReturnValue = { [Math.random().toString().slice(3, 12)]: expressionReturnValue }
-    }
-    
-    return expressionReturnValue || { error: 'Invalid expression return value.' };
 }
 
 export default eval_expression;

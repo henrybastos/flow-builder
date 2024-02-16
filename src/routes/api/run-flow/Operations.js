@@ -4,7 +4,7 @@ import {
     xxx, 
     goto as goto_fn, 
     download_blob, 
-    download_yt_video,
+    // download_yt_video,
     async_eval
 } from "$lib/operations/_flowBuilderFuncs";
 
@@ -58,7 +58,7 @@ export default class Operations {
         xxx,
         goto: goto_fn,
         download_blob,
-        download_yt_video,
+        // download_yt_video,
         async_eval
     }
 
@@ -70,7 +70,7 @@ export default class Operations {
         /** @type {import('puppeteer').Page} */
         this.curr_page = _page;
         this.pages[0] = {
-            id: 'Main Page',
+            id: 'main_page',
             page: _page
         };
         console.log('SET MAIN PAGE');
