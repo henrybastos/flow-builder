@@ -24,6 +24,8 @@ export interface Operation {
    env_var?: string
    input_fields?: InputFields
    page_id?: string
+   key?: string
+   trigger_onchange_on_tab?: boolean
 }
 
 export interface InputFields {

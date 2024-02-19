@@ -1,4 +1,4 @@
-async function keyboard_type ({ target, value }) {
+async function keyboard_type ({ target, value, trigger_onchange_on_tab }) {
     const [element] = await this.getElement(target);
 
     this.logger.logEvent('operation_log', {
@@ -7,6 +7,11 @@ async function keyboard_type ({ target, value }) {
     });
 
     await element.type(value);
+
+    /** Optional. Causes the onchange event to trigger. */
+    if (trigger_onchange_on_tab) {
+        this.press_key({ key: 'Tab' })
+    }
 }
 
 export default keyboard_type;

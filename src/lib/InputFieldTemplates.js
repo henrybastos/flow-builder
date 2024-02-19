@@ -121,6 +121,10 @@ export const FLOW_BUILDER_INPUT_FIELD_TEMPLATES = {
             {
                 label: 'Backspace',
                 value: 'Backspace'
+            },
+            {
+                label: 'Tab',
+                value: 'Tab'
             }
         ],
         value: ''
