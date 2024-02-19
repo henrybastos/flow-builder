@@ -41,6 +41,8 @@ function createLogger () {
     * @param {'info'|'success'|'error'|'warning'} _tag 
     */
    function logMessage (_message, _tag) {
+      console.log(_message, _tag);
+      
       update(_log => {
          const new_message = {
             [genUUID()]: {

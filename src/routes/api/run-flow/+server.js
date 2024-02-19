@@ -207,7 +207,7 @@ export async function POST ({ request }) {
             'Cache-Control': 'no-cache',
             'Content-Type': 'text/event-stream',
             'Access-Control-Allow-Origin': '*',
-            'Connection': 'keep-alive',
+            'Connection': 'keep-alive'
         }
     });   
 }

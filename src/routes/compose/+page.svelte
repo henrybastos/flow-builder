@@ -133,7 +133,6 @@
    }
 
    function openEnvPanel() {
-      console.log(flowBlocksList);
       let loadDefaultValues = Object.keys(combinedEnvPayload).length === 0;
 
       for (let block of flowBlocksList) {
@@ -365,7 +364,7 @@
 </AlertDialog.Root>
 
 <FlowBlockPayloadViewerPanel bind:isPanelOpen={isFlowBlockPanelOpen} bind:flowBlock={currentFlowBlock}/>
-<EnvPanel bind:combinedEnvPayload bind:isEnvPanelOpen />
+<EnvPanel bind:combinedEnvPayload bind:isEnvPanelOpen bind:isPayloadRunning />
 <AddFlowBlockPanel bind:flowBlocksList={flowBlocksList} bind:isPanelOpen={isAddFlowBlockOpen} />
 <PayloadLogsPanel {toast} bind:isPanelOpen={isLogsPanelOpen} bind:isPayloadRunning />
 <DevSettingsPanel bind:devSettings bind:isPanelOpen={isDevSettingsPanelOpen} {defaultDevSettings} />

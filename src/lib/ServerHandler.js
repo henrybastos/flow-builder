@@ -30,7 +30,15 @@ export class ServerHandler {
             const [event, data] = event_lines.split('\n').filter(v=>v).map(line => {
                 return ( line.slice(7).trim(), line.slice(6).trim() );
             });
-            return { event, data: JSON.parse(data) };
+            try {
+                return { event, data: JSON.parse(data) };
+            } catch (err) {
+                console.log('Data is not an object', data, typeof data);
+                return { event, data: {
+                    message: data,
+                    status_message: 500
+                } };
+            }
         });
     }
 
@@ -92,7 +100,6 @@ export class ServerHandler {
             this.isRequestCanceled = false;
             
             let startTime = Date.now();
-            let fetchError;
 
             try {
                 this.logger.logMessage(

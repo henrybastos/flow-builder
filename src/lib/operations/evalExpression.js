@@ -18,7 +18,7 @@ async function eval_expression ({ expression }) {
 
     let expressionReturnValue = await this.curr_page.evaluate(expression);
 
-    console.log('EVAL RESULT', expressionReturnValue);
+    // console.log('EVAL RESULT', expressionReturnValue);
 
     if (expressionReturnValue) {
         if (expressionReturnValue?._expose_key) {
@@ -50,7 +50,7 @@ async function eval_expression ({ expression }) {
             logMessage = JSON.stringify(expressionReturnValue);
         } else if (['string', 'number', 'boolean'].includes(typeof expressionReturnValue)) { 
             logMessage = expressionReturnValue;
-            expressionReturnValue = { [Math.random().toString().slice(3, 12)]: expressionReturnValue }
+            expressionReturnValue = { [`AUTO_${ Math.random().toString().slice(3, 12) }`]: expressionReturnValue }
         } 
 
         this.logger.logEvent("operation_log", {

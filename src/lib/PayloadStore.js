@@ -3,13 +3,13 @@ import { genUUID } from "./utils";
 
 export const initStruct = {
     config: {
-        ws_endpoint: false,
+        ws_endpoint: "",
         close_browser_on_finish: false,
         close_browser_on_cancel_request: false,
         headless: false
     },
     env: {
-        pages: {
+        _pages: {
             main_page: 'main_page'
         }
     },

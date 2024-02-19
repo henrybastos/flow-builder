@@ -11,7 +11,9 @@
 
     const tags_color = {
         kiwify: 'bg-emerald-500',
-        eduzz: 'bg-amber-500'
+        eduzz: 'bg-amber-500',
+        dev: 'bg-purple-500',
+        youtube: 'bg-red-500'
     }
 
     function addBlock (block) {

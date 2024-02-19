@@ -1,5 +1,6 @@
 import ServerLogger from "./ServerLogger"
 import { 
+    expose,
     x, 
     xxx, 
     goto as goto_fn, 
@@ -54,6 +55,7 @@ export default class Operations {
 
     // static __flow_builder_are_funcs_injected__ = false;
     static _flowBuilderInjectionFuncs = {
+        expose,
         x,
         xxx,
         goto: goto_fn,
@@ -86,6 +88,10 @@ export default class Operations {
     }
 
     static async _injectFunctions () {
+        if (!await this.curr_page.evaluate('try { press_key } catch (err) { false }')) {
+            await this.curr_page.exposeFunction('press_key', this.curr_page.keyboard.press);
+        }
+
         for (let [fn_name, fn_func] of Object.entries(this._flowBuilderInjectionFuncs)) {
             /** Tries to inject the function with a try-catch block, as the function might already be declared and defined. */
             if (!await this.curr_page.evaluate(`try { ${ fn_name } } catch (err) { false }`)) {

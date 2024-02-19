@@ -1,7 +1,11 @@
-export const x = (path) => document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+export const expose = (value) => {
+    return { _expose_key: '_fb_vars', ...value };
+};
 
-export const xxx = (path) => {
-    const nodesSnapshot = document.evaluate(path, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+export const x = (path, root) => document.evaluate(path, root || document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+
+export const xxx = (path, root) => {
+    const nodesSnapshot = document.evaluate(path, root || document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
     let elements = [];
     for (let i = 0; i < nodesSnapshot.snapshotLength; i++) {
         elements.push(nodesSnapshot.snapshotItem(i));

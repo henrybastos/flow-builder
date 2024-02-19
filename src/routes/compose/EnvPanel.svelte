@@ -1,4 +1,7 @@
 <script>
+    import hljs from 'highlight.js/lib/core';
+    import json from 'highlight.js/lib/languages/json'
+    import hljs_theme from 'highlight.js/styles/tokyo-night-dark.min.css';
     import * as Dialog from "$lib/components/ui/dialog";
     import * as AlertDialog from "$lib/components/ui/alert-dialog";
     import * as Tabs from "$lib/components/ui/tabs";
@@ -10,30 +13,30 @@
     import { page } from "$app/stores";
     import { toast } from "svelte-sonner";
     import { LOGGER, TAGS } from "$lib/LogStore";
+    import { onMount } from "svelte";
 
     export let isEnvPanelOpen = false;
     export let combinedEnvPayload;
+    export let isPayloadRunning;
     
     let envJsonPayloadValue = {};
     let changesMade = false;
     let isConfirmAlertDialogOpen = false;
     let isEditEnvJsonPanelOpen = false;
     let activeTab = "input_tab";
+    let outputCodeEl;
 
     const DEV_MODE = $page.url.searchParams.has('dev_mode');
+
+    hljs.registerLanguage('json', json);
 
     ServerHandler.logger = LOGGER;
     ServerHandler.logger_tags = TAGS;
 
     $: envClone = structuredClone(combinedEnvPayload);
-    $: responsePayload = JSON.stringify(JSON.parse(ServerHandler.responsePayload), null ,3);
-
-    function cloneEnv (_payload) {
-        let clone = structuredClone(_payload);
-        for (let [key, prop] of Object.entries(clone)) {
-        }
-        return clone;
-    }
+    $: if (activeTab == 'output_tab' && isEnvPanelOpen && !outputCodeEl?.dataset?.highlighted && outputCodeEl) { 
+        hljs.highlightElement(outputCodeEl);
+    };
 
     function closeEnvPanel (state = true) {
         changesMade = state;
@@ -91,8 +94,12 @@
     }
 
     function copyResponsePayloadToClipboard () {
-        window.navigator.clipboard.writeText(responsePayload);
+        window.navigator.clipboard.writeText(JSON.stringify(JSON.parse(ServerHandler.responsePayload), null ,3));
         toast.success('Saída copiada para a Área de Transferência!');
+    }
+
+    function handleTabChange (tab_value) {
+        activeTab = tab_value;
     }
 </script>
 
@@ -113,7 +120,7 @@
             <Dialog.Description class="text-base">Todos os valores variáveis utilizados pelos blocos de fluxo</Dialog.Description>
         </Dialog.Header>
 
-        <Tabs.Root bind:value={activeTab} onValueChange={(tab_value) => activeTab = tab_value}>
+        <Tabs.Root bind:value={activeTab} onValueChange={handleTabChange} class="w-full">
             <Tabs.List class="grid grid-cols-2 w-full">
                 <Tabs.Trigger class="col-span-1" value="input_tab">Entrada</Tabs.Trigger>
                 <Tabs.Trigger class="col-span-1" value="output_tab">Saída</Tabs.Trigger>
@@ -154,7 +161,9 @@
             </Tabs.Content>
             
             <Tabs.Content data-active-tab={activeTab} value="output_tab" class="data-[active-tab=output\_tab]:flex flex-col h-[60vh] justify-between">
-                <Textarea bind:value={responsePayload} class="font-code text-base min-h-[10rem] h-[50vh] resize-none" placeholder="..." />
+                {#key isPayloadRunning}
+                    <pre class="h-[50vh] rounded-lg overflow-x-auto w-[57rem] font-code p-5 mt-2" bind:this={outputCodeEl}>{ JSON.stringify(JSON.parse(ServerHandler.responsePayload), null ,3) }</pre>
+                {/key}
 
                 <div class="flex flex-row-reverse gap-x-2">
                     <Button variant="default" on:click={copyResponsePayloadToClipboard}>Copiar saída</Button>
