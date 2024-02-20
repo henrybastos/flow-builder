@@ -49,14 +49,44 @@ async function eval_expression ({ expression }) {
         if (typeof expressionReturnValue === 'object') {
             logMessage = JSON.stringify(expressionReturnValue);
         } else if (['string', 'number', 'boolean'].includes(typeof expressionReturnValue)) { 
-            logMessage = expressionReturnValue;
+            logMessage = expressionReturnValue.toString();
             expressionReturnValue = { [`AUTO_${ Math.random().toString().slice(3, 12) }`]: expressionReturnValue }
         } 
 
         this.logger.logEvent("operation_log", {
-            message: `Expression result: ${ logMessage }`,
+            message: `Expression result: ${ logMessage.toString().slice(0, 100) }`,
             status_message: "info"
         })
+
+        // console.log('RESPONSE ALL', logMessage);
+
+        // if (logMessage.length > 20000) {
+        //     const bufferArray = logMessage.match(/.{20000}/g);
+        //     const resBuffer = {
+        //         chunks: bufferArray, 
+        //         ...(
+        //             bufferArray.join('').length !== logMessage.length && 
+        //             {last_chunk: logMessage.slice(bufferArray.join('').length - logMessage.length)}
+        //         )
+        //     }
+
+        //     for (let chunk of [...resBuffer.chunks, resBuffer.last_chunk]) {
+        //         this.logger.logEvent("response_chunk", {
+        //             message: chunk,
+        //             status_message: "info"
+        //         })
+        //     }
+        // } else {
+        //     this.logger.logEvent("response", {
+        //         message: logMessage,
+        //         status_message: "info"
+        //     })
+        // }
+
+        // this.logger.logEvent("response", {
+        //     message: logMessage,
+        //     status_message: "info"
+        // })
 
         return expressionReturnValue;
     }

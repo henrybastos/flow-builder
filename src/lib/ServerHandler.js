@@ -5,6 +5,7 @@ export class ServerHandler {
     static isRequestCanceled = false;
     static isFLowAPILoading = false;
     static responsePayload = JSON.stringify({ response: 'Nothing to display :D' });
+    static responsePayloadChunks = [];
     static closeBrowserPayload = {
         config: {
             ws_endpoint: false,
@@ -30,14 +31,16 @@ export class ServerHandler {
             const [event, data] = event_lines.split('\n').filter(v=>v).map(line => {
                 return ( line.slice(7).trim(), line.slice(6).trim() );
             });
-            try {
-                return { event, data: JSON.parse(data) };
-            } catch (err) {
-                console.log('Data is not an object', data, typeof data);
-                return { event, data: {
-                    message: data,
-                    status_message: 500
-                } };
+
+            if (event !== 'response_chunk') {
+                try {
+                    return { event, data: JSON.parse(data) };
+                } catch (err) {
+                    console.log('Response chunk data is not an object', data, typeof data);
+                    return { event, data: { message: data, status_message: 'info' } };
+                }
+            } else {
+                return { event, data: { message: data, status_message: 'info' } };
             }
         });
     }
@@ -57,10 +60,13 @@ export class ServerHandler {
     
         for (let sse_event of SSEData) {
             switch (sse_event.event) {
+                case 'response_chunk':
+                    this.responsePayloadChunks.push(sse_event.data.message);
+                    break;
                 case 'response':
                     this.responsePayload = JSON.stringify(sse_event.data.payload, null, 3);
                     // console.dir(this.responsePayload, { depth: null });
-                    this.logger.logMessage(sse_event.data.message, this.logger_tags[sse_event.data.status_message]);
+                    this.logger.logMessage(sse_event.data.message, this.logger_tags.info);
                     break;
                 case 'system':
                     this.closeBrowserPayload.config.ws_endpoint = sse_event.data.message.match(/(?<=WS Endpoint:\s?).*/gi)[0].trim();
@@ -119,6 +125,11 @@ export class ServerHandler {
     
                 const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
                 await this.loopReader(reader);
+
+                // if (this.responsePayloadChunks.length > 0) {
+                //     console.log('BEFORE', this.responsePayload);
+                //     this.responsePayload = this.responsePayloadChunks.join('');
+                // }
     
                 // WIP
                 // if ($PAYLOAD.config.close_browser_on_cancel_request) {

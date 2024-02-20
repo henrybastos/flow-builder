@@ -178,8 +178,6 @@ export async function POST ({ request }) {
                 await browser.close();
             }
 
-            console.log('RESPONSE PAYLOAD', responsePayload);
-            
             ServerLogger.logEvent('response', {
                 message: 'All operations done.',
                 status_code: 200,

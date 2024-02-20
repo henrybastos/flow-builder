@@ -14,9 +14,21 @@ export default class ServerLogger {
      * @param {string|{ message: string, status_message: 'info'|'success'|'error' }} _response_payload The JSON to be passed as response.
      */
     static logEvent (_response_event, _response_payload) {
-        const message = `event: ${ _response_event }\ndata: ${ JSON.stringify(_response_payload) }\n\n`;
-        console.log(message);
-        this.controller.enqueue(message);
+        if (_response_event === 'response') {
+            let responseDataString = JSON.stringify(_response_payload);
+            
+            const message = `event: response\ndata: ${ responseDataString }\n\n`;
+            this.controller.enqueue(message);
+
+        } else if (_response_event === 'response_chunk') {
+            let responseDataString = _response_payload?.message || JSON.stringify(_response_payload);
+
+            const message = `event: response_chunk\ndata: ${ responseDataString }\n\n`;
+            this.controller.enqueue(message);
+        } else {
+            const message = `event: ${ _response_event }\ndata: ${ JSON.stringify(_response_payload) }\n\n`;
+            this.controller.enqueue(message);
+        }
     }
 
     static closeStream () {
