@@ -180,9 +180,6 @@ export async function POST ({ request }) {
 
             ServerLogger.logEvent('response', {
                 message: 'All operations done.',
-                status_code: 200,
-                status_message: 'success',
-                ws_endpoint: browser.wsEndpoint(),
                 payload: responsePayload
             });
 
