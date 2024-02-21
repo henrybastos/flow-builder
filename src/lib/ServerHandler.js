@@ -36,7 +36,7 @@ export class ServerHandler {
                 try {
                     return { event, data: JSON.parse(data) };
                 } catch (err) {
-                    console.log('Response chunk data is not an object', data, typeof data);
+                    console.log('Response chunk data is not an object\nEVENT:', event, '\nDATA:', data, '\nDATA TYPE:', typeof data);
                     return { event, data: { message: data, status_message: 'info' } };
                 }
             } else {
@@ -71,10 +71,10 @@ export class ServerHandler {
                 case 'system':
                     this.closeBrowserPayload.config.ws_endpoint = sse_event.data.message.match(/(?<=WS Endpoint:\s?).*/gi)[0].trim();
                     console.log('Close browser endpoint found and set', this.closeBrowserPayload.config);
-                    this.logger.logMessage(sse_event.data.message, this.logger_tags[sse_event.data.status_message]);
+                    this.logger.logMessage(sse_event.data.message, this.logger_tags[sse_event.data.status_message || 'info']);
                     break;
                 default:
-                    this.logger.logMessage(sse_event.data.message, this.logger_tags[sse_event.data.status_message]);
+                    this.logger.logMessage(sse_event.data.message, this.logger_tags[sse_event.data.status_message || 'info']);
                     break;
             }
         }
