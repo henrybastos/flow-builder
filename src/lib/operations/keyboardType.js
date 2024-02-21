@@ -6,7 +6,7 @@ async function keyboard_type ({ target, value, trigger_onchange_on_tab }) {
         status_message: 'info'
     });
 
-    await element.type(value);
+    await element.type(value.toString());
 
     /** Optional. Causes the onchange event to trigger. */
     if (trigger_onchange_on_tab) {
