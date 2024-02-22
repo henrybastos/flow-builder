@@ -8,6 +8,7 @@
     export let checked = false;
 
     // FIXME: Should be separate?
+    // FIXED: ShadcnUI baby ehehehe
     $: disabled ? checked = false : checked = checked;
 
     function onToggle () {

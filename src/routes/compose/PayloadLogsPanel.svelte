@@ -3,7 +3,7 @@
    import * as Collapsible from "$lib/components/ui/collapsible";
    import LogMessage from "$lib/components/LogMessage.svelte";
    import { LOGGER } from "$lib/LogStore";
-    import Button from "$lib/components/ui/button/button.svelte";
+   import Button from "$lib/components/ui/button/button.svelte";
    
    export let isPanelOpen = false;
    export let isPayloadRunning;
@@ -29,7 +29,9 @@
    }
 
    function triggerToasts (_isPayloadRunning) {
-        if (!_isPayloadRunning) {
+       if (!_isPayloadRunning) {
+            console.log(logsGroups.slice(-1));
+            
             for (let messages of logsGroups.slice(-1)) {
                 for (let msg of messages) {
                     switch (msg.tag.type) {
@@ -65,35 +67,33 @@
                 <p class="w-full text-neutral-500 text-center">No logs yet</p>
             {:else}
                 {#each logsGroups as logGroup, index}
-                    <Collapsible.Root class="border border-neutral-700 rounded-md p-2 m-2 group/collapsible">
-                        <Collapsible.Trigger class="flex flex-row w-full justify-between px-1">
+                    <Collapsible.Root class="border flex flex-row flex-wrap border-neutral-700 rounded-md p-2 m-2 space-x-1 group/collapsible">
+                        {#if isPayloadRunning && index === 0}
+                            <Button size="icon" disabled variant="ghost">
+                                <i class="ti ti-loader animate-spin"></i>
+                            </Button>
+                        {:else}
+                            <Button 
+                                size="icon" 
+                                variant="ghost"
+                                href={generateLogDownloadPayload(index)} 
+                                download={`logs_${ new Date().toLocaleTimeString() }_${ new Date().toLocaleDateString() }.json`}
+                            >
+                                <i class="ti ti-download"></i>
+                            </Button>
+                        {/if}
+                        <Collapsible.Trigger class="flex flex-row grow justify-between items-center px-1">
                             <div class="inline-flex space-x-2">
-                                {#if isPayloadRunning && index === 0}
-                                    <i class="ti ti-loader animate-spin"></i>
-                                {/if}
                                 <LogMessage data={logGroup[0]} />
                             </div>
 
-                            <div class="inline-flex space-x-2">
+                            <div class="inline-flex justify-center items-center space-x-2 text-base">
                                 <p>{ logGroup.length }</p>
                                 <i class="ti ti-chevron-down group-data-[state=open]/collapsible:rotate-180"></i>
                             </div>
                         </Collapsible.Trigger>
 
-                        <Collapsible.Content class="p-3 max-w-full overflow-x-auto space-y-1">
-                            {#if isPayloadRunning && index === 0}
-                                <Button disabled variant="outline">Waiting for execution to end</Button>
-                            {:else}
-                                <Button 
-                                    variant="outline"
-                                    href={generateLogDownloadPayload(index)} 
-                                    download={`logs_${ new Date().toLocaleTimeString() }_${ new Date().toLocaleDateString() }.json`}
-                                >
-                                    <i class="ti ti-file-download mr-2"></i>
-                                    Download logs
-                                </Button>
-                            {/if}
-
+                        <Collapsible.Content class="p-3 w-full overflow-x-auto space-y-1">
                             {#each logGroup.slice(1) as msg, _ (Math.random().toString().slice(8))}
                                 <LogMessage data={msg} />
                             {/each}

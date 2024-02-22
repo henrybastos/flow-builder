@@ -66,7 +66,7 @@ export class ServerHandler {
                 case 'response':
                     this.responsePayload = JSON.stringify(sse_event.data.payload, null, 3);
                     // console.dir(this.responsePayload, { depth: null });
-                    this.logger.logMessage(sse_event.data.message, this.logger_tags.info);
+                    // this.logger.logMessage(sse_event.data.message, this.logger_tags.info);
                     break;
                 case 'system':
                     this.closeBrowserPayload.config.ws_endpoint = sse_event.data.message.match(/(?<=WS Endpoint:\s?).*/gi)[0].trim();

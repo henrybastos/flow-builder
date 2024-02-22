@@ -1,6 +1,7 @@
 import ServerLogger from "./ServerLogger"
 import { 
     expose,
+    env,
     x, 
     xxx, 
     goto as goto_fn, 
@@ -52,10 +53,12 @@ export default class Operations {
     /** @type {Array<{ page: import('puppeteer').Page; }>} */
     static pages = [];
     static logger = ServerLogger;
+    static logs = [];
 
     // static __flow_builder_are_funcs_injected__ = false;
     static _flowBuilderInjectionFuncs = {
         expose,
+        env,
         x,
         xxx,
         goto: goto_fn,

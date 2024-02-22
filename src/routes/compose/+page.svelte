@@ -234,10 +234,11 @@
             {:else}
                Carga combinada
 
-               <div class="space-x-1">
+               <div class="flex space-x-2">
                   <Button class="text-base" on:click={() => (isLogsPanelOpen = true)} variant="outline">
                      Logs
                   </Button>
+
                   {#if DEV_MODE}   
                      <Button on:click={() => (isDevSettingsPanelOpen = true)} variant="outline" size="icon">
                         <i class="ti ti-settings-code text-neutral-500"></i>
@@ -258,8 +259,8 @@
          {:else}
             {#if flowBlocksList.length === 0}
                <div class="flex flex-col items-center">
-                  <i class="ti ti-zoom-question text-neutral-500"></i>
-                  <p class="text-neutral-500">Nenhum bloco para executar. Adicione um clicando no botão abaixo.</p>
+                  <i class="ti ti-zoom-question text-muted-foreground"></i>
+                  <p class="text-muted-foreground">Nenhum bloco para executar. Adicione um clicando no botão abaixo.</p>
                </div>
             {/if}
             <DraggableList

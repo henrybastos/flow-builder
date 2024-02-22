@@ -83,12 +83,7 @@ async function eval_expression ({ expression }) {
         //     })
         // }
 
-        // this.logger.logEvent("response", {
-        //     message: logMessage,
-        //     status_message: "info"
-        // })
-
-        // console.log('expressionReturnValue', expressionReturnValue);
+        console.log('expressionReturnValue', expressionReturnValue);
         return expressionReturnValue;
     }
 }

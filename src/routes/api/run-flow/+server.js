@@ -50,6 +50,7 @@ export async function POST ({ request }) {
 
         page.setViewport({ width: 1366, height: 720 });
 
+        // FIXME
         page.on('dialog', async (dialog) => {
             // Required to reload the page on "Create Jivo PT" flow preset.
             if (page.url().match(/app.jivosite.com/gi)) { await dialog.accept() }
@@ -78,8 +79,6 @@ export async function POST ({ request }) {
         let _browser;
         const width = 1366;
         const height = 720;
-
-        console.log();
 
         if (payload.config.ws_endpoint) {
             console.log(`Attempting to connect at ${ payload.config.ws_endpoint }...`);
@@ -146,9 +145,11 @@ export async function POST ({ request }) {
             case 'eval_expression':
                 for (let [key, value] of Object.entries(await Operations.eval_expression(_operation) || {})) {
                     responsePayload[key] = value;
+                    _env[key] = value;
                 }
 
                 EnvHandler.setResponsePayload(responsePayload);
+                console.log('EnvHandler.setResponsePayload', responsePayload);
                 break;
             default:
                 if (_operation?.response_slot) {

@@ -125,7 +125,6 @@
             cols="30" rows="16"
         ></textarea> -->
     </div>
-    
 
     <div class="console_screen mt-4 items-center overflow-hidden">
         {#if Object.values($LOGGER.messages).length > 0}

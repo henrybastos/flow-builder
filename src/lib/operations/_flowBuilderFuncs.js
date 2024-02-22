@@ -2,6 +2,9 @@ export const expose = (value) => {
     return { _expose_key: '_fb_vars', ...value };
 };
 
+/** Sets a value in env payload. */
+export const env = (obj) => obj;
+
 export const x = (path, root) => document.evaluate(path, root || document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
 
 export const xxx = (path, root) => {
