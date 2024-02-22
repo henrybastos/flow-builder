@@ -29,23 +29,20 @@
    }
 
    function triggerToasts (_isPayloadRunning) {
-       if (!_isPayloadRunning) {
-            console.log(logsGroups.slice(-1));
-            
-            for (let messages of logsGroups.slice(-1)) {
-                for (let msg of messages) {
-                    switch (msg.tag.type) {
-                        case 'error':
-                            toast.error('Ocorreu um erro durante a execução dos blocos.');
-                            break;
-                        case 'warning':
-                            toast.warning('Um aviso foi adicionado nos logs.');
-                            break;
-                    }
+       if (!_isPayloadRunning && logsGroups.length > 0) {
+           for (let msg of logsGroups[0]) {
+                switch (msg.tag.type) {
+                    case 'error':
+                        toast.error('Ocorreu um erro durante a execução dos blocos.');
+                        break;
+                    case 'warning':
+                        toast.warning('Um aviso foi adicionado nos logs.');
+                        break;
                 }
             }
 
             toast.info("Blocos executados.");
+            toast.warning("Verifique manualmente a eficácia da execução do fluxo.");
         }
    }
 

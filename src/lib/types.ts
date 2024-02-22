@@ -10,6 +10,7 @@ export interface Operation {
    enabled: boolean
    target?: string
    value?: string
+   name?: string
    flow?: string
    time?: string
    color?: string

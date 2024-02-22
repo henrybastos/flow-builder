@@ -25,6 +25,7 @@
     let isEditEnvJsonPanelOpen = false;
     let activeTab = "input_tab";
     let outputCodeEl;
+    let responseTextarea;
 
     const DEV_MODE = $page.url.searchParams.has('dev_mode');
 
@@ -94,7 +95,14 @@
     }
 
     function copyResponsePayloadToClipboard () {
-        window.navigator.clipboard.writeText(JSON.stringify(JSON.parse(ServerHandler.responsePayload), null ,3));
+        if (navigator.clipboard && window.isSecureContext) {
+            window.navigator.clipboard.writeText(JSON.stringify(JSON.parse(ServerHandler.responsePayload), null ,3));
+        } else {
+            console.warn(`Context is not secure (${ window.isSecureContext }). Using select and copy.`);
+            responseTextarea.select();
+            document.execCommand('copy')
+        }
+        
         toast.success('Saída copiada para a Área de Transferência!');
     }
 
@@ -162,6 +170,7 @@
             
             <Tabs.Content data-active-tab={activeTab} value="output_tab" class="data-[active-tab=output\_tab]:flex flex-col h-[60vh] justify-between">
                 {#key isPayloadRunning}
+                    <textarea bind:this={responseTextarea} class="absolute opacity-0">{ JSON.stringify(JSON.parse(ServerHandler.responsePayload), null ,3) }</textarea>
                     <pre class="h-[50vh] rounded-lg overflow-x-auto w-[57rem] font-code p-5 mt-2" bind:this={outputCodeEl}>{ JSON.stringify(JSON.parse(ServerHandler.responsePayload), null ,3) }</pre>
                 {/key}
 
