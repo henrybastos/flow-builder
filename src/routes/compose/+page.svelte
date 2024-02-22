@@ -16,7 +16,7 @@
    import PayloadLogsPanel from "./PayloadLogsPanel.svelte";
    import DevSettingsPanel from "./DevSettingsPanel.svelte";
    import Skeleton from "$lib/components/ui/skeleton/skeleton.svelte";
-   import { PUBLIC_ENV } from "$env/static/public";
+   import { env } from "$env/dynamic/public"
 
    let isPayloadRunning = false;
    let isPageLoading = true;
@@ -221,7 +221,7 @@
    <title>Flow Composer</title>
 </svelte:head>
 
-{#if PUBLIC_ENV.toUpperCase() === 'DEV'}
+{#if env?.PUBLIC_ENV?.toUpperCase() === 'DEV'}
    <span class="absolute bottom-0 w-full bg-purple-400 text-base text-neutral-900 text-center font-code py-1">DEV ENVIRONMENT</span>
 {/if}
 
