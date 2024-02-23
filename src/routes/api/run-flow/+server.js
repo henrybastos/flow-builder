@@ -63,12 +63,6 @@ export async function POST ({ request }) {
             'accept-language': 'en-US,en;q=0.9,en;q=0.8'
         }); 
 
-        // FIXME: Everything crashing idk why AAAAAAAAAA
-        // page.evaluate(`window.addEventListener("close", () => {
-        //     confirm("Close windows?");
-        //     return false;
-        // }, false)`);
-
         Operations._setMainPage(page);
         Operations._setBrowser(browser);
 

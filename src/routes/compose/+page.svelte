@@ -134,30 +134,6 @@
    }
 
    function openEnvPanel() {
-      let loadDefaultValues = Object.keys(combinedEnvPayload).length === 0;
-
-      for (let block of flowBlocksList) {
-         let hasEnvPayload = Object.keys(block.env_payload).length > 0;
-
-         if (hasEnvPayload) {
-            combinedEnvPayload = {
-               ...combinedEnvPayload,
-               ...block.env_payload,
-            };
-   
-            if (loadDefaultValues && combinedEnvPayload) {
-               // Sets all env fields to the default value set on the flow block's payload.
-               for (let [env_field, env_value] of Object.entries(block.payload.env)) {
-                  // Ignores private env vars that starts with a _
-                  // e.g.: _admin_password
-                  if (!env_field.match(/^_.*/g)) {
-                     combinedEnvPayload[env_field].value = env_value;
-                  }
-               }
-            }
-         }
-      }
-
       isEnvPanelOpen = true;
    }
 
@@ -169,11 +145,14 @@
          toast.warning("Using DEFAULT_ENV_TEST_PAYLOAD as Env Payload");
       }
 
-      if (DEV_MODE) {
-         combinedPayload.config.headless = devSettings.headless;
-      }
-
       combinedPayload.config.close_browser_on_finish = true;
+
+      if (DEV_MODE) {
+         for (let [opt, value] of Object.entries(devSettings)) {
+            console.warn(`[DEV MODE] Setting config: ${ opt } as ${ value }`);
+            combinedPayload.config[opt] = value;
+         }
+      }
 
       const sendPayloadPromise = new Promise(async (resolve, reject) => {
          updateEnvPayload();
@@ -371,6 +350,6 @@
 
 <FlowBlockPayloadViewerPanel bind:isPanelOpen={isFlowBlockPanelOpen} bind:flowBlock={currentFlowBlock}/>
 <EnvPanel bind:combinedEnvPayload bind:isEnvPanelOpen bind:isPayloadRunning />
-<AddFlowBlockPanel bind:flowBlocksList={flowBlocksList} bind:isPanelOpen={isAddFlowBlockOpen} />
+<AddFlowBlockPanel bind:combinedEnvPayload bind:flowBlocksList={flowBlocksList} bind:isPanelOpen={isAddFlowBlockOpen} />
 <PayloadLogsPanel {toast} bind:isPanelOpen={isLogsPanelOpen} bind:isPayloadRunning />
 <DevSettingsPanel bind:devSettings bind:isPanelOpen={isDevSettingsPanelOpen} {defaultDevSettings} />

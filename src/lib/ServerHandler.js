@@ -65,7 +65,6 @@ export class ServerHandler {
                     break;
                 case 'response':
                     this.responsePayload = JSON.stringify(sse_event.data.payload, null, 3);
-                    // console.dir(this.responsePayload, { depth: null });
                     // this.logger.logMessage(sse_event.data.message, this.logger_tags.info);
                     break;
                 case 'system':

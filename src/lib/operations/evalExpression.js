@@ -42,6 +42,13 @@ async function eval_expression ({ expression }) {
             })
 
             return expressionReturnValue;
+        } else if (expressionReturnValue?.warning) {
+            this.logger.logEvent("operation_log", {
+                message: `[EVAL WARNING]: ${ expressionReturnValue.warning }`,
+                status_message: "warning"
+            })
+
+            return expressionReturnValue;
         } 
 
         let logMessage;

@@ -19,7 +19,6 @@
     export let combinedEnvPayload;
     export let isPayloadRunning;
     
-    let envJsonPayloadValue = {};
     let changesMade = false;
     let isConfirmAlertDialogOpen = false;
     let isEditEnvJsonPanelOpen = false;
@@ -34,6 +33,7 @@
     ServerHandler.logger = LOGGER;
     ServerHandler.logger_tags = TAGS;
 
+    $: envJsonPayloadValue = {};
     $: envClone = structuredClone(combinedEnvPayload);
     $: if (activeTab == 'output_tab' && isEnvPanelOpen && !outputCodeEl?.dataset?.highlighted && outputCodeEl) { 
         hljs.highlightElement(outputCodeEl);
@@ -57,7 +57,7 @@
             combinedEnvPayload[name].value = props.value;
         }
 
-        console.log(combinedEnvPayload);
+        console.log(combinedEnvPayload, envClone);
         changesMade = false;
     }
 
@@ -69,14 +69,16 @@
         };
 
         if (!combinedEnvPayload) { combinedEnvPayload = envClone };
-        if (typeof envJsonPayloadValue === 'string') { envJsonPayloadValue = JSON.parse(envJsonPayloadValue) };
+        // if (typeof envJsonPayloadValue === 'string') { envJsonPayloadValue = JSON.parse(envJsonPayloadValue) };
+        
+        envJsonPayloadValue = {};
+        console.log(combinedEnvPayload)
 
         for (let [name, prop] of Object.entries(combinedEnvPayload)) {
             envJsonPayloadValue[name] = prop.value;
         }
 
         envJsonPayloadValue = JSON.stringify(envJsonPayloadValue, null, 3);
-
 
         isEditEnvJsonPanelOpen = true;
     }

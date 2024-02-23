@@ -10,6 +10,7 @@
    export let defaultDevSettings;
 
    $: headless = devSettings.headless;
+   $: close_browser_on_finish = devSettings.close_browser_on_finish;
 
    function updateLS (setting, value) {
       devSettings[setting] = value;
@@ -41,6 +42,12 @@
          <Switch bind:checked={headless} onCheckedChange={(checked) => updateLS('headless', checked)} id="headless_mode" />
          <Label class="text-base ml-2" for="headless_mode">Headless mode</Label>
       </div>
+
+      <div class="inline-flex items-center">
+         <Switch bind:checked={close_browser_on_finish} onCheckedChange={(checked) => updateLS('close_browser_on_finish', checked)} id="close_browser_on_finish_option" />
+         <Label class="text-base ml-2" for="close_browser_on_finish_option">Close broswer on finish</Label>
+      </div>
+
       <Dialog.Footer>
          <Button on:click={resetSettings} variant="destructive">Reset settings</Button>
       </Dialog.Footer>
