@@ -32,16 +32,23 @@ export class ServerHandler {
                 return ( line.slice(7).trim(), line.slice(6).trim() );
             });
 
-            if (event !== 'response_chunk') {
-                try {
-                    return { event, data: JSON.parse(data) };
-                } catch (err) {
-                    console.log('Response chunk data is not an object\nEVENT:', event, '\nDATA:', data, '\nDATA TYPE:', typeof data);
-                    return { event, data: { message: data, status_message: 'info' } };
-                }
-            } else {
+            try {
+                return { event, data: JSON.parse(data) };
+            } catch (err) {
+                console.log('Response chunk data is not an object\nEVENT:', event, '\nDATA:', data, '\nDATA TYPE:', typeof data);
                 return { event, data: { message: data, status_message: 'info' } };
             }
+
+            // if (event !== 'response_chunk') {
+            //     try {
+            //         return { event, data: JSON.parse(data) };
+            //     } catch (err) {
+            //         console.log('Response chunk data is not an object\nEVENT:', event, '\nDATA:', data, '\nDATA TYPE:', typeof data);
+            //         return { event, data: { message: data, status_message: 'info' } };
+            //     }
+            // } else {
+            //     return { event, data: { message: data, status_message: 'info' } };
+            // }
         });
     }
 
