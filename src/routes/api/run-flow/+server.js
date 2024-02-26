@@ -138,8 +138,22 @@ export async function POST ({ request }) {
                 break;
             case 'eval_expression':
                 for (let [key, value] of Object.entries(await Operations.eval_expression(_operation) || {})) {
-                    responsePayload[key] = value;
-                    _env[key] = value;
+                    // Verifies for potentially unsafe code
+                    if (key.replaceAll(/[\w|\.]*/g, '').length === 0) {
+                        try {
+                            // Support for object queries
+                            eval(`responsePayload.${ key } = value`);
+                            eval(`_env.${ key } = value`);
+                            console.log('[ENV]', _env);
+                            console.log('[RESPONSE PAYLOAD]', responsePayload);
+                        } catch (err) {
+                            console.error('[ENV EVAL ERROR]', err);
+                            ServerLogger.logEvent('error', { message: `${ err.name } :: ${ err.message }` });
+                        }
+                    } else {
+                        console.error('[ENV EVAL ERROR] Invalid env query (potentially harmfull).');
+                        ServerLogger.logEvent('error', { message: 'Invalid env query (potentially harmfull).' });
+                    }
                 }
 
                 EnvHandler.setResponsePayload(responsePayload);

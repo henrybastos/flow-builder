@@ -5,7 +5,6 @@ export class ServerHandler {
     static isRequestCanceled = false;
     static isFLowAPILoading = false;
     static responsePayload = JSON.stringify({ response: 'Nothing to display :D' });
-    static responsePayloadChunks = [];
     static closeBrowserPayload = {
         config: {
             ws_endpoint: false,
@@ -35,20 +34,9 @@ export class ServerHandler {
             try {
                 return { event, data: JSON.parse(data) };
             } catch (err) {
-                console.log('Response chunk data is not an object\nEVENT:', event, '\nDATA:', data, '\nDATA TYPE:', typeof data);
+                console.log('Unable to parse data', data);
                 return { event, data: { message: data, status_message: 'info' } };
             }
-
-            // if (event !== 'response_chunk') {
-            //     try {
-            //         return { event, data: JSON.parse(data) };
-            //     } catch (err) {
-            //         console.log('Response chunk data is not an object\nEVENT:', event, '\nDATA:', data, '\nDATA TYPE:', typeof data);
-            //         return { event, data: { message: data, status_message: 'info' } };
-            //     }
-            // } else {
-            //     return { event, data: { message: data, status_message: 'info' } };
-            // }
         });
     }
 
@@ -67,9 +55,6 @@ export class ServerHandler {
     
         for (let sse_event of SSEData) {
             switch (sse_event.event) {
-                case 'response_chunk':
-                    this.responsePayloadChunks.push(sse_event.data.message);
-                    break;
                 case 'response':
                     this.responsePayload = JSON.stringify(sse_event.data.payload, null, 3);
                     // this.logger.logMessage(sse_event.data.message, this.logger_tags.info);
@@ -131,20 +116,9 @@ export class ServerHandler {
     
                 const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
                 await this.loopReader(reader);
-
-                // if (this.responsePayloadChunks.length > 0) {
-                //     console.log('BEFORE', this.responsePayload);
-                //     this.responsePayload = this.responsePayloadChunks.join('');
-                // }
-    
-                // WIP
-                // if ($PAYLOAD.config.close_browser_on_cancel_request) {
-                //     await closeBrowserOnCancelRequest();
-                // }
             } catch (err) {
                 console.error(err);
                 this.logger.logMessage('Fetch error. Something went wrong.', this.logger_tags.error);
-                // fetchError = err;
             }
 
             if (this.isRequestCanceled === true) {

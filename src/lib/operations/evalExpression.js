@@ -65,32 +65,7 @@ async function eval_expression ({ expression }) {
             status_message: "info"
         })
 
-        // console.log('RESPONSE ALL', logMessage);
-
-        // if (logMessage.length > 20000) {
-        //     const bufferArray = logMessage.match(/.{20000}/g);
-        //     const resBuffer = {
-        //         chunks: bufferArray, 
-        //         ...(
-        //             bufferArray.join('').length !== logMessage.length && 
-        //             {last_chunk: logMessage.slice(bufferArray.join('').length - logMessage.length)}
-        //         )
-        //     }
-
-        //     for (let chunk of [...resBuffer.chunks, resBuffer.last_chunk]) {
-        //         this.logger.logEvent("response_chunk", {
-        //             message: chunk,
-        //             status_message: "info"
-        //         })
-        //     }
-        // } else {
-        //     this.logger.logEvent("response", {
-        //         message: logMessage,
-        //         status_message: "info"
-        //     })
-        // }
-
-        console.log('expressionReturnValue', expressionReturnValue);
+        console.log('[EVAL EXPRESSION] Result: ', expressionReturnValue);
         return expressionReturnValue;
     }
 }
