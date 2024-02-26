@@ -35,7 +35,7 @@ export class ServerHandler {
                 return { event, data: JSON.parse(data) };
             } catch (err) {
                 console.log('Unable to parse data', data);
-                return { event, data: { message: data, status_message: 'info' } };
+                return { event, data: { message: data || 'unparsed_message', status_message: 'info' } };
             }
         });
     }
@@ -56,7 +56,7 @@ export class ServerHandler {
         for (let sse_event of SSEData) {
             switch (sse_event.event) {
                 case 'response':
-                    this.responsePayload = JSON.stringify(sse_event.data.payload, null, 3);
+                    this.responsePayload = JSON.stringify(sse_event.data?.payload, null, 3) || 'unparsed_response_payload';
                     // this.logger.logMessage(sse_event.data.message, this.logger_tags.info);
                     break;
                 case 'system':
