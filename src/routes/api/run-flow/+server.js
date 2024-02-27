@@ -201,6 +201,8 @@ export async function POST ({ request }) {
                 status_code: 500,
                 status_message: 'error'
             });
+
+            await Operations.screenshot({ filename: 'last_error.png' });
             
             ServerLogger.closeStream();
         }
