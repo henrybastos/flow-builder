@@ -326,5 +326,14 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = {
             success_flow: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.success_flow,
             error_flow: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.error_flow          
         }
+    },
+    screenshot: {
+        command: 'screenshot',
+        enabled: true,
+        label: 'Screenshot',
+        icon: 'ti-focus-centered',
+        input_fields: {
+            filename: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.filename
+        }
     }
 };

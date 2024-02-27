@@ -143,7 +143,7 @@ export async function POST ({ request }) {
                         try {
                             // Support for object queries
                             eval(`responsePayload.${ key } = value`);
-                            eval(`_env.${ key } = value`);
+                            eval(`payload.env.${ key } = value`);
                             console.log('[ENV]', _env);
                             console.log('[RESPONSE PAYLOAD]', responsePayload);
                         } catch (err) {

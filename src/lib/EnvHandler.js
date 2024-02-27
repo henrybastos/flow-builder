@@ -129,7 +129,8 @@ export class EnvHandler {
    }
 
    static needsStringReplacement (_str) {
-      return _str.match(/(?<=%)(.*?)(?=%)/g).filter((w, i) => i % 2 == 0 && w).length > 0;
+      console.log('[ENV_HANDLER]', _str);
+      return _str.match(/(?<=%)(.*?)(?=%)/g)?.filter((w, i) => i % 2 == 0 && w)?.length > 0;
    }
    
    static resolveDotNotation (_str, _env) {

@@ -40,6 +40,7 @@ import select_page from "$lib/operations/selectPage";
 import wait_for_element from "$lib/operations/waitForElement";
 import check_element from "$lib/operations/checkElement";
 import branch_eval from "$lib/operations/branchEval";
+import screenshot from "$lib/operations/screenshot";
 
 /**
  * Comprise all Flow Builder Operations, like goto, scrape, eval etc.
@@ -185,4 +186,5 @@ export default class Operations {
     static select_page = select_page;
     static wait_for_element = wait_for_element;
     static branch_eval = branch_eval;
+    static screenshot = screenshot;
 }

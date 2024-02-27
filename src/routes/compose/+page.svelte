@@ -351,7 +351,7 @@
 
 <FlowBlockPayloadViewerPanel bind:isPanelOpen={isFlowBlockPanelOpen} bind:flowBlock={currentFlowBlock}/>
 <EnvPanel bind:combinedEnvPayload bind:isEnvPanelOpen bind:isPayloadRunning />
-<AddFlowBlockPanel bind:combinedEnvPayload bind:flowBlocksList={flowBlocksList} bind:isPanelOpen={isAddFlowBlockOpen} />
+<AddFlowBlockPanel {DEV_MODE} bind:combinedEnvPayload bind:flowBlocksList={flowBlocksList} bind:isPanelOpen={isAddFlowBlockOpen} />
 <PayloadLogsPanel {toast} bind:isPanelOpen={isLogsPanelOpen} bind:isPayloadRunning />
 <DevSettingsPanel bind:devSettings bind:isPanelOpen={isDevSettingsPanelOpen} {defaultDevSettings} />
 <ComposeFlowbar />
