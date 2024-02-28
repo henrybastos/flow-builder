@@ -41,6 +41,7 @@ import wait_for_element from "$lib/operations/waitForElement";
 import check_element from "$lib/operations/checkElement";
 import branch_eval from "$lib/operations/branchEval";
 import screenshot from "$lib/operations/screenshot";
+import wait_for_dom_render from "$lib/operations/wait_for_dom_render";
 
 /**
  * Comprise all Flow Builder Operations, like goto, scrape, eval etc.
@@ -119,36 +120,7 @@ export default class Operations {
         * @param {import type { Page } from "puppeteer";} page 
         * @param {number} timeout 
         */
-    static async waitTillHTMLRendered (page, timeout = 30000) {
-        const checkDurationMsecs = 1000;
-        const maxChecks = timeout / checkDurationMsecs;
-        let lastHTMLSize = 0;
-        let checkCounts = 1;
-        let countStableSizeIterations = 0;
-        const minStableSizeIterations = 3;
-        
-        while(checkCounts++ <= maxChecks){
-            let html = await page.content();
-            let currentHTMLSize = html.length; 
-        
-            let bodyHTMLSize = await page.evaluate(() => document.body.innerHTML.length);
-        
-            console.log('[DOM LOADING] last: ', lastHTMLSize, ' <> curr: ', currentHTMLSize, " body html size: ", bodyHTMLSize);
-        
-            if(lastHTMLSize != 0 && currentHTMLSize == lastHTMLSize) 
-            countStableSizeIterations++;
-            else 
-            countStableSizeIterations = 0; //reset the counter
-        
-            if(countStableSizeIterations >= minStableSizeIterations) {
-            console.log("[DOM LOADING] Page rendered fully..");
-            break;
-            }
-        
-            lastHTMLSize = currentHTMLSize;
-            await page.waitForTimeout(checkDurationMsecs);
-        }  
-    }
+    static async 
 
     static async getElement (_target, _timeout = 15000) {
         await this.wait_for_selector({ target: _target, timeout: _timeout });
@@ -187,4 +159,5 @@ export default class Operations {
     static wait_for_element = wait_for_element;
     static branch_eval = branch_eval;
     static screenshot = screenshot;
+    static wait_for_dom_render = wait_for_dom_render;
 }

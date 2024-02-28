@@ -4,12 +4,7 @@
  */
 async function eval_expression ({ expression }) {
     await this._injectFunctions();
-
-    this.logger.logEvent("operation_log", {
-        message: `Waiting for DOM changes...`,
-        status_message: "info"
-    })
-    await this.waitTillHTMLRendered(await this.curr_page, 5000);
+    await this.wait_for_dom_render(await this.curr_page, 5000);
 
     this.logger.logEvent("operation_log", {
         message: `Evaluating expression: ${ expression }`,

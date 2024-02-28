@@ -141,9 +141,11 @@ export async function POST ({ request }) {
                     // Verifies for potentially unsafe code
                     if (key.replaceAll(/[\w|\.]*/g, '').length === 0) {
                         try {
-                            // Support for object queries
-                            eval(`responsePayload.${ key } = value`);
-                            eval(`payload.env.${ key } = value`);
+                            // FIXME: Support for object queries
+                            // eval(`responsePayload.${ key } = value`);
+                            // eval(`payload.env.${ key } = value`);
+                            responsePayload[key] = value;
+                            payload.env[key] = value;
                             console.log('[ENV]', _env);
                             console.log('[RESPONSE PAYLOAD]', responsePayload);
                         } catch (err) {
@@ -157,7 +159,7 @@ export async function POST ({ request }) {
                 }
 
                 EnvHandler.setResponsePayload(responsePayload);
-                console.log('EnvHandler.setResponsePayload', responsePayload);
+                console.log('[RESPONSE PAYLOAD]', responsePayload);
                 break;
             default:
                 if (_operation?.response_slot) {
