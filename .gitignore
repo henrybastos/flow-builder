@@ -12,3 +12,6 @@ src/lib/flow-blocks/
 public
 static
 .sh
+.jpg
+.jpeg
+.png

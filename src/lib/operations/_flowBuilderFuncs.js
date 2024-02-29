@@ -5,6 +5,13 @@ export const expose = (value) => {
 /** Sets a value in env payload. */
 export const env = (obj) => obj;
 
+/** Sets a value in env payload with a query. */
+export const env_query = (obj) => { 
+    const [queryKey, value] = Object.entries(obj)?.[0];
+    console.log({ [`@query:${ queryKey }`]: value });
+    return { [`@query:${ queryKey }`]: value };
+ };
+
 export const x = (path, root) => document.evaluate(path, root || document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
 
 export const xxx = (path, root) => {

@@ -138,23 +138,44 @@ export async function POST ({ request }) {
                 break;
             case 'eval_expression':
                 for (let [key, value] of Object.entries(await Operations.eval_expression(_operation) || {})) {
-                    // Verifies for potentially unsafe code
-                    if (key.replaceAll(/[\w|\.]*/g, '').length === 0) {
-                        try {
-                            // FIXME: Support for object queries
-                            // eval(`responsePayload.${ key } = value`);
-                            // eval(`payload.env.${ key } = value`);
+                    console.log('[EVAL KEY]', key);
+                    try {
+                        // Support for object queries
+                        const queryKey = key.match(/(?<=@query:).*/g)?.[0];
+
+                        if (queryKey) {
+                            let query = '';
+                        
+                            queryKey.split('.').forEach((v, index, array) => {
+                                if (v.match(/\s/g)) { 
+                                    v = `['${ v }']` 
+                                } else {
+                                    v = `.${ v }` 
+                                }
+
+                                query = `${ query || '' }${ v }`
+                        
+                                let objQuery = `payload.env${ query.charAt(0) === '[' ? `${ query }` : `.${ query }` }`;
+                        
+                                if (eval(`!${ objQuery }`) ) { eval(`${ objQuery } = {}`) }
+
+                                if (index == array.length - 1) { 
+                                    console.log(`${ objQuery } = value`);
+                                    eval(`${ objQuery } = value`)
+                                }
+
+                                console.log(objQuery);
+                            })
+                        } else {
                             responsePayload[key] = value;
                             payload.env[key] = value;
-                            console.log('[ENV]', _env);
-                            console.log('[RESPONSE PAYLOAD]', responsePayload);
-                        } catch (err) {
-                            console.error('[ENV EVAL ERROR]', err);
-                            ServerLogger.logEvent('error', { message: `${ err.name } :: ${ err.message }` });
                         }
-                    } else {
-                        console.error('[ENV EVAL ERROR] Invalid env query (potentially harmfull).');
-                        ServerLogger.logEvent('error', { message: 'Invalid env query (potentially harmfull).' });
+                        console.log('[ENV]', _env);
+                        console.log('[GLOBAL ENV]', payload.env);
+                        console.log('[RESPONSE PAYLOAD]', responsePayload);
+                    } catch (err) {
+                        console.error('[ENV EVAL ERROR]', err);
+                        ServerLogger.logEvent('error', { message: `${ err.name } :: ${ err.message }` });
                     }
                 }
 

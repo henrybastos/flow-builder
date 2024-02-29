@@ -2,6 +2,7 @@ import ServerLogger from "./ServerLogger"
 import { 
     expose,
     env,
+    env_query,
     x, 
     xxx, 
     goto as goto_fn, 
@@ -61,6 +62,7 @@ export default class Operations {
     static _flowBuilderInjectionFuncs = {
         expose,
         env,
+        env_query,
         x,
         xxx,
         goto: goto_fn,

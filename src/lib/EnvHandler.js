@@ -1,5 +1,5 @@
 export class EnvHandler {
-   static log_events = false;
+   static log_events = true;
 
    static ENV_VARIABLES_INPUT_ALLOWLIST = [
       'target',
@@ -58,6 +58,7 @@ export class EnvHandler {
             return envVar;
          });
 
+         this._END_LOG_EVENT_('[ALL ENV VARS]', result);
          this._END_LOG_EVENT_('[RETURN ENV VARS]', result.slice(-1)[0]);
          return result.slice(-1)[0];
       } else {
@@ -113,7 +114,7 @@ export class EnvHandler {
       // console.log('evenPlaceholders', evenPlaceholders);
 
       // Removes the "$$env" and "$$res"
-      return evenPlaceholders;
+      return Array.from(new Set(evenPlaceholders));
    }
 
    static trimAbsolutePlaceholders (_str) {
