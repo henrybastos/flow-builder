@@ -147,15 +147,16 @@ export async function POST ({ request }) {
                             let query = '';
                         
                             queryKey.split('.').forEach((v, index, array) => {
-                                if (v.match(/\s/g)) { 
-                                    v = `['${ v }']` 
-                                } else {
-                                    v = `.${ v }` 
-                                }
+                                // if (v.match(/\s/g)) { 
+                                //     v = `['${ v }']` 
+                                // } else {
+                                //     v = `.${ v }` 
+                                // }
 
+                                v = `.${ v }`
                                 query = `${ query || '' }${ v }`
                         
-                                let objQuery = `payload.env${ query.charAt(0) === '[' ? `${ query }` : `.${ query }` }`;
+                                let objQuery = `payload.env${ query }`;
                         
                                 if (eval(`!${ objQuery }`) ) { eval(`${ objQuery } = {}`) }
 
