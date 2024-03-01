@@ -1,8 +1,9 @@
 <script>
-    import Button from "$lib/components/ui/button/button.svelte";
     import * as Dialog from "$lib/components/ui/dialog";
     import * as Tabs from "$lib/components/ui/tabs";
+    import * as Select from "$lib/components/ui/select";
     import { Textarea } from "$lib/components/ui/textarea";
+    import Button from "$lib/components/ui/button/button.svelte";
     import Input from "$lib/components/ui/input/input.svelte";
     import Label from "$lib/components/ui/label/label.svelte";
     
@@ -12,20 +13,54 @@
     let generatedSchema;
     let envPayload;
     let newBlockName;
+    let schemaTags = [];
 
-    let blockTemplate = `import type { EnvPayloadModel, Payload } from "$lib/types";
+    let blockTemplate = `import type { EnvPayloadModel, Payload, BlockProps } from "$lib/types";
 
 const ENV_PAYLOAD: EnvPayloadModel = @@env_payload@;
 
 const PAYLOAD: Payload = @@payload@;
 
-export const @@block_filename@ = {
+export const @@block_filename@: BlockProps = {
     title: '@@block_name@',
     block_id: '@@block_id@',
     description: 'A new Flow Block.',
+    dependencies: [],
+    tags: @@schema_tags@,
     payload: PAYLOAD,
     env_payload: ENV_PAYLOAD
-}`
+}`;
+
+    const TAGS = [
+        {
+            label: 'Eduzz',
+            value: 'eduzz'
+        },
+        {
+            label: 'Kiwify',
+            value: 'kiwify'
+        },
+        {
+            label: 'Dev',
+            value: 'dev'
+        },
+        {
+            label: 'YouTube',
+            value: 'youtube'
+        },
+        {
+            label: 'Kronus',
+            value: 'kronus'
+        },
+        {
+            label: 'Google',
+            value: 'google'
+        }
+    ]
+
+    function setSchemaTags (tags) {
+        schemaTags = tags.map(tag => tag.value);
+    }
 
     function scanSchema (value, appendValue = true) {
         const templateSchema = structuredClone(value[0] || value);
@@ -85,7 +120,8 @@ export const @@block_filename@ = {
             'payload',
             'block_name',
             'block_id',
-            'block_filename'
+            'block_filename',
+            'schema_tags'
         ]
 
         try {
@@ -100,6 +136,7 @@ export const @@block_filename@ = {
         schemaFileContent.block_id = crypto.randomUUID();
         schemaFileContent.env_payload = JSON.stringify(scanSchema(parsedEnvPayload.env), null, 3);
         schemaFileContent.payload = JSON.stringify(parsedEnvPayload, null, 3);
+        schemaFileContent.schema_tags = JSON.stringify(schemaTags);
 
         for (let placeholder of replacePlaceholders) {
             const replacePlaceholderRegex = new RegExp(`@@${placeholder}@`, 'g');
@@ -131,9 +168,26 @@ export const @@block_filename@ = {
                 <h3 class="text-lg my-3">Env payload</h3>
                 <Textarea class="h-[100rem] max-h-[50vh] text-base font-code resize-none" bind:value={envPayload} placeholder="Original payload"/>
                 
-                <div class="grid grid-cols-[min-content_auto] items-center mt-3 gap-x-3">
-                    <Label class="text-base whitespace-nowrap">Block name</Label>
-                    <Input class="text-base" placeholder="My new block" type="text" bind:value={newBlockName}/>
+                <div class="flex flex-row flex-wrap space-y-4">
+                    <div class="flex flex-row items-center mt-3 gap-x-3 w-full">
+                        <Label class="text-base whitespace-nowrap">Block name</Label>
+                        <Input class="text-base flex flex-row grow" placeholder="My new block" type="text" bind:value={newBlockName}/>
+                        <Select.Root onSelectedChange={setSchemaTags} multiple={true}>
+                            <Select.Trigger class="w-fit">
+                              <Select.Value class="whitespace-nowrap" placeholder="Select a tag" />
+                            </Select.Trigger>
+                            <Select.Content>
+                                {#each TAGS as tag}
+                                    <Select.Item on:change value={tag.value} label={tag.label}>
+                                        {tag.label}
+                                    </Select.Item>
+                                {/each}
+                            </Select.Content>
+                            <Select.Input name="schemaTagsInput" />
+                        </Select.Root>
+                    </div>
+
+                    <Button class="text-base" on:click={generateEnvPayloadSchema}>Generate schema</Button>
                 </div>
             </Tabs.Content>
 
@@ -142,9 +196,5 @@ export const @@block_filename@ = {
                 <Textarea class="h-[100rem] max-h-[50vh] text-base font-code resize-none" bind:value={generatedSchema} placeholder="Generated schema"/>
             </Tabs.Content>
         </Tabs.Root>
-
-        <Dialog.Footer>
-            <Button class="text-base" on:click={generateEnvPayloadSchema}>Generate schema</Button>
-        </Dialog.Footer>
     </Dialog.Content>
 </Dialog.Root>

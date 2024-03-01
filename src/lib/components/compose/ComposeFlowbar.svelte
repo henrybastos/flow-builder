@@ -2,7 +2,7 @@
    import * as Sheet from "$lib/components/ui/sheet";
    import * as Tabs from "$lib/components/ui/tabs";
    import Button from "$lib/components/ui/button/button.svelte";
-   import KronusLessonConverterToolbeltTab from "./flowbar/KronusLessonConverterFlowbarTab.svelte";
+   import KronusLessonConverterFlowbarTab from "./flowbar/KronusLessonConverterFlowbarTab.svelte";
 </script>
 
 <Sheet.Root>
@@ -21,7 +21,7 @@
          </Tabs.List>
 
          <Tabs.Content value="kronus_lesson_converter">
-            <KronusLessonConverterToolbeltTab />
+            <KronusLessonConverterFlowbarTab />
          </Tabs.Content>
       </Tabs.Root>
 

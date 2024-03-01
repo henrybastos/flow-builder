@@ -195,11 +195,13 @@ export async function POST ({ request }) {
     }
 
     async function runFlow (_flow, _env) {
-        for(const operation of _flow) {
-            // Avoids replacement issues with repeatears like Run Flow For Each
-            let operationCopy = structuredClone(operation);
-            await evalOperation(operationCopy, _env);
-        }
+        if (_flow) {
+            for(const operation of _flow) {
+                // Avoids replacement issues with repeatears like Run Flow For Each
+                let operationCopy = structuredClone(operation);
+                await evalOperation(operationCopy, _env);
+            }
+        } else { return };
     }
 
     async function _execStream (browser) {

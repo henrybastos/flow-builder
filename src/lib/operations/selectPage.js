@@ -1,5 +1,7 @@
 async function select_page ({ page_id }) {
-   const targetPage = this.pages.find(({ id }) => id === page_id);
+   // TESTME:
+   const targetPage = page_id === 'main_page' ? 'main_page' :  this.pages.find(({ id }) => id === page_id);
+   
    if (targetPage) {
       this.logger.logEvent('operation_log', {
          message: `Page "${ page_id }" selected.`,

@@ -5,6 +5,8 @@
     import Button from "$lib/components/ui/button/button.svelte";
     import Badge from "$lib/components/ui/badge/badge.svelte";
 
+    let highlightedBlockID = '';
+
     export let DEV_MODE;
     export let isPanelOpen = false;
     export let flowBlocksList;
@@ -15,7 +17,9 @@
         kiwify: 'bg-emerald-500',
         eduzz: 'bg-amber-500',
         dev: 'bg-purple-500',
-        youtube: 'bg-red-500'
+        youtube: 'bg-red-500',
+        kronus: 'bg-orange-500',
+        google: 'bg-blue-500'
     }
 
     function addBlock (block) {
@@ -46,6 +50,15 @@
 
         isPanelOpen = false;
     }
+
+    function highlightBlock (block_id) {
+        highlightedBlockID = block_id;
+        document.getElementById(highlightedBlockID).scrollIntoView();
+
+        setTimeout(() => {
+            highlightedBlockID = '';
+        }, 4000)
+    }
 </script>
 
 <Dialog.Root bind:open={isPanelOpen}>
@@ -55,12 +68,12 @@
             <!-- <Dialog.Description>{ flowBlock.description }</Dialog.Description> -->
         </Dialog.Header>
 
-        <div class="max-h-[36rem] space-y-4 overflow-y-auto">
+        <div class="max-h-[36rem] space-y-4 overflow-y-auto scroll-smooth">
             {#each FlowBlocks as block}
                 {#if DEV_MODE === block?.tags?.includes('dev') || !block?.tags?.includes('dev')}    
-                    <Card.Root class="rounded-lg">
-                        <Card.Header class="p-4">
-                            <Card.Title class="text-xl text-left flex justify-between">
+                    <Card.Root id="{block.block_id}" class="rounded-lg transition-all border-{ block.block_id === highlightedBlockID ? 'amber-500' : 'neutral-400' }">
+                        <Card.Header class="flex flex-row p-4 text-xl text-left justify-between items-center">
+                            <Card.Title>
                                 <div class="space-x-2">
                                     <h3 class="inline-flex">{block.title}</h3>
 
@@ -70,18 +83,28 @@
                                         {/each}
                                     {/if}
                                 </div>
-
-                                <div class="space-x-2">
-            
-                                    <Button on:click={() => addBlock(block)} size="icon">
-                                        <i class="ti ti-plus"></i>
-                                    </Button>
-                                </div>
                             </Card.Title>
-                            <Card.Description class="text-base">
-                                {block.description}
-                            </Card.Description>
+
+                            <Button on:click={() => addBlock(block)} size="icon">
+                                <i class="ti ti-plus"></i>
+                            </Button>
                         </Card.Header>
+
+                        <Card.Content class="p-4 pt-0 divide-y">
+                            <p class="text-muted-foreground pb-2">{block.description}</p>
+
+                            {#if block?.dependencies}    
+                                <div class="pt-2 space-x-2">
+                                    <span class="text-sm">DEPENDÊNCIAS:</span>
+                                    
+                                    {#each block?.dependencies || [] as dep_block_id}
+                                        <span class="cursor-pointer" on:click={() => highlightBlock(dep_block_id)}>
+                                            <Badge variant="secondary" class="uppercase font-bold text-neutral-300">{ FlowBlocks.find(_block => _block.block_id === dep_block_id).title }</Badge>
+                                        </span>
+                                    {/each}
+                                </div>
+                            {/if}
+                        </Card.Content>
                     </Card.Root>
                 {/if}
             {/each}

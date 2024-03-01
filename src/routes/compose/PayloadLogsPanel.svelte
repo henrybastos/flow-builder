@@ -1,4 +1,5 @@
 <script>
+   import * as Tabs from "$lib/components/ui/tabs";   
    import * as Dialog from "$lib/components/ui/dialog";
    import * as Collapsible from "$lib/components/ui/collapsible";
    import LogMessage from "$lib/components/LogMessage.svelte";
@@ -59,51 +60,66 @@
            <Dialog.Description>Shows the logs of the payload execution.</Dialog.Description>
        </Dialog.Header>
 
-       <div class="console_screen flex-col-reverse overflow-y-auto overflow-x-clip max-h-[36rem] border">
-            {#if logsGroups.length === 0}
-                <p class="w-full text-neutral-500 text-center">No logs yet</p>
-            {:else}
-                {#each logsGroups as logGroup, index}
-                    <Collapsible.Root class="border flex flex-row flex-wrap border-neutral-700 rounded-md p-2 m-2 space-x-1 group/collapsible">
-                        {#if isPayloadRunning && index === 0}
-                            <Button size="icon" disabled variant="ghost">
-                                <i class="ti ti-loader animate-spin"></i>
-                            </Button>
-                        {:else}
-                            <Button 
-                                size="icon" 
-                                variant="ghost"
-                                href={generateLogDownloadPayload(index)} 
-                                download={`logs_${ new Date().toLocaleTimeString() }_${ new Date().toLocaleDateString() }.json`}
-                            >
-                                <i class="ti ti-download"></i>
-                            </Button>
-                        {/if}
-                        <Collapsible.Trigger class="flex flex-row grow justify-between items-center px-1">
-                            <div class="inline-flex space-x-2">
-                                <LogMessage data={logGroup[0]} />
-                            </div>
+       <Tabs.Root class="w-full">
+            <Tabs.List class="grid grid-cols-2 w-full">
+                <Tabs.Trigger class="col-span-1" value="logs_tab">Logs</Tabs.Trigger>
+                <Tabs.Trigger class="col-span-1" value="screenshot_tab">Screenshot</Tabs.Trigger>
+            </Tabs.List>
 
-                            <div class="inline-flex justify-center items-center space-x-2 text-base">
-                                <p>{ logGroup.length }</p>
-                                <i class="ti ti-chevron-down group-data-[state=open]/collapsible:rotate-180"></i>
-                            </div>
-                        </Collapsible.Trigger>
+            <Tabs.Content value="logs_tab" class="h-[60vh]">
+                <div class="console_screen flex-col-reverse overflow-y-auto overflow-x-clip max-h-[36rem] border mt-3">
+                    {#if logsGroups.length === 0}
+                        <p class="w-full text-neutral-500 text-center">No logs yet</p>
+                    {:else}
+                        {#each logsGroups as logGroup, index}
+                            <Collapsible.Root class="border flex flex-row flex-wrap border-neutral-700 rounded-md p-2 m-2 space-x-1 group/collapsible">
+                                {#if isPayloadRunning && index === 0}
+                                    <Button size="icon" disabled variant="ghost">
+                                        <i class="ti ti-loader animate-spin"></i>
+                                    </Button>
+                                {:else}
+                                    <Button 
+                                        size="icon" 
+                                        variant="ghost"
+                                        href={generateLogDownloadPayload(index)} 
+                                        download={`logs_${ new Date().toLocaleTimeString() }_${ new Date().toLocaleDateString() }.json`}
+                                    >
+                                        <i class="ti ti-download"></i>
+                                    </Button>
+                                {/if}
+                                <Collapsible.Trigger class="flex flex-row grow justify-between items-center px-1">
+                                    <div class="inline-flex space-x-2">
+                                        <LogMessage data={logGroup[0]} />
+                                    </div>
+        
+                                    <div class="inline-flex justify-center items-center space-x-2 text-base">
+                                        <p>{ logGroup.length }</p>
+                                        <i class="ti ti-chevron-down group-data-[state=open]/collapsible:rotate-180"></i>
+                                    </div>
+                                </Collapsible.Trigger>
+        
+                                <Collapsible.Content class="p-3 w-[57rem] overflow-x-auto space-y-1">
+                                    {#each logGroup.slice(1) as msg, _ (Math.random().toString().slice(8))}
+                                        <LogMessage data={msg} />
+                                    {/each}
+                                </Collapsible.Content>
+                            </Collapsible.Root>
+                        {/each}
+                    {/if}
+               </div>
+            </Tabs.Content>
+            
+            <Tabs.Content value="screenshot_tab" class="h-[60vh]">
+                {#key isPayloadRunning}
+                    <img class="mt-3" alt="No screenshot found." src="/last_error.png?{ Math.random().toString().slice(3,8) }" />
+                {/key}
+            </Tabs.Content>
+        </Tabs.Root>
 
-                        <Collapsible.Content class="p-3 w-full overflow-x-auto space-y-1">
-                            {#each logGroup.slice(1) as msg, _ (Math.random().toString().slice(8))}
-                                <LogMessage data={msg} />
-                            {/each}
-                        </Collapsible.Content>
-                    </Collapsible.Root>
-                {/each}
-            {/if}
-       </div>
-
-       {#if isPayloadRunning}
-           <p class="font-code font-semibold text-neutral-500"><i class="inline-flex w-fit h-fit ti ti-loader-2 animate-spin mr-1"></i> Processing operations...</p>
-       {:else}
-           <p class="font-code font-semibold text-neutral-500">All operations processed.</p>
-       {/if}
+        {#if isPayloadRunning}
+            <p class="font-code font-semibold text-neutral-500"><i class="inline-flex w-fit h-fit ti ti-loader-2 animate-spin mr-1"></i> Processing operations...</p>
+        {:else}
+            <p class="font-code font-semibold text-neutral-500">All operations processed.</p>
+        {/if}
    </Dialog.Content>
 </Dialog.Root>

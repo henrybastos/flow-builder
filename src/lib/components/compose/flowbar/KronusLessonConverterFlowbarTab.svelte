@@ -7,9 +7,11 @@
    import { getContext } from "svelte";
 
    let modulesIndex = 0;
-   let kronusPayload = '';
-   let flowComposerPayload = '';
-   const toast = getContext('toast');
+   let kronusPayload = "";
+   let flowComposerPayload = "";
+   let responseTextarea;
+
+   const toast = getContext("toast");
 
    const INCLUDE_MODULE_DAYS_LOCKED = false;
 
@@ -26,86 +28,154 @@
    // NOTE: Disabling this might break some filenames if used with yt-dlp downloader
    const CLEAN_FILE_NAME = true;
 
-   function checkSellingOrWelcomeVideo (title) {
-      return title.match(/P(á|a)gina de Vendas/gi) || title.match(/Boas(-|\s)Vindas/gi);
+   function checkSellingOrWelcomeVideo(title) {
+      return (
+         title.match(/P(á|a)gina\s?(?:de)?\s?Vendas/gi) ||
+         title.match(/Boas(-|\s)Vindas/gi) ||
+         title.match(/V(i|í)deo\s?(?:de)?\s?Vendas/gi)
+      );
    }
 
-   function pipeLesson (title, index, max) {
-      if (!APPEND_LESSON_PREFIX || checkSellingOrWelcomeVideo(title)) { return title; }
-      if (!CLEAN_FILE_NAME) { return `Aula ${ (index + 1).toString().padStart(max > 100 ? 3 : 2, '0') } - ${ title }` }
-
-      return cleanTitle(`Aula ${ (index + 1).toString().padStart(max > 100 ? 3 : 2, '0') } - ${ title }`);
+   function checkPrefix(title) {
+      return title.match(/(M(ó|o)dulo|B(ô|o)nus|Aula?)/gi).length > 0;
    }
 
-   function pipeModule (title, max) {
-      if (!APPEND_MODULE_PREFIX || checkSellingOrWelcomeVideo(title)) { return title; }
+   function pipeLesson(title, index, max) {
+      if (
+         !APPEND_LESSON_PREFIX ||
+         checkSellingOrWelcomeVideo(title) ||
+         checkPrefix(title)
+      ) {
+         return title;
+      }
+      if (!CLEAN_FILE_NAME) {
+         return `Aula ${(index + 1).toString().padStart(max > 100 ? 3 : 2, "0")} - ${title}`;
+      }
+
+      return cleanTitle(
+         `Aula ${(index + 1).toString().padStart(max > 100 ? 3 : 2, "0")} - ${title}`,
+      );
+   }
+
+   function pipeModule(title, max) {
+      if (
+         !APPEND_MODULE_PREFIX ||
+         checkSellingOrWelcomeVideo(title) ||
+         checkPrefix(title)
+      ) {
+         return title;
+      }
       modulesIndex++;
-      if (!CLEAN_FILE_NAME) { return `Módulo ${ modulesIndex } - ${ title }` }
+      if (!CLEAN_FILE_NAME) {
+         return `Módulo ${modulesIndex} - ${title}`;
+      }
 
-      return cleanTitle(`Módulo ${ modulesIndex } - ${ title }`);
+      return cleanTitle(`Módulo ${modulesIndex} - ${title}`);
    }
 
-   function pipeLink (link) {
-      if (REMOVE_PLAYLIST) { 
-         return link.match(/.*(?=&list=)/gi)?.[0] || link; 
+   function pipeLink(link) {
+      if (REMOVE_PLAYLIST) {
+         return link.match(/.*(?=&list=)/gi)?.[0] || link;
       }
       return link;
    }
 
-   function cleanTitle (_title) {
-      return _title.match(/[^\\/\:\*\?\<\>\|!@#$%¨&]/gi).join('')
+   function cleanTitle(_title) {
+      return _title.match(/[^\\/\:\*\?\<\>\|!@#$%¨&:]/gi).join("");
    }
 
-   function getModulesAndLessons (payload) {
+   function getModulesAndLessons(payload) {
       return payload.map((module, _, mod_array) => ({
-         module_title: pipeModule(module.modules_id.description.trim(), mod_array.length),
-         module_lessons: module.modules_id.lessons.map((lesson, lesson_index, lesson_array) => ({
-               lesson_title: pipeLesson(lesson.lessons_id.description.trim(), lesson_index, lesson_array.length),
-               lesson_link: pipeLink(lesson.lessons_id.videoLink)
-         })),
-         ...(INCLUDE_MODULE_DAYS_LOCKED && { module_days_locked: "" })
+         module_title: pipeModule(
+            module.modules_id.description.trim(),
+            mod_array.length,
+         ),
+         module_lessons: module.modules_id.lessons.map(
+            (lesson, lesson_index, lesson_array) => ({
+               lesson_title: pipeLesson(
+                  lesson.lessons_id.description.trim(),
+                  lesson_index,
+                  lesson_array.length,
+               ),
+               lesson_link: pipeLink(lesson.lessons_id.videoLink),
+            }),
+         ),
+         ...(INCLUDE_MODULE_DAYS_LOCKED && { module_days_locked: "" }),
       }));
    }
 
-   function convertKronusPayload () {
+   function convertKronusPayload() {
       try {
-         const convertedOutput = getModulesAndLessons(JSON.parse(kronusPayload));
+         const convertedOutput = getModulesAndLessons(
+            JSON.parse(kronusPayload),
+         );
          flowComposerPayload = JSON.stringify(convertedOutput, null, 3);
-         toast.success('Dados convertidos!');
-         console.log('Writing done!');
+         toast.success("Dados convertidos!");
+         console.log("Writing done!");
       } catch (err) {
-         toast.error('Ocorreu um erro...');
-         console.error('[ERROR] Something went wrong: ', err);
+         toast.error("Ocorreu um erro...");
+         console.error("[ERROR] Something went wrong: ", err);
       }
    }
+
+   function copyFlowComposerPayloadOutput () {
+        if (navigator.clipboard && window.isSecureContext) {
+            window.navigator.clipboard.writeText(flowComposerPayload);
+        } else {
+            console.warn(`Context is not secure (${ window.isSecureContext }). Using select and copy.`);
+            responseTextarea.select();
+            document.execCommand('copy')
+        }
+        
+        toast.success('Saída copiada para a Área de Transferência!');
+    }
 </script>
 
 <Card.Root class="mt-4 rounded-lg">
    <Card.Header>
-      <Card.Title class="text-2xl font-bold">Conversor de Aulas Kronus</Card.Title>
-      <Card.Description class="text-base text-muted-foreground">Converte aulas do Kronus para um formato aceitado pelo Flow Builder.</Card.Description>
+      <Card.Title class="text-2xl font-bold"
+         >Conversor de Aulas Kronus</Card.Title
+      >
+      <Card.Description class="text-base text-muted-foreground"
+         >Converte aulas do Kronus para um formato aceitado pelo Flow Builder.</Card.Description
+      >
    </Card.Header>
 
    <Card.Content>
       <Tabs.Root value="kronus_data" class="w-full">
          <Tabs.List class="grid w-full grid-cols-2">
             <Tabs.Trigger value="kronus_data">Dados do Kronus</Tabs.Trigger>
-            <Tabs.Trigger value="flow_composer_data">Dados do Flow Composer</Tabs.Trigger>
+            <Tabs.Trigger value="flow_composer_data"
+               >Dados do Flow Composer</Tabs.Trigger
+            >
          </Tabs.List>
 
          <Tabs.Content value="kronus_data">
             <Label class="text-lg">Dados do Kronus</Label>
-            <Textarea rows="12" class="resize-none mt-3 font-code text-base" bind:value={kronusPayload} />
+            <Textarea
+               rows="12"
+               class="resize-none mt-3 font-code text-base"
+               bind:value={kronusPayload}
+            />
+
+            <div class="flex flex-row gap-x-2 mt-4">
+               <Button on:click={convertKronusPayload}>Converter</Button>
+           </div>
          </Tabs.Content>
 
          <Tabs.Content value="flow_composer_data">
             <Label class="text-lg">Dados do Flow Composer</Label>
-            <Textarea rows="12" class="resize-none mt-3 font-code text-base" bind:value={flowComposerPayload} />
+            <textarea  bind:this={responseTextarea} class="absolute opacity-0">{ flowComposerPayload }</textarea>
+            <Textarea
+               rows="12"
+               class="resize-none mt-3 font-code text-base"
+               bind:value={flowComposerPayload}
+            />
+
+            <div class="flex flex-row gap-x-2 mt-4">
+               <Button variant="default" on:click={copyFlowComposerPayloadOutput}>Copiar saída</Button>
+           </div>
          </Tabs.Content>
       </Tabs.Root>
    </Card.Content>
-
-   <Card.Footer>
-      <Button on:click={convertKronusPayload}>Converter</Button>
-   </Card.Footer>
 </Card.Root>

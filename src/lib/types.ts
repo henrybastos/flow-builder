@@ -74,3 +74,13 @@ export interface EnvPayloadModel {
 }
 
 export type InputType = 'text' | 'password' | 'email';
+
+export interface BlockProps {
+   title: string
+   block_id: string
+   description: string
+   dependencies: Array<string>
+   tags: Array<string>
+   payload: Payload
+   env_payload: EnvPayloadModel
+}
