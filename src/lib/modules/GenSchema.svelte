@@ -11,6 +11,7 @@
 
     let isFlowBlocksListOpen = false;
     let generatedSchema;
+    let generatedSchemaTextarea;
     let envPayload;
     let newBlockName;
     let schemaTags = [];
@@ -146,6 +147,18 @@ export const @@block_filename@: BlockProps = {
         generatedSchema = blockTemplateCopy;
         toast.success('Schema generated');
     }
+
+    function copyGeneratedSchemaOutput () {
+        if (navigator.clipboard && window.isSecureContext) {
+            window.navigator.clipboard.writeText(generatedSchema);
+        } else {
+            console.warn(`Context is not secure (${ window.isSecureContext }). Using select and copy.`);
+            generatedSchemaTextarea.select();
+            document.execCommand('copy')
+        }
+        
+        toast.success('Schema copied!');
+   }
 </script>
 
 <svelte:window on:load={() => console.log('Hello!')}/>
@@ -193,7 +206,12 @@ export const @@block_filename@: BlockProps = {
 
             <Tabs.Content value="schema">
                 <h3 class="text-lg my-3">Schema</h3>
+                <textarea id="copy-only-field" bind:this={generatedSchemaTextarea} class="absolute opacity-0">{ generatedSchema }</textarea>
                 <Textarea class="h-[100rem] max-h-[50vh] text-base font-code resize-none" bind:value={generatedSchema} placeholder="Generated schema"/>
+
+                <div class="flex flex-row gap-x-2 mt-4">
+                    <Button variant="default" on:click={copyGeneratedSchemaOutput}>Copy schema</Button>
+                </div>
             </Tabs.Content>
         </Tabs.Root>
     </Dialog.Content>

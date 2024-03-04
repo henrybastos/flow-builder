@@ -3,6 +3,7 @@
    import * as Tabs from "$lib/components/ui/tabs";
    import Button from "$lib/components/ui/button/button.svelte";
    import KronusLessonConverterFlowbarTab from "./flowbar/KronusLessonConverterFlowbarTab.svelte";
+   import CourseStructureConverterFlowbarTab from "./flowbar/CourseStructureConverterFlowbarTab.svelte";
 </script>
 
 <Sheet.Root>
@@ -16,12 +17,17 @@
       </Sheet.Header>
 
       <Tabs.Root value="kronus_lesson_converter" class="w-full">
-         <Tabs.List class="grid w-full grid-cols-1">
-            <Tabs.Trigger class="data-[state=active]:bg-sky-400 text-base" value="kronus_lesson_converter">Conversor Aula Kronus</Tabs.Trigger>
+         <Tabs.List class="grid w-full grid-cols-2">
+            <Tabs.Trigger class="data-[state=active]:bg-sky-400 text-base" value="kronus_lesson_converter">Conversor de Aulas Kronus</Tabs.Trigger>
+            <Tabs.Trigger class="data-[state=active]:bg-sky-400 text-base" value="course_structure_converter">Conversor de Estrutura do Curso</Tabs.Trigger>
          </Tabs.List>
 
          <Tabs.Content value="kronus_lesson_converter">
             <KronusLessonConverterFlowbarTab />
+         </Tabs.Content>
+         
+         <Tabs.Content value="course_structure_converter">
+            <CourseStructureConverterFlowbarTab />
          </Tabs.Content>
       </Tabs.Root>
 

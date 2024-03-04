@@ -133,7 +133,6 @@
                            bind:changesMade={changesMade}
                            bind:value={item[item_key]}
                            bind:data={data.schema.fields[item_key]}
-                           bind:isInputEditable
                         />
                      {/each}
                      <Button on:click={() => removeItemFromList(index)} class="col-span-full ml-auto uppercase mt-2 h-7 w-7" variant="destructive" size="icon">

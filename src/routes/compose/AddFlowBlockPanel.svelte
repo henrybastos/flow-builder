@@ -71,7 +71,7 @@
         <div class="max-h-[36rem] space-y-4 overflow-y-auto scroll-smooth">
             {#each FlowBlocks as block}
                 {#if DEV_MODE === block?.tags?.includes('dev') || !block?.tags?.includes('dev')}    
-                    <Card.Root id="{block.block_id}" class="rounded-lg transition-all border-{ block.block_id === highlightedBlockID ? 'amber-500' : 'neutral-400' }">
+                    <Card.Root id="{block.block_id}" class="rounded-lg transition-all { block.block_id === highlightedBlockID ? 'border-amber-500' : '' }">
                         <Card.Header class="flex flex-row p-4 text-xl text-left justify-between items-center">
                             <Card.Title>
                                 <div class="space-x-2">

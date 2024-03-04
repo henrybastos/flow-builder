@@ -37,13 +37,13 @@
                         toast.error('Ocorreu um erro durante a execução dos blocos.');
                         break;
                     case 'warning':
-                        toast.warning('Um aviso foi adicionado nos logs.');
+                        toast.warning('Um alerta foi disparado, favor checar os logs.');
                         break;
                 }
             }
 
             toast.info("Blocos executados.");
-            toast.warning("Verifique manualmente a eficácia da execução do fluxo.");
+            toast.warning("Verifique manualmente os resultados da execução do fluxo.");
         }
    }
 
@@ -61,15 +61,15 @@
        </Dialog.Header>
 
        <Tabs.Root class="w-full">
-            <Tabs.List class="grid grid-cols-2 w-full">
+            <Tabs.List class="grid grid-cols-2 w-full mb-4">
                 <Tabs.Trigger class="col-span-1" value="logs_tab">Logs</Tabs.Trigger>
                 <Tabs.Trigger class="col-span-1" value="screenshot_tab">Screenshot</Tabs.Trigger>
             </Tabs.List>
 
-            <Tabs.Content value="logs_tab" class="h-[60vh]">
-                <div class="console_screen flex-col-reverse overflow-y-auto overflow-x-clip max-h-[36rem] border mt-3">
+            <Tabs.Content value="logs_tab" class="h-[60vh] overflow-y-auto">
+                <div class="console_screen flex-col-reverse overflow-y-auto overflow-x-clip min-h-full border justify-end">
                     {#if logsGroups.length === 0}
-                        <p class="w-full text-neutral-500 text-center">No logs yet</p>
+                        <p class="w-full text-neutral-500 text-center my-auto">No logs yet</p>
                     {:else}
                         {#each logsGroups as logGroup, index}
                             <Collapsible.Root class="border flex flex-row flex-wrap border-neutral-700 rounded-md p-2 m-2 space-x-1 group/collapsible">
@@ -111,7 +111,7 @@
             
             <Tabs.Content value="screenshot_tab" class="h-[60vh]">
                 {#key isPayloadRunning}
-                    <img class="mt-3" alt="No screenshot found." src="/last_error.png?{ Math.random().toString().slice(3,8) }" />
+                    <img class="rounded-md" alt="No screenshot found." src="/last_error.png?{ Math.random().toString().slice(2,8) }" />
                 {/key}
             </Tabs.Content>
         </Tabs.Root>

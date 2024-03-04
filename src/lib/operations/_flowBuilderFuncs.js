@@ -10,7 +10,7 @@ export const env_query = (obj) => {
     const [queryKey, value] = Object.entries(obj)?.[0];
     console.log({ [`@query:${ queryKey }`]: value });
     return { [`@query:${ queryKey }`]: value };
- };
+};
 
 export const x = (path, root) => document.evaluate(path, root || document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
 
@@ -22,6 +22,20 @@ export const xxx = (path, root) => {
     }
     return elements;
 }
+
+/**
+ * Sets an element attribute/property and bubbles up the events "input" and "change";
+ * @param {string} x_path - The XPath to locate the element.
+ * @param {string} value - The value to be set.
+ * @param {string} attribute - The attribute/property to change the value of.
+ */
+export const set_element_value = (x_path, value, attribute = 'value') => {
+    const element = x(x_path);
+    element.focus();
+    element[attribute] = value;
+    element.dispatchEvent(new Event('input', { bubbles: true }));
+    element.dispatchEvent(new Event('change', { bubbles: true }));
+ }
 
 export const goto = (href) => { window.location.href = href };
 

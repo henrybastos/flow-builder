@@ -8,7 +8,7 @@ async function wait_for_navigation () {
     } catch (err) {
         this.logger.logEvent('operation_log', {
             message: `Failed to wait for navigation`,
-            status_message: 'error'
+            status_message: 'warning'
         });
     }
 }

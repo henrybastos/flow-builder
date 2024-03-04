@@ -81,7 +81,8 @@
    }
 
    function cleanTitle(_title) {
-      return _title.match(/[^\\/\:\*\?\<\>\|!@#$%¨&:]/gi).join("");
+      // return _title.match(/^(?!.*\.\.)(?!.*\.$)[^\x00-\x1F\x80-\x9F\s]+(\.[^\x00-\x1F\x80-\x9F\s]+)*$/gi).join("");
+      return _title.match(/[\w\s\d\.-]/gi).join('');
    }
 
    function getModulesAndLessons(payload) {
@@ -128,7 +129,7 @@
         }
         
         toast.success('Saída copiada para a Área de Transferência!');
-    }
+   }
 </script>
 
 <Card.Root class="mt-4 rounded-lg">
@@ -137,7 +138,7 @@
          >Conversor de Aulas Kronus</Card.Title
       >
       <Card.Description class="text-base text-muted-foreground"
-         >Converte aulas do Kronus para um formato aceitado pelo Flow Builder.</Card.Description
+         >Converte aulas do Kronus para um formato aceito pelo Flow Builder.</Card.Description
       >
    </Card.Header>
 
@@ -165,7 +166,7 @@
 
          <Tabs.Content value="flow_composer_data">
             <Label class="text-lg">Dados do Flow Composer</Label>
-            <textarea  bind:this={responseTextarea} class="absolute opacity-0">{ flowComposerPayload }</textarea>
+            <textarea id="copy-only-field" bind:this={responseTextarea} class="absolute opacity-0">{ flowComposerPayload }</textarea>
             <Textarea
                rows="12"
                class="resize-none mt-3 font-code text-base"

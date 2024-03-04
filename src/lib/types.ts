@@ -27,6 +27,7 @@ export interface Operation {
    page_id?: string
    key?: string
    trigger_onchange_on_tab?: boolean
+   filename?: string
 }
 
 export interface InputFields {
