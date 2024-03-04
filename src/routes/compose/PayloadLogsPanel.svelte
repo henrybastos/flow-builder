@@ -60,14 +60,14 @@
            <Dialog.Description>Shows the logs of the payload execution.</Dialog.Description>
        </Dialog.Header>
 
-       <Tabs.Root class="w-full">
+       <Tabs.Root class="w-full" active="logs_tab">
             <Tabs.List class="grid grid-cols-2 w-full mb-4">
                 <Tabs.Trigger class="col-span-1" value="logs_tab">Logs</Tabs.Trigger>
                 <Tabs.Trigger class="col-span-1" value="screenshot_tab">Screenshot</Tabs.Trigger>
             </Tabs.List>
 
-            <Tabs.Content value="logs_tab" class="h-[60vh] overflow-y-auto">
-                <div class="console_screen flex-col-reverse overflow-y-auto overflow-x-clip min-h-full border justify-end">
+            <Tabs.Content value="logs_tab" class="h-[60vh]">
+                <div class="flex flex-col-reverse overflow-y-auto max-h-full h-full">
                     {#if logsGroups.length === 0}
                         <p class="w-full text-neutral-500 text-center my-auto">No logs yet</p>
                     {:else}

@@ -41,7 +41,7 @@
                 <i class="ti ti-info-circle text-xl ml-1 text-neutral-600 hover:text-neutral-400"></i>
             </Tooltip.Trigger>
             <Tooltip.Content>
-            <p class="text-sm">{ tooltip }</p>
+            <p class="text-base">{ tooltip }</p>
             </Tooltip.Content>
         </Tooltip.Root>
     {/if}
