@@ -11,6 +11,8 @@
    let tsvData;
    let jsonData;
    let responseTextarea;
+   let inputFileOpener;
+   let tsvFile;
 
    class CourseFormatter {
       static CONTENT_CSV;
@@ -207,6 +209,24 @@
         
         toast.success('Saída copiada para a Área de Transferência!');
    }
+
+   function importTsvFile (evt) {
+      try {
+         evt.target.files.item(0)
+         let newFile = inputFileOpener.files[0];
+         let reader = new FileReader();
+         reader.readAsText(newFile, 'UTF-8');
+         reader.onload = (evt) => {
+            tsvFile = evt.target.result;
+            tsvData = tsvFile;
+         }
+   
+         toast.success(`Arquivo ${ newFile.name } importado com sucesso!`);
+      } catch (err) {
+         console.error(err);
+         toast.error(`Não foi possível importar o arquivo ${ newFile.name }`);
+      }
+   }
 </script>
 
 <Card.Root class="mt-4 rounded-lg">
@@ -232,9 +252,11 @@
                class="resize-none mt-3 font-code text-base"
                bind:value={tsvData}
             />
+            <input on:change={importTsvFile} bind:this={inputFileOpener} class="absolute opacity-0 left-36" type="file" accept="tsv" id="input-file-opener"/>
 
             <div class="flex flex-row gap-x-2 mt-4">
                <Button on:click={convertTsvData}>Converter</Button>
+               <Button variant="secondary" on:click={() => inputFileOpener.click()}>Importar Arquivo TSV</Button>
            </div>
          </Tabs.Content>
 

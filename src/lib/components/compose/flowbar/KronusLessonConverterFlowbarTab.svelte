@@ -37,7 +37,7 @@
    }
 
    function checkPrefix(title) {
-      return title.match(/(M(ó|o)dulo|B(ô|o)nus|Aula?)/gi).length > 0;
+      return title.match(/(M(ó|o)dulo|B(ô|o)nus|Aula?)/gi)?.length > 0;
    }
 
    function pipeLesson(title, index, max) {
