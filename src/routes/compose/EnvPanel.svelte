@@ -48,6 +48,7 @@
             return;
         };
 
+        envClone = structuredClone(combinedEnvPayload);
         isConfirmAlertDialogOpen = false;
         isEnvPanelOpen = false;
     }
@@ -115,7 +116,7 @@
 
 <Dialog.Root 
     closeOnEscape={!changesMade} 
-    closeOnOutsideClick={!changesMade} 
+    closeOnOutsideClick={false} 
     onOutsideClick={() => closeEnvPanel(changesMade)} 
     bind:open={isEnvPanelOpen}
 >
