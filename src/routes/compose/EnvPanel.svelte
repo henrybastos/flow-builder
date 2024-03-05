@@ -117,7 +117,6 @@
 <Dialog.Root 
     closeOnEscape={!changesMade} 
     closeOnOutsideClick={false} 
-    onOutsideClick={() => closeEnvPanel(changesMade)} 
     bind:open={isEnvPanelOpen}
 >
     <Dialog.Content class="max-w-[60rem]">
