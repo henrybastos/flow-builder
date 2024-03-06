@@ -1,6 +1,6 @@
 <script lang="ts">
-   import ComposeInput from "$lib/components/compose/ComposeInput.svelte";
    import ComposeInputList from "$lib/components/compose/ComposeInputList.svelte";
+   import ComposeInput from "$lib/components/compose/ComposeInput.svelte";
    import ComposeLabel from "$lib/components/compose/ComposeLabel.svelte";
    import ComposeSelect from "./ComposeSelect.svelte";
    import Button from "$lib/components/ui/button/button.svelte";
@@ -86,9 +86,9 @@
       />
    {/if}
 {:else if data?.schema?.fields_type === "array"}
-   <ComposeLabel tooltip={data.schema?.tooltip}
-      >{data.schema.label}</ComposeLabel
-   >
+   <ComposeLabel tooltip={data.schema?.tooltip}>
+      {data.schema.label}
+   </ComposeLabel>
    <ComposeInputList
       schema={data.schema}
       template_schema={data.template_schema}
@@ -145,9 +145,10 @@
       {/if}
    </ComposeInputList>
 {:else if data?.schema?.fields_type === "object"}
-   <ComposeLabel tooltip={data.schema.tooltip} groupType="object"
-      >Credenciais</ComposeLabel
-   >
+   <ComposeLabel tooltip={data.schema.tooltip} groupType="object">
+      Credenciais
+   </ComposeLabel>
+
    <div class="border border-neutral-800 rounded-md p-3 mt-1 mb-3 last:mb-0">
       {#each Object.entries(data.schema.fields) as [field_name, field]}
          <ComposeLabel tooltip={field.tooltip}>{field.label}</ComposeLabel>
@@ -159,7 +160,7 @@
       {/each}
    </div>
 {:else if data?.schema?.fields_type === "select"}
-   <ComposeSelect on:change={({ detail }) => triggerChange(() => data.value = detail.value)} label={data.schema.label} options={data.schema.options}/>
+   <ComposeSelect bind:placeholder={data.value} on:change={({ detail }) => triggerChange(() => data.value = detail.value)} label={data.schema.label} options={data.schema.options}/>
 {:else}
    <h1>INVALID</h1>
    <pre>{JSON.stringify(data, null, 3)}</pre>

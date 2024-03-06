@@ -6,15 +6,21 @@
    const dispatch = createEventDispatcher();
 
    export let options;
-   export let placeholder = options[0].label || 'Selecione uma opção';
+   export let placeholder = options.find(v => v === placeholder || v?.value === placeholder);
    export let tooltip = '';
    export let label;
+
+   function onChange (option) {
+      dispatch('change', option);
+      console.log(option);
+      placeholder = option?.label || option;
+   }
 </script>
 
 <ComposeLabel {tooltip}>{label}</ComposeLabel>
-<Select.Root onSelectedChange={(option) => dispatch('change', option)}>
+<Select.Root onSelectedChange={onChange}>
    <Select.Trigger class="w-full text-base">
-      <Select.Value {placeholder} />
+      <Select.Value placeholder={ placeholder?.label || placeholder || "Selecione uma opção" } />
    </Select.Trigger>
    <Select.Content class="max-h-[20rem] overflow-y-auto">
       {#each options as opt}
