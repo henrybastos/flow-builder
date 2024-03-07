@@ -171,9 +171,14 @@ export async function POST ({ request }) {
                             responsePayload[key] = value;
                             payload.env[key] = value;
                         }
-                        console.log('[ENV]', _env);
-                        console.log('[GLOBAL ENV]', payload.env);
-                        console.log('[RESPONSE PAYLOAD]', responsePayload);
+                        console.log('[ENV]');
+                        console.dir(_env, { depth: null });
+                        
+                        console.log('[GLOBAL ENV]');
+                        console.dir(payload.env, { depth: null });
+                        
+                        console.log('[RESPONSE PAYLOAD]');
+                        console.dir(responsePayload, { depth: null });
                     } catch (err) {
                         console.error('[ENV EVAL ERROR]', err);
                         ServerLogger.logEvent('error', { message: `${ err.name } :: ${ err.message }` });

@@ -243,15 +243,6 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = {
             filename: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.filename
         }
     },
-    eval_expression: {
-        command: 'eval_expression',
-        enabled: true,
-        label: 'Evaluate expression',
-        icon: 'ti-terminal-2',
-        input_fields: {
-            expression: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.expression
-        }
-    },
     attach_to_iframe: {
         command: 'attach_to_iframe',
         enabled: true,
@@ -314,6 +305,15 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = {
                 placeholder: '15000',
                 value: ''
             }
+        }
+    },
+    eval_expression: {
+        command: 'eval_expression',
+        enabled: true,
+        label: 'Evaluate expression',
+        icon: 'ti-terminal-2',
+        input_fields: {
+            expression: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.expression
         }
     },
     branch_eval: {

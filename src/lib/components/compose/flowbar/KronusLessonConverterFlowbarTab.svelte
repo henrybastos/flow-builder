@@ -5,6 +5,7 @@
    import Label from "$lib/components/ui/label/label.svelte";
    import Textarea from "$lib/components/ui/textarea/textarea.svelte";
    import { getContext } from "svelte";
+    import Clipboard from "$lib/components/Clipboard.svelte";
 
    let modulesIndex = 0;
    let kronusPayload = "";
@@ -119,17 +120,7 @@
       }
    }
 
-   function copyFlowComposerPayloadOutput () {
-        if (navigator.clipboard && window.isSecureContext) {
-            window.navigator.clipboard.writeText(flowComposerPayload);
-        } else {
-            console.warn(`Context is not secure (${ window.isSecureContext }). Using select and copy.`);
-            responseTextarea.select();
-            document.execCommand('copy')
-        }
-        
-        toast.success('Saída copiada para a Área de Transferência!');
-   }
+   
 </script>
 
 <Card.Root class="mt-4 rounded-lg">
@@ -166,7 +157,7 @@
 
          <Tabs.Content value="flow_composer_data">
             <Label class="text-lg">Dados do Flow Composer</Label>
-            <textarea id="copy-only-field" bind:this={responseTextarea} class="absolute opacity-0">{ flowComposerPayload }</textarea>
+            
             <Textarea
                rows="12"
                class="resize-none mt-3 font-code text-base"
@@ -174,7 +165,9 @@
             />
 
             <div class="flex flex-row gap-x-2 mt-4">
-               <Button variant="default" on:click={copyFlowComposerPayloadOutput}>Copiar saída</Button>
+               <Clipboard let:copyToClipboard bind:clipboardContent={flowComposerPayload} {toast}>
+                  <Button variant="default" on:click={copyToClipboard}>Copiar saída</Button>
+               </Clipboard>
            </div>
          </Tabs.Content>
       </Tabs.Root>

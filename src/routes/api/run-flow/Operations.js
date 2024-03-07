@@ -155,12 +155,12 @@ export default class Operations {
     static extract_param_from_url = extract_param_from_url;
     static extract_route_from_url = extract_route_from_url;
     static download_image = download_image;
-    static eval_expression = eval_expression;
     static attach_to_iframe = attach_to_iframe;
     static detach_from_iframe = detach_from_iframe;
     static new_page = new_page;
     static select_page = select_page;
     static wait_for_element = wait_for_element;
+    static eval_expression = eval_expression;
     static branch_eval = branch_eval;
     static screenshot = screenshot;
     static wait_for_dom_render = wait_for_dom_render;

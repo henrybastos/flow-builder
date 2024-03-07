@@ -1,9 +1,11 @@
 export const expose = (value) => {
-    return { _expose_key: '_fb_vars', ...value };
+    return { _expose_key: '$fb', ...value };
 };
 
 /** Sets a value in env payload. */
-export const env = (obj) => obj;
+export const env = (obj, _expose) => {
+    return _expose ? { ...obj, ...expose(obj) } : obj;
+};
 
 /** Sets a value in env payload with a query. */
 export const env_query = (obj) => { 
