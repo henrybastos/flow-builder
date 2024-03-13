@@ -15,7 +15,7 @@
         }
     })
 
-    const ALLOWED_DROPDOWN_OPERATIONS = ['run_flow', 'run_flow_for_each', 'check_element', 'branch_eval'];
+    const ALLOWED_DROPDOWN_OPERATIONS = ['run_flow', 'run_flow_iterations', 'run_flow_for_each', 'check_element', 'branch_eval'];
 
     const OPERATION_CONFIG_OPTIONS = [
         {

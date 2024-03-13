@@ -94,6 +94,16 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = {
             flow: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.flow
         }
     },
+    run_flow_iterations: {
+        command: 'run_flow_iterations',
+        enabled: true,
+        label: 'Run Flow Iterations',
+        icon: 'ti-repeat',
+        input_fields: {
+            flow: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.flow,
+            iterations: FLOW_BUILDER_INPUT_FIELD_TEMPLATES.iterations
+        }
+    },
     run_flow_for_each: {
         command: 'run_flow_for_each',
         enabled: true,
@@ -186,6 +196,20 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = {
         enabled: true,
         label: 'Wait For Navigation',
         icon: 'ti-speedboat'
+    },
+    wait_for_dom_render: {
+        command: 'wait_for_dom_render',
+        enabled: true,
+        label: 'Wait For DOM to Render',
+        icon: 'ti-crane',
+        input_fields: {
+            time: {
+                type: 'text',
+                label: 'Timeout time (ms)',
+                placeholder: '15000',
+                value: ''
+            }
+        }
     },
     close_browser: {
         command: 'close_browser',

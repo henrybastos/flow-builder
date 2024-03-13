@@ -47,7 +47,8 @@
          checkSellingOrWelcomeVideo(title) ||
          checkPrefix(title)
       ) {
-         return title;
+         if (!CLEAN_FILE_NAME) { return title; }
+         return cleanTitle(title);
       }
       if (!CLEAN_FILE_NAME) {
          return `Aula ${(index + 1).toString().padStart(max > 100 ? 3 : 2, "0")} - ${title}`;
@@ -83,7 +84,7 @@
 
    function cleanTitle(_title) {
       // return _title.match(/^(?!.*\.\.)(?!.*\.$)[^\x00-\x1F\x80-\x9F\s]+(\.[^\x00-\x1F\x80-\x9F\s]+)*$/gi).join("");
-      return _title.match(/[\w\s\d\.-]/gi).join('');
+      return _title.match(/[çáãâíóôõêéúû\w\s\d\.-]/gi).join('');
    }
 
    function getModulesAndLessons(payload) {

@@ -43,7 +43,8 @@ import wait_for_element from "$lib/operations/waitForElement";
 import check_element from "$lib/operations/checkElement";
 import branch_eval from "$lib/operations/branchEval";
 import screenshot from "$lib/operations/screenshot";
-import wait_for_dom_render from "$lib/operations/wait_for_dom_render";
+import wait_for_dom_render from "$lib/operations/waitForDomRender";
+import { initStruct } from "$lib/PayloadStore";
 
 /**
  * Comprise all Flow Builder Operations, like goto, scrape, eval etc.
@@ -94,9 +95,18 @@ export default class Operations {
 
     static _setPayload (_payload) {
         this.payload = _payload;
+        if (!this.payload.env?._$fb) { this.payload.env._$fb = initStruct; }
     }
 
     static async _injectFunctions () {
+        if (!this.payload.env?._$fb) {
+            console.log('[OPERATIONS] No _$fb env variable found.');
+            console.log(this.payload.env);
+        }
+        
+        // Initiates Flow Builder's internal variable $fb, exposed to the browser.
+        await this.curr_page.evaluate(`const _$fb = ${ JSON.stringify(this.payload.env._$fb) } || {};`)
+
         if (!await this.curr_page.evaluate('try { press_key } catch (err) { false }')) {
             await this.curr_page.exposeFunction('press_key', this.curr_page.keyboard.press);
         }
@@ -118,19 +128,21 @@ export default class Operations {
         }
     }
 
-    /**
-        * Code extracted from https://stackoverflow.com/questions/52497252/puppeteer-wait-until-page-is-completely-loaded
-        * by Anand Mahajan and Arel
-        * @param {import type { Page } from "puppeteer";} page 
-        * @param {number} timeout 
-        */
-    static async 
-
     static async getElement (_target, _timeout = 15000) {
         await this.wait_for_selector({ target: _target, timeout: _timeout });
         return await this.curr_page.$$(`xpath/${ _target }`);
     }
 
+    static async runIterations (cb_flow, max_iterations) {
+        for (let i = 0; i < parseInt(max_iterations); i++) { 
+            console.log(`[FLOW ITERATION ${i}] Running flow...`);
+
+            this.payload.env._$fb.flow_iteration = i;
+            await this.curr_page.evaluate(`_$fb.flow_iteration = ${ i };`);
+            
+            await cb_flow(); 
+        }
+    }
     
     static check_element = check_element;
     static goto = goto;

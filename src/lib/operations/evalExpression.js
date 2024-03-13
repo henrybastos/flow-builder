@@ -3,8 +3,8 @@
  * @returns If an object is returned, it is forward to the Response Payload accordingly.
  */
 async function eval_expression ({ expression }) {
-    await this._injectFunctions();
-    await this.wait_for_dom_render(await this.curr_page, 5000);
+    // await this._injectFunctions();
+    // await this.wait_for_dom_render(await this.curr_page, 5000);
 
     this.logger.logEvent("operation_log", {
         message: `Evaluating expression: ${ expression }`,

@@ -1,4 +1,10 @@
-async function wait_for_dom_render({ timeout = 30000 }) {
+/**
+* Code extracted from https://stackoverflow.com/questions/52497252/puppeteer-wait-until-page-is-completely-loaded
+* by Anand Mahajan and Arel
+* @param {import type { Page } from "puppeteer";} page 
+* @param {number} timeout 
+*/
+async function wait_for_dom_render({ timeout = 15000 }) {
     const checkDurationMsecs = 1000;
     const maxChecks = timeout / checkDurationMsecs;
     let lastHTMLSize = 0;

@@ -25,6 +25,19 @@
          bonus: '4'
       };
 
+      static casefy = {
+         titleCase: (str) => {
+            return str
+               .split(' ')
+               .filter(v => v)
+               .map(w => { 
+                  w = w.toLowerCase(); 
+                  return w.charAt(0).toUpperCase() + w.slice(1, w.length)
+               })
+               .join(' ');
+         }
+      }
+
       static configFormatter (tsd_data) {
          this.CONTENT_CSV = tsd_data;
          this.LINES = this.CONTENT_CSV.split('\n');
@@ -144,10 +157,11 @@
             // Used to push the last module to the module list when is arrives at the last line.
             const isLastLine = index === this.LINES.length - 1;
             
-            const [title] = this.isLesson(line.trim()) || this.isModule(line.trim()) || this.isBonus(line.trim()) || line.trim();
-            const [link, material] = this.extractLink(line) || [null];
+            let [title] = this.isLesson(line.trim()) || this.isModule(line.trim()) || this.isBonus(line.trim()) || line.trim();
+            let [link, material] = this.extractLink(line) || [null];
 
             if (this.isLesson(line.trim())) {
+               // title = this.casefy.titleCase(title);
                lessonsBuffer.push(this.genLesson({ 
                   title, 
                   link,

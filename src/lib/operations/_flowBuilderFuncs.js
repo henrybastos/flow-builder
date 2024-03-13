@@ -1,5 +1,7 @@
+// Some functions are then treated in the /api/run-flow/+server.js at the switch case inside evalOperation method.
+
 export const expose = (value) => {
-    return { _expose_key: '$fb', ...value };
+    return { _expose_key: '_$fb', ...value };
 };
 
 /** Sets a value in env payload. */
@@ -61,7 +63,6 @@ export const async_eval = async (maxAttempts = 5, interval = 5000, cb) => {
          
                   if (attempt >= maxAttempts) {
                      clearInterval(timeInterval);
-                     
                      if (cbError) { resolve(cbError); } 
                      else { resolve({ warning: `Max attempts reached: ${ maxAttempts }` }) }
                   }

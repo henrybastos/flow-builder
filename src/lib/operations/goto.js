@@ -5,9 +5,8 @@ async function goto({ target }) {
     });
     
     try {
-        let status = await this.curr_page.goto(target, { waitUntil: 'networkidle0' });
-        if (status) { status = status.status() };
-        // console.log('[NAVIGATION STATUS]', status);
+        await this.curr_page.goto(target, { waitUntil: 'networkidle0' });
+        await this._injectFunctions();
     } catch (err) {
         console.error(err);
         this.logger.logEvent('error', {

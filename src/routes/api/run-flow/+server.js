@@ -130,6 +130,9 @@ export async function POST ({ request }) {
             case 'run_flow':
                 await runFlow(payload.flows[_operation.flow], _env);
                 break;
+            case 'run_flow_iterations':
+                await Operations.runIterations(async () => await runFlow(payload.flows[_operation.flow], _env), _operation.iterations);
+                break;
             case 'run_flow_for_each':
                 await _runFlowForEach(_operation, _env)
                 break;

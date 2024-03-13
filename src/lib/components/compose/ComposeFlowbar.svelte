@@ -4,6 +4,7 @@
    import Button from "$lib/components/ui/button/button.svelte";
    import KronusLessonConverterFlowbarTab from "./flowbar/KronusLessonConverterFlowbarTab.svelte";
    import CourseStructureConverterFlowbarTab from "./flowbar/CourseStructureConverterFlowbarTab.svelte";
+   import DownloadVideosFlowbarTab from "./flowbar/DownloadVideosFlowbarTab.svelte";
 </script>
 
 <Sheet.Root>
@@ -20,6 +21,7 @@
          <Tabs.List class="grid w-full grid-cols-3">
             <Tabs.Trigger class="data-[state=active]:bg-sky-400 text-base" value="kronus_lesson_converter">Conversor de Aulas Kronus</Tabs.Trigger>
             <Tabs.Trigger class="data-[state=active]:bg-sky-400 text-base" value="course_structure_converter">Conversor de Estrutura do Curso</Tabs.Trigger>
+            <Tabs.Trigger class="data-[state=active]:bg-sky-400 text-base" value="videos_download">Download de vídeos</Tabs.Trigger>
          </Tabs.List>
 
          <Tabs.Content value="kronus_lesson_converter">
@@ -28,6 +30,10 @@
          
          <Tabs.Content value="course_structure_converter">
             <CourseStructureConverterFlowbarTab />
+         </Tabs.Content>
+         
+         <Tabs.Content value="videos_download">
+            <DownloadVideosFlowbarTab />
          </Tabs.Content>
       </Tabs.Root>
 
