@@ -5,8 +5,12 @@ export const expose = (value) => {
 };
 
 /** Sets a value in env payload. */
-export const env = (obj, _expose) => {
-    return _expose ? { ...obj, ...expose(obj) } : obj;
+export const env = (obj, _expose, _scoped) => {
+    return { 
+        ...obj, 
+        ...(_expose && expose(obj)),
+        ...(_scoped && { _scoped: true })
+    };
 };
 
 /** Sets a value in env payload with a query. */

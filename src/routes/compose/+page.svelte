@@ -196,6 +196,12 @@
       combinedEnvPayload = newCombinedEnvPayload;
    }
 
+   async function gitUpdate () {
+      console.log('Updating...')
+      const response = await fetch('/api/git-update');
+      console.log(await response.json());
+   }
+
    onMount(() => {
       isPageLoading = false;
    });
@@ -224,8 +230,12 @@
                      Logs
                   </Button>
 
+                  <Button on:click={gitUpdate} variant="outline" size="icon">
+                     <i class="ti ti-download text-green-500"></i>
+                  </Button>
+
                   {#if DEV_MODE}   
-                     <Button on:click={() => (isDevSettingsPanelOpen = true)} variant="outline" size="icon">
+                     <Button on:click={() => isDevSettingsPanelOpen = true} variant="outline" size="icon">
                         <i class="ti ti-settings-code text-neutral-500"></i>
                      </Button>
                   {/if}

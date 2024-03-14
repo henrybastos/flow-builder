@@ -1,26 +1,30 @@
 <script>
    import * as Select from "$lib/components/ui/select";
    import ComposeLabel from "./ComposeLabel.svelte";
-   import { createEventDispatcher } from "svelte";
+   import { createEventDispatcher, onMount } from "svelte";
 
    const dispatch = createEventDispatcher();
 
    export let options;
-   export let placeholder = options.find(v => v === placeholder || v?.value === placeholder);
+   export let placeholder;
    export let tooltip = '';
    export let label;
 
    function onChange (option) {
       dispatch('change', option);
       console.log(option);
-      placeholder = option?.label || option;
+      placeholder = option.label;
    }
+
+   onMount(() => {
+      placeholder = options.find(v => v.value === placeholder)?.label || placeholder;
+   })
 </script>
 
 <ComposeLabel {tooltip}>{label}</ComposeLabel>
 <Select.Root onSelectedChange={onChange}>
    <Select.Trigger class="w-full text-base">
-      <Select.Value placeholder={ placeholder?.label || placeholder || "Selecione uma opção" } />
+      <Select.Value placeholder={ placeholder || "Selecione uma opção" } />
    </Select.Trigger>
    <Select.Content class="max-h-[20rem] overflow-y-auto">
       {#each options as opt}

@@ -6,7 +6,6 @@ async function goto({ target }) {
     
     try {
         await this.curr_page.goto(target, { waitUntil: 'networkidle0' });
-        await this._injectFunctions();
     } catch (err) {
         console.error(err);
         this.logger.logEvent('error', {

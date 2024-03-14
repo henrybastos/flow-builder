@@ -24,7 +24,7 @@
    }
 
    //==================== DRAGGABLE ====================/
-   function handleDragStart({ detail }) {
+   function handleDragStart({ detail }: { detail: { from: number } }) {
       dragFromIndex = detail.from;
       isOnDrag = isDraggable;
    }
@@ -33,7 +33,7 @@
       isOnDrag = false;
    }
 
-   function handleDrop({ detail }) {
+   function handleDrop({ detail }: { detail: { to: number } }) {
       dragToIndex = detail.to;
 
       let itemToInsert = value[dragFromIndex];
@@ -160,7 +160,7 @@
       {/each}
    </div>
 {:else if data?.schema?.fields_type === "select"}
-   <ComposeSelect bind:placeholder={data.value} on:change={({ detail }) => triggerChange(() => data.value = detail.value)} label={data.schema.label} options={data.schema.options}/>
+   <ComposeSelect placeholder={data.value} on:change={({ detail }) => triggerChange(() => data.value = detail.value)} label={data.schema.label} options={data.schema.options}/>
 {:else}
    <h1>INVALID</h1>
    <pre>{JSON.stringify(data, null, 3)}</pre>

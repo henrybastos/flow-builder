@@ -117,6 +117,7 @@ export async function POST ({ request }) {
         }
         
         Operations._setPayload(payload);
+        await Operations._injectFunctions();
         console.log(`Operation: ${ _operation.command }`);
 
         // Calls the operation
@@ -143,13 +144,27 @@ export async function POST ({ request }) {
                 for (let [key, value] of Object.entries(await Operations.eval_expression(_operation) || {})) {
                     console.log('[EVAL KEY]', key);
                     try {
-                        // Support for object queries
-                        const queryKey = key.match(/(?<=@query:).*/g)?.[0];
+                        /**
+                         * Flags to modify the code behaviour. Can be stacked (e.g.: `@scoped:@query:user.info.email`)
+                         * 
+                         * @property {boolean} query - Support for object queries/dot notation (e.g.: `user.info.name`).
+                         * @property {boolean} scoped - Whether it uses `payload.env` (global/absolute) of `_env` (local/relative).
+                         */
+                        let flags = {
+                            scoped: false,
+                            query: false
+                        }
 
-                        if (queryKey) {
+                        flags.scoped = key.match(/@scoped:/g);
+                        flags.query = key.match(/@query:/g);
+
+                        // Cleans out the flags from the key
+                        key = key.replace(/(@query:|@scoped:)/g, '');
+
+                        if (flags.query) {
                             let query = '';
                         
-                            queryKey.split('.').forEach((v, index, array) => {
+                            key.split('.').forEach((v, index, array) => {
                                 // if (v.match(/\s/g)) { 
                                 //     v = `['${ v }']` 
                                 // } else {
@@ -171,8 +186,13 @@ export async function POST ({ request }) {
                                 console.log(objQuery);
                             })
                         } else {
+                            if (flags.scoped) {
+                                _env[key] = value;
+                            } else {
+                                payload.env[key] = value;
+                            }
+
                             responsePayload[key] = value;
-                            payload.env[key] = value;
                         }
                         console.log('[ENV]');
                         console.dir(_env, { depth: null });

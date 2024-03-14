@@ -105,7 +105,9 @@ export default class Operations {
         }
         
         // Initiates Flow Builder's internal variable $fb, exposed to the browser.
-        await this.curr_page.evaluate(`const _$fb = ${ JSON.stringify(this.payload.env._$fb) } || {};`)
+        if (!await this.curr_page.evaluate('try { _$fb } catch (err) { false }')) {
+            await this.curr_page.evaluate(`const _$fb = ${ JSON.stringify(this.payload.env._$fb) } || {};`)
+        }
 
         if (!await this.curr_page.evaluate('try { press_key } catch (err) { false }')) {
             await this.curr_page.exposeFunction('press_key', this.curr_page.keyboard.press);
