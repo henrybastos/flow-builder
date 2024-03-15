@@ -65,8 +65,8 @@ export const flyAndScale = (
 /* MY UTILS */
 
 const envPlaceholder = {
-    start: '%',
-    end: '%'
+    start: '@@',
+    end: '@'
 }
 
 /**

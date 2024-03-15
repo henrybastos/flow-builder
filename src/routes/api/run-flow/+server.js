@@ -95,9 +95,11 @@ export async function POST ({ request }) {
 
     async function _runFlowForEach ({ env_var, flow }, _env) {
         const replacedEnv = EnvHandler.checkPlaceholders(env_var, _env);
+        console.log(replacedEnv);
 
-        for (const _scoped_env of replacedEnv) {
+        for (const [i, _scoped_env] of Object.entries(replacedEnv)) {
             await runFlow(payload.flows[flow], _scoped_env);
+            _scoped_env._flow_iteration = i;
         }
     }
 
@@ -113,6 +115,7 @@ export async function POST ({ request }) {
         for (const [_input_name, _input_value] of Object.entries(_operation)) {
             if (EnvHandler.ENV_VARIABLES_INPUT_ALLOWLIST.includes(_input_name)) {
                 _operation[_input_name] = EnvHandler.checkPlaceholders(_input_value, _env);
+                console.log(_operation[_input_name]);
             }
         }
         

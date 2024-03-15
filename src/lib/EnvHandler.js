@@ -29,40 +29,37 @@ export class EnvHandler {
       this._BEGIN_LOG_EVENT_();
       this._LOG_EVENT_('[START]', _str, _env);
 
-      if (this.hasEnvPlaceholder(_str)) {
-         let rawEnvVars = this.hasEnvPlaceholder(_str);
-         this._LOG_EVENT_('[RAW ENV VARS]', rawEnvVars);
+      const placeholders = this.hasEnvPlaceholder(_str);
+      console.log('[PLACEHOLDERS]', placeholders);
 
-         const result = rawEnvVars?.map(raw_env_var => {
-            this._LOG_EVENT_('[IS GLOBAL]', this.isEnvGlobal(_str));
-            this._LOG_EVENT_('[IS RESPONSE PAYLOAD]', this.isResponsePayload(_str));
+      if (placeholders) {
+         const result = placeholders?.map(placeholder => {
    
-            let envVar = this.resolveDotNotation(this.trimAbsolutePlaceholders(raw_env_var), this.chooseEnv(raw_env_var, _env));
-            this._LOG_EVENT_('[ENV VAR]', envVar);
-   
-            if (typeof envVar === 'string') {
-               if (this.hasEnvPlaceholder(envVar)) {
-                  this._LOG_EVENT_('[RUN AGAIN]', envVar);
-                  envVar = this.checkPlaceholders(envVar, _env);
-               } 
+            const cleanedPlaceholder = this.trimAbsolutePlaceholders(placeholder);
+            const chosenEnv = this.chooseEnv(placeholder, _env);
+            let envVar = this.resolveDotNotation(cleanedPlaceholder, chosenEnv);
+
+            if (typeof envVar === 'string' && this.hasEnvPlaceholder(envVar)) {
+               envVar = this.checkPlaceholders(envVar, _env);
             }
-            this._LOG_EVENT_('[STR]', _str, this.needsStringReplacement(_str));
 
-            if (this.needsStringReplacement(_str) && typeof envVar === 'string') {
+            // console.log('[DEBUG #01 - STR]', _str);
+            // console.log('[DEBUG #02 - ENV VAR]', envVar);
+            // console.log('[DEBUG #03 - REMAINING]', remainingPlaceholders);
+
+            if (typeof envVar === 'string') {
                // eslint-disable-next-line no-useless-escape
-               const newPlaceholder = new RegExp(`(%|%\\$\\$(env|res)\.)${ this.trimAbsolutePlaceholders(raw_env_var) }%`, 'g');
-               this._LOG_EVENT_('[REPLACE ALL]', _str.replaceAll(newPlaceholder, envVar), newPlaceholder, envVar);
+               const newPlaceholder = new RegExp(`(@@|@@\\$\\$(env|res):)${ this.trimAbsolutePlaceholders(placeholder) }@`, 'g');
                return _str = _str.replaceAll(newPlaceholder, envVar);
             }
-
+            
+            console.log('[NOT STRING]', envVar);
             return envVar;
          });
 
-         this._END_LOG_EVENT_('[ALL ENV VARS]', result);
-         this._END_LOG_EVENT_('[RETURN ENV VARS]', result.slice(-1)[0]);
+         console.log('[DEBUG #05 - RESULT]', result);
          return result.slice(-1)[0];
       } else {
-         this._END_LOG_EVENT_('[RETURN RAW]', _str);
          return _str;
       }
    }
@@ -102,36 +99,35 @@ export class EnvHandler {
 
    static hasEnvPlaceholder (_str) {
       // Gets all placeholders
-      const placeholders = _str.match(/(?<=%)(.*?)(?=%)/g);
+      const placeholders = _str.match(/(?<=@@)([^@]+)(?=@)/g);
 
       if (!placeholders) {
          return null;
       }
 
-      // Gets all even placeholders 
-      // e.g.: In "%var_1%/%var_2%" it would return ["%var_1%", "/", "%var_2%"], and the "/" its not desired, its a subproduct.
-      let evenPlaceholders = placeholders?.filter((w,i) => i % 2 == 0 && w);
-      // console.log('evenPlaceholders', evenPlaceholders);
+      /*
+      if (placeholders.length > 2) {
+         // Gets all even placeholders 
+         // e.g.: In "@var_1@/@var_2@" it would return ["@@var_1@", "/", "@@var_2@"], and the "/" its not desired, its a subproduct.
+         let evenPlaceholders = placeholders?.filter((w,i) => i % 2 == 0 && w);
+         // console.log('evenPlaceholders', evenPlaceholders);
+      }
+      */
 
       // Removes the "$$env" and "$$res"
-      return Array.from(new Set(evenPlaceholders));
+      return Array.from(new Set(placeholders));
    }
 
    static trimAbsolutePlaceholders (_str) {
-      return _str.replace(/\$\$(env|res)\./g, '');
+      return _str.replace(/\$\$(env|res):/g, '');
    }
    
    static isEnvGlobal (_str) {
-      return _str.match(/\$\$env\./g) !== null;
+      return _str.match(/\$\$env:/g) !== null;
    }
 
    static isResponsePayload (_str) {
-      return _str.match(/\$\$res\./g) !== null;
-   }
-
-   static needsStringReplacement (_str) {
-      console.log('[ENV_HANDLER]', _str);
-      return _str.match(/(?<=%)(.*?)(?=%)/g)?.filter((w, i) => i % 2 == 0 && w)?.length > 0;
+      return _str.match(/\$\$res:/g) !== null;
    }
    
    static resolveDotNotation (_str, _env) {

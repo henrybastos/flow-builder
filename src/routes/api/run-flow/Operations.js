@@ -106,25 +106,14 @@ export default class Operations {
         
         // Initiates Flow Builder's internal variable $fb, exposed to the browser.
         if (!await this.curr_page.evaluate('try { _$fb } catch (err) { false }')) {
-            await this.curr_page.evaluate(`const _$fb = ${ JSON.stringify(this.payload.env._$fb) } || {};`)
-        }
-
-        if (!await this.curr_page.evaluate('try { press_key } catch (err) { false }')) {
-            await this.curr_page.exposeFunction('press_key', this.curr_page.keyboard.press);
+            console.log('FB does not exist', await this.curr_page.evaluate('try { _$fb } catch (err) { err.message }'));
+            await this.curr_page.evaluate(`const _$fb = ${ JSON.stringify(this.payload.env?._$fb || {}) } ;`);
         }
 
         for (let [fn_name, fn_func] of Object.entries(this._flowBuilderInjectionFuncs)) {
             /** Tries to inject the function with a try-catch block, as the function might already be declared and defined. */
             if (!await this.curr_page.evaluate(`try { ${ fn_name } } catch (err) { false }`)) {
                 console.log('[FUNC INJECTION]: Injecting function', fn_name);
-                // console.log(`[FUNC] ${fn_name} :: const ${ fn_name } = ${ fn_func }`);
-                /** Injects the functions into the page, so it can be used with evaluate */
-                // if (fn_func instanceof (async () => {}).constructor) {
-                //     await this.curr_page.evaluate(`const ${ fn_name } = async ${ fn_func }`);
-                // } else {
-                //     await this.curr_page.evaluate(`const ${ fn_name } = ${ fn_func }`);
-                // }
-
                 await this.curr_page.evaluate(`const ${ fn_name } = ${ fn_func }`);
             }
         }
