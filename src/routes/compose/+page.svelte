@@ -199,7 +199,8 @@
    async function gitUpdate () {
       console.log('Updating...')
       const response = await fetch('/api/git-update');
-      console.log(await response.json());
+      const result = await response.json();
+      console.log(result);
    }
 
    onMount(() => {
@@ -230,9 +231,9 @@
                      Logs
                   </Button>
 
-                  <!-- <Button on:click={gitUpdate} variant="outline" size="icon">
+                  <Button on:click={gitUpdate} variant="outline" size="icon">
                      <i class="ti ti-download text-green-500"></i>
-                  </Button> -->
+                  </Button>
 
                   <Button on:click={() => isUserSettingsPanelOpen = true} variant="outline" size="icon">
                      <i class="ti ti-adjustments text-neutral-500"></i>
