@@ -1,7 +1,6 @@
 <script>
     import hljs from 'highlight.js/lib/core';
     import json from 'highlight.js/lib/languages/json'
-    import hljs_theme from 'highlight.js/styles/tokyo-night-dark.min.css';
     import * as Dialog from "$lib/components/ui/dialog";
     import * as AlertDialog from "$lib/components/ui/alert-dialog";
     import * as Tabs from "$lib/components/ui/tabs";
@@ -13,11 +12,11 @@
     import { page } from "$app/stores";
     import { toast } from "svelte-sonner";
     import { LOGGER, TAGS } from "$lib/LogStore";
-    import { onMount } from "svelte";
 
     export let isEnvPanelOpen = false;
     export let combinedEnvPayload;
     export let isPayloadRunning;
+    export let userSettings;
     
     let changesMade = false;
     let isConfirmAlertDialogOpen = false;
@@ -116,7 +115,7 @@
 
 <Dialog.Root 
     closeOnEscape={!changesMade} 
-    closeOnOutsideClick={false} 
+    closeOnOutsideClick={userSettings?.close_env_panel_on_outside_click} 
     bind:open={isEnvPanelOpen}
 >
     <Dialog.Content class="max-w-[60rem]">

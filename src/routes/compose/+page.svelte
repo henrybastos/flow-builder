@@ -19,22 +19,20 @@
    import ComposeFlowbar from "$lib/components/compose/ComposeFlowbar.svelte";
    import { env } from "$env/dynamic/public"
    import { setContext } from "svelte";
+   import UserSettingsPanel from "./UserSettingsPanel.svelte";
 
-   setContext('toast', toast);
-
-   let isPayloadRunning = false;
-   let isPageLoading = true;
    let isFlowBlockPanelOpen = false;
    let isEnvPanelOpen = false;
    let isAddFlowBlockOpen = false;
    let isLogsPanelOpen = false;
    let isStopExecutionOpen = false;
    let isDevSettingsPanelOpen = false;
-   let defaultDevSettings = {
-      headless: true
-   }
+   let isUserSettingsPanelOpen = false;
+   let isPayloadRunning = false;
+   let isPageLoading = true;
 
-   let devSettings = defaultDevSettings;
+   let devSettings;
+   let userSettings;
 
    let currentFlowBlock = {
       title: "",
@@ -68,6 +66,8 @@
 
    ServerHandler.logger = LOGGER;
    ServerHandler.logger_tags = TAGS;
+
+   setContext('toast', toast);
 
    function combineAllPayloads() {
       let fullPayload = {};
@@ -230,13 +230,17 @@
                      Logs
                   </Button>
 
-                  <Button on:click={gitUpdate} variant="outline" size="icon">
+                  <!-- <Button on:click={gitUpdate} variant="outline" size="icon">
                      <i class="ti ti-download text-green-500"></i>
+                  </Button> -->
+
+                  <Button on:click={() => isUserSettingsPanelOpen = true} variant="outline" size="icon">
+                     <i class="ti ti-adjustments text-neutral-500"></i>
                   </Button>
 
                   {#if DEV_MODE}   
-                     <Button on:click={() => isDevSettingsPanelOpen = true} variant="outline" size="icon">
-                        <i class="ti ti-settings-code text-neutral-500"></i>
+                     <Button on:click={() => isDevSettingsPanelOpen = true} variant="dev" size="icon">
+                        <i class="ti ti-settings-code text-purple-600"></i>
                      </Button>
                   {/if}
                </div>
@@ -360,12 +364,13 @@
 </AlertDialog.Root>
 
 <FlowBlockPayloadViewerPanel bind:isPanelOpen={isFlowBlockPanelOpen} bind:flowBlock={currentFlowBlock}/>
-<EnvPanel bind:combinedEnvPayload bind:isEnvPanelOpen bind:isPayloadRunning />
+<EnvPanel bind:userSettings bind:combinedEnvPayload bind:isEnvPanelOpen bind:isPayloadRunning />
 <AddFlowBlockPanel {DEV_MODE} bind:combinedEnvPayload bind:flowBlocksList={flowBlocksList} bind:isPanelOpen={isAddFlowBlockOpen} />
 <PayloadLogsPanel {toast} bind:isPanelOpen={isLogsPanelOpen} bind:isPayloadRunning />
-<DevSettingsPanel bind:devSettings bind:isPanelOpen={isDevSettingsPanelOpen} {defaultDevSettings} />
+<DevSettingsPanel bind:devSettings bind:isPanelOpen={isDevSettingsPanelOpen} />
+<UserSettingsPanel bind:userSettings bind:isPanelOpen={isUserSettingsPanelOpen} />
 <ComposeFlowbar />
 
 {#if env?.PUBLIC_ENV?.toUpperCase() === 'DEV'}
-   <span class="absolute bottom-0 w-full bg-purple-400 text-base text-neutral-900 text-center font-code py-1">DEV ENVIRONMENT</span>
+   <span class="absolute bottom-0 w-full bg-purple-600 text-base text-center font-code py-1">DEV ENVIRONMENT</span>
 {/if}

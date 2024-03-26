@@ -1,3 +1,5 @@
+import { removeKeyFlags } from "../../routes/api/run-flow/operationUtils";
+
 /**
  * Evaluate Expression
  * @returns If an object is returned, it is forward to the Response Payload accordingly.
@@ -5,54 +7,62 @@
 async function eval_expression ({ expression }) {
     // await this._injectFunctions();
     // await this.wait_for_dom_render(await this.curr_page, 5000);
+    let expressionResult = await this.curr_page.evaluate(expression);
 
     this.logger.logEvent("operation_log", {
         message: `Evaluating expression: ${ expression }`,
         status_message: "info"
     })
 
-    let expressionReturnValue = await this.curr_page.evaluate(expression);
+    // console.log('EVAL RESULT', expressionResult);
 
-    // console.log('EVAL RESULT', expressionReturnValue);
+    if (expressionResult) {
+        for (let [key, value] of Object.entries(expressionResult)) {
+            const exposed = key.match(/@exposed:/g);
 
-    if (expressionReturnValue) {
-        if (expressionReturnValue?._expose_key) {
-            // Filters out the _expose_key
-            const filteredObject = Object.fromEntries(
-                Object.entries(structuredClone(expressionReturnValue)).filter(([ key, value ]) => key !== '_expose_key' && { [key]: value })
-            );
+            key = removeKeyFlags(key);
 
-            // Adding the _expose_key object, exposes the expressionReturnValue to the browser to be used with eval_expression;
-            const exposeEvalExpression = `const ${ expressionReturnValue?._expose_key } = ${ JSON.stringify(filteredObject) }`;
-            await this.curr_page.evaluate(exposeEvalExpression);
-            await this.curr_page.evaluate(`console.log("[FB_SYS] Exposed key: ${expressionReturnValue?._expose_key}")`);
-            console.log(exposeEvalExpression);
-            expressionReturnValue = filteredObject;
+            if (exposed) {
+                await this.curr_page.evaluate(`_$fb = { ..._$fb, ...(${ JSON.stringify({ [key]: value })}) }`);
+                await this.curr_page.evaluate(`console.log("[FLOW BUILDER] Exposed key: ${ key }")`);
+            }
         }
+        // if (flags.exposed) {
+            // Filters out the _expose_key
+            // const filteredObject = Object.fromEntries(
+            //     Object.entries(structuredClone(expressionResult)).filter(([ key, value ]) => key !== '_expose_key' && { [key]: value })
+            // );
 
-        if (expressionReturnValue?.error) {
+            // Adding the _expose_key object, exposes the expressionResult to the browser to be used with eval_expression;
+            // if (!await this.curr_page.evaluate(`try { ${ expressionResult?._expose_key } } catch (err) { false }`)) {
+            // }
+            // await this.curr_page.evaluate(`_$fb = { ..._$fb, ...(${ JSON.stringify(filteredObject)}) }`);
+            // await this.curr_page.evaluate(`console.log("[FB_SYS] Exposed key: ${expressionResult}")`);
+        // }
+
+        if (expressionResult?.error) {
             this.logger.logEvent("operation_log", {
-                message: `[EVAL EXECPTION]: ${ expressionReturnValue.error }`,
+                message: `[EVAL EXECPTION]: ${ expressionResult.error }`,
                 status_message: "error"
             })
 
-            return expressionReturnValue;
-        } else if (expressionReturnValue?.warning) {
+            return expressionResult;
+        } else if (expressionResult?.warning) {
             this.logger.logEvent("operation_log", {
-                message: `[EVAL WARNING]: ${ expressionReturnValue.warning }`,
+                message: `[EVAL WARNING]: ${ expressionResult.warning }`,
                 status_message: "warning"
             })
 
-            return expressionReturnValue;
+            return expressionResult;
         } 
 
         let logMessage;
         
-        if (typeof expressionReturnValue === 'object') {
-            logMessage = JSON.stringify(expressionReturnValue);
-        } else if (['string', 'number', 'boolean'].includes(typeof expressionReturnValue)) { 
-            logMessage = expressionReturnValue.toString();
-            expressionReturnValue = { [`AUTO_${ Math.random().toString().slice(3, 12) }`]: expressionReturnValue }
+        if (typeof expressionResult === 'object') {
+            logMessage = JSON.stringify(expressionResult);
+        } else if (['string', 'number', 'boolean'].includes(typeof expressionResult)) { 
+            logMessage = expressionResult.toString();
+            expressionResult = { [`AUTO_${ Math.random().toString().slice(3, 12) }`]: expressionResult }
         } 
 
         this.logger.logEvent("operation_log", {
@@ -60,8 +70,8 @@ async function eval_expression ({ expression }) {
             status_message: "info"
         })
 
-        console.log('[EVAL EXPRESSION] Result: ', expressionReturnValue);
-        return expressionReturnValue;
+        console.log('[EVAL EXPRESSION] Result: ', expressionResult);
+        return expressionResult;
     }
 }
 

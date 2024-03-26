@@ -57,7 +57,7 @@
    <Dialog.Content class="max-w-[90vw] justify-center">
        <Dialog.Header>
            <Dialog.Title class="text-xl">Logs</Dialog.Title>
-           <Dialog.Description>Shows the logs of the payload execution.</Dialog.Description>
+           <Dialog.Description class="text-base">Shows the logs of the payload execution.</Dialog.Description>
        </Dialog.Header>
 
        <Tabs.Root active="logs_tab">

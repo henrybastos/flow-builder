@@ -1,6 +1,6 @@
-import ServerLogger from "./ServerLogger"
+import ServerLogger from "./ServerLogger";
+import { EnvHandler } from "$lib/EnvHandler";
 import { 
-    expose,
     env,
     env_query,
     x, 
@@ -62,7 +62,6 @@ export default class Operations {
 
     // static __flow_builder_are_funcs_injected__ = false;
     static _flowBuilderInjectionFuncs = {
-        expose,
         env,
         env_query,
         x,
@@ -107,7 +106,7 @@ export default class Operations {
         // Initiates Flow Builder's internal variable $fb, exposed to the browser.
         if (!await this.curr_page.evaluate('try { _$fb } catch (err) { false }')) {
             console.log('FB does not exist', await this.curr_page.evaluate('try { _$fb } catch (err) { err.message }'));
-            await this.curr_page.evaluate(`const _$fb = ${ JSON.stringify(this.payload.env?._$fb || {}) } ;`);
+            await this.curr_page.evaluate(`let _$fb = ${ JSON.stringify(this.payload.env?._$fb || {}) } ;`);
         }
 
         for (let [fn_name, fn_func] of Object.entries(this._flowBuilderInjectionFuncs)) {
@@ -124,13 +123,14 @@ export default class Operations {
         return await this.curr_page.$$(`xpath/${ _target }`);
     }
 
-    static async runIterations (cb_flow, max_iterations) {
-        for (let i = 0; i < parseInt(max_iterations); i++) { 
+    static async runIterations (cb_flow, _operation, _env) {
+        for (let i = 0; i < parseInt(_operation.iterations); i++) { 
             console.log(`[FLOW ITERATION ${i}] Running flow...`);
 
             this.payload.env._$fb.flow_iteration = i;
             await this.curr_page.evaluate(`_$fb.flow_iteration = ${ i };`);
-            
+            // this._replaceEnvPlaceholders(_operation, _env);
+
             await cb_flow(); 
         }
     }

@@ -1,17 +1,11 @@
 // Some functions are then treated in the /api/run-flow/+server.js at the switch case inside evalOperation method.
 
-export const expose = (value) => {
-    return { _expose_key: '_$fb', ...value };
-};
+// export const expose = (value) => {
+//     return { _expose_key: '_$fb', ...value };
+// };
 
 /** Sets a value in env payload. */
-export const env = (obj, _expose, _scoped) => {
-    return { 
-        ...obj, 
-        ...(_expose && expose(obj)),
-        ...(_scoped && { _scoped: true })
-    };
-};
+export const env = (obj) => obj;
 
 /** Sets a value in env payload with a query. */
 export const env_query = (obj) => { 

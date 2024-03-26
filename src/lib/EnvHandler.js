@@ -34,7 +34,6 @@ export class EnvHandler {
 
       if (placeholders) {
          const result = placeholders?.map(placeholder => {
-   
             const cleanedPlaceholder = this.trimAbsolutePlaceholders(placeholder);
             const chosenEnv = this.chooseEnv(placeholder, _env);
             let envVar = this.resolveDotNotation(cleanedPlaceholder, chosenEnv);
@@ -43,13 +42,20 @@ export class EnvHandler {
                envVar = this.checkPlaceholders(envVar, _env);
             }
 
+            // console.log('[DEBUG #00 - CHOSEN ENV]', chosenEnv);
             // console.log('[DEBUG #01 - STR]', _str);
             // console.log('[DEBUG #02 - ENV VAR]', envVar);
-            // console.log('[DEBUG #03 - REMAINING]', remainingPlaceholders);
+            // console.log('[DEBUG #03 - PLACEHOLDERS]', placeholder);
+            // console.log('[DEBUG #03 - CLEANED PLACEHOLDERS]', cleanedPlaceholder);
+
+            if (typeof envVar === 'number') {
+               envVar = envVar.toString();
+            }
 
             if (typeof envVar === 'string') {
                // eslint-disable-next-line no-useless-escape
                const newPlaceholder = new RegExp(`(@@|@@\\$\\$(env|res):)${ this.trimAbsolutePlaceholders(placeholder) }@`, 'g');
+               console.log('[NEW PLACEHOLDER]', _str.replaceAll(newPlaceholder, envVar));
                return _str = _str.replaceAll(newPlaceholder, envVar);
             }
             
@@ -57,7 +63,7 @@ export class EnvHandler {
             return envVar;
          });
 
-         console.log('[DEBUG #05 - RESULT]', result);
+         // console.log('[DEBUG #05 - RESULT]', result);
          return result.slice(-1)[0];
       } else {
          return _str;
@@ -66,16 +72,16 @@ export class EnvHandler {
 
    static chooseEnv(_str, _relative_env) {
       if (this.isEnvGlobal(_str)) {
-         this._LOG_EVENT_('[GLOBAL ENV]', _str, this.env);
+         // console.log('[GLOBAL ENV]', _str, this.env);
          return this.env;
       } 
 
       if (this.isResponsePayload(_str)) {
-         this._LOG_EVENT_('[RESPONSE ENV]', _str, this.response_payload);
+         // console.log('[RESPONSE ENV]', _str, this.response_payload);
          return this.response_payload;
       }
 
-      this._LOG_EVENT_('[RELATIVE ENV]', _str, _relative_env);
+      // console.log('[RELATIVE ENV]', _str, _relative_env);
       return _relative_env;
    }
 
@@ -132,6 +138,6 @@ export class EnvHandler {
    
    static resolveDotNotation (_str, _env) {
       // console.log(_env);
-      return [_env, ..._str.split('.')]?.reduce((a,b) => a?.[b]) || 'invalid_env_var';
+      return [_env, ..._str.split('.')]?.reduce((a,b) => a?.[b]) ?? 'invalid_env_var';
    }
 }

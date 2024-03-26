@@ -25,7 +25,7 @@ export const FLOW_BUILDER_INPUT_FIELD_TEMPLATES = {
     env_var: {
         type: 'text',
         label: 'Env variable',
-        placeholder: '%variable%',
+        placeholder: '@@variable@',
         value: ''
     },
     env_query: {
@@ -75,7 +75,7 @@ export const FLOW_BUILDER_INPUT_FIELD_TEMPLATES = {
         code_font: true,
         type: 'text',
         label: 'Regex',
-        placeholder: '(?<=%).[^%]*(?=%)',
+        placeholder: '(?<=@@)[^@]+(?=@)',
         value: ''
     },
     param: {

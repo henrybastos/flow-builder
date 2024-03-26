@@ -1,6 +1,7 @@
 import puppeteer from "puppeteer-extra";
 import pluginStealth from 'puppeteer-extra-plugin-stealth';
 import { EnvHandler } from "$lib/EnvHandler";
+import { removeKeyFlags, replaceEnvPlaceholders } from "./operationUtils";
 
 import ServerLogger from "./ServerLogger"
 import Operations from "./Operations";
@@ -95,11 +96,13 @@ export async function POST ({ request }) {
 
     async function _runFlowForEach ({ env_var, flow }, _env) {
         const replacedEnv = EnvHandler.checkPlaceholders(env_var, _env);
-        console.log(replacedEnv);
+        console.log('[RUN FLOW FOR EACH]', replacedEnv);
 
         for (const [i, _scoped_env] of Object.entries(replacedEnv)) {
+            console.log('[TEST]', replacedEnv);
+            _scoped_env._index = i;
+            _scoped_env._length = Object.keys(replacedEnv).length.toString();
             await runFlow(payload.flows[flow], _scoped_env);
-            _scoped_env._flow_iteration = i;
         }
     }
 
@@ -112,13 +115,8 @@ export async function POST ({ request }) {
             console.log(_operation);
         }
         
-        for (const [_input_name, _input_value] of Object.entries(_operation)) {
-            if (EnvHandler.ENV_VARIABLES_INPUT_ALLOWLIST.includes(_input_name)) {
-                _operation[_input_name] = EnvHandler.checkPlaceholders(_input_value, _env);
-                console.log(_operation[_input_name]);
-            }
-        }
         
+        replaceEnvPlaceholders(_operation, _env);
         Operations._setPayload(payload);
         await Operations._injectFunctions();
         console.log(`Operation: ${ _operation.command }`);
@@ -135,7 +133,7 @@ export async function POST ({ request }) {
                 await runFlow(payload.flows[_operation.flow], _env);
                 break;
             case 'run_flow_iterations':
-                await Operations.runIterations(async () => await runFlow(payload.flows[_operation.flow], _env), _operation.iterations);
+                await Operations.runIterations(async () => await runFlow(payload.flows[_operation.flow], _env), _operation, _env);
                 break;
             case 'run_flow_for_each':
                 await _runFlowForEach(_operation, _env)
@@ -162,7 +160,8 @@ export async function POST ({ request }) {
                         flags.query = key.match(/@query:/g);
 
                         // Cleans out the flags from the key
-                        key = key.replace(/(@query:|@scoped:)/g, '');
+                        // key = key.replace(/(@query:|@scoped:|@exposed:)/g, '');
+                        key = removeKeyFlags(key);
 
                         if (flags.query) {
                             let query = '';
@@ -197,14 +196,6 @@ export async function POST ({ request }) {
 
                             responsePayload[key] = value;
                         }
-                        console.log('[ENV]');
-                        console.dir(_env, { depth: null });
-                        
-                        console.log('[GLOBAL ENV]');
-                        console.dir(payload.env, { depth: null });
-                        
-                        console.log('[RESPONSE PAYLOAD]');
-                        console.dir(responsePayload, { depth: null });
                     } catch (err) {
                         console.error('[ENV EVAL ERROR]', err);
                         ServerLogger.logEvent('error', { message: `${ err.name } :: ${ err.message }` });
@@ -223,6 +214,15 @@ export async function POST ({ request }) {
                 }
                 break;
         }
+
+        console.log('[ENV]');
+        console.dir(_env, { depth: null });
+        
+        console.log('[GLOBAL ENV]');
+        console.dir(payload.env, { depth: null });
+        
+        console.log('[RESPONSE PAYLOAD]');
+        console.dir(responsePayload, { depth: null });
     }
 
     async function runFlow (_flow, _env) {
