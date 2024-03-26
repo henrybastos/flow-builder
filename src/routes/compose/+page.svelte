@@ -197,7 +197,7 @@
    }
 
    async function gitUpdate () {
-      console.log('Updating...')
+      console.log('Updating...');
       const response = await fetch('/api/git-update');
       const result = await response.json();
       console.log(result);
