@@ -52,8 +52,8 @@ export async function GET() {
    // handlePrompt('git remote -v');
    // handlePrompt('git config --local --list');
    // handlePrompt('git pull origin dev_lab', 'Kbk@1234');
-   handlePrompt('git remote -v');
-   // handlePrompt('git pull origin dev_lab');
+   // handlePrompt('git remote -v');
+   handlePrompt('git pull origin main');
    
    await waitForExit();
    return new Response(JSON.stringify({ status: exitCode == 0 ? 200 : 500, exitCode }));

@@ -200,6 +200,13 @@
       console.log('Updating...');
       const response = await fetch('/api/git-update');
       const result = await response.json();
+      
+      if (result?.status === 500) {
+         toast.error('ERRO - Falha na atualização');
+      } else if (result?.status === 200) {
+         toast.success('Projeto atualizado');
+      }
+
       console.log(result);
    }
 

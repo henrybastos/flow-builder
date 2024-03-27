@@ -1,6 +1,7 @@
 <script>
     import hljs from 'highlight.js/lib/core';
-    import json from 'highlight.js/lib/languages/json'
+    import json from 'highlight.js/lib/languages/json';
+    import hljs_theme from 'highlight.js/styles/tokyo-night-dark.min.css';
     import * as Dialog from "$lib/components/ui/dialog";
     import * as AlertDialog from "$lib/components/ui/alert-dialog";
     import * as Tabs from "$lib/components/ui/tabs";
@@ -38,18 +39,20 @@
         hljs.highlightElement(outputCodeEl);
     };
 
-    function closeEnvPanel (state = true) {
-        changesMade = state;
-
-        if (changesMade) {
-            isConfirmAlertDialogOpen = true;
-            console.log('Cannot close. Changes were made');
-            return;
-        };
-
+    function closeEnvPanel () {
         envClone = structuredClone(combinedEnvPayload);
         isConfirmAlertDialogOpen = false;
         isEnvPanelOpen = false;
+        changesMade = false;
+    }
+
+    function handleCloseEnvPanel () {
+        if (changesMade) {
+            isConfirmAlertDialogOpen = true;
+            return;
+        };
+
+        closeEnvPanel();
     }
 
     function buildEnv () {
@@ -115,7 +118,8 @@
 
 <Dialog.Root 
     closeOnEscape={!changesMade} 
-    closeOnOutsideClick={userSettings?.close_env_panel_on_outside_click} 
+    closeOnOutsideClick={false} 
+    onOutsideClick={() => userSettings?.close_env_panel_on_outside_click && handleCloseEnvPanel()}
     bind:open={isEnvPanelOpen}
 >
     <Dialog.Content class="max-w-[60rem]">
@@ -165,7 +169,7 @@
                         Salvar dados
                     </Button>
 
-                    <Button variant="outline" on:click={() => closeEnvPanel(changesMade)}>Cancelar</Button>
+                    <Button variant="outline" on:click={handleCloseEnvPanel}>Cancelar</Button>
                 </div>
             </Tabs.Content>
             
@@ -191,7 +195,7 @@
         </AlertDialog.Header>
 
         <AlertDialog.Footer>
-            <AlertDialog.Cancel on:click={() => closeEnvPanel(false)}>Descartar alterações</AlertDialog.Cancel>
+            <AlertDialog.Cancel on:click={closeEnvPanel}>Descartar alterações</AlertDialog.Cancel>
             <AlertDialog.Action>Continuar editando</AlertDialog.Action>
           </AlertDialog.Footer>
     </AlertDialog.Content>
