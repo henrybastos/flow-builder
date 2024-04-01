@@ -152,10 +152,12 @@ export async function POST ({ request }) {
                          * @property {boolean} scoped - Whether it uses `payload.env` (global/absolute) of `_env` (local/relative).
                          */
                         let flags = {
+                            private: false,
                             scoped: false,
                             query: false
                         }
 
+                        flags.private = key.match(/@private:/g);
                         flags.scoped = key.match(/@scoped:/g);
                         flags.query = key.match(/@query:/g);
 
@@ -194,7 +196,9 @@ export async function POST ({ request }) {
                                 payload.env[key] = value;
                             }
 
-                            responsePayload[key] = value;
+                            if (!flags.private) {
+                                responsePayload[key] = value;
+                            }
                         }
                     } catch (err) {
                         console.error('[ENV EVAL ERROR]', err);

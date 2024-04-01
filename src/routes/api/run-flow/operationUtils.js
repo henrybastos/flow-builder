@@ -4,7 +4,8 @@ export function removeKeyFlags (key) {
    const flags = [
        '@exposed:', 
        '@scoped:',
-       '@query:'
+       '@query:',
+       '@private:'
    ];
 
    flags.forEach(flag => key = key.replace(flag, ''));
