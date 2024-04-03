@@ -273,10 +273,10 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = {
         label: 'Attach to IFrame',
         icon: 'ti-box-margin',
         input_fields: {
-            name: {
+            xpath: {
                 type: 'text',
-                label: 'iFrame',
-                placeholder: 'videoplayer',
+                label: 'iFrame XPath',
+                placeholder: '//iframe[@title="videoplayer"]',
                 value: ''
             }
         }

@@ -10,18 +10,32 @@
    const toast = getContext("toast");
    let courseStructure;
 
-   async function downloadVideos () {
-      toast.info('Downloading...');
-      
-      const response = await fetch('/api/download-videos', {
+   const courseStructurePlaceholder = [
+   {
+      "module_lessons": [
+         {
+            "lesson_title": "Aula 002",
+            "lesson_link": "https://www.youtube.com/watch?v=w7NqMEgXiGQ"
+         }
+      ]
+   }
+]
+
+   async function callDOwnloadAPI () {
+      return await fetch('/api/download-videos', {
          method: 'POST',
          body: JSON.stringify({ collection: courseStructure })
       })
-
-      console.log(response);
-
-      toast.info('Done.');
    }
+
+   async function downloadVideos () {
+      toast.promise(callDOwnloadAPI, {
+         loading: 'Loading...',
+         success: 'Vídeos baixados com sucesso na pasta /videos',
+         error: 'Erro ao baixar os vídeos.',
+      });
+   }
+
 </script>
 
 <Card.Root class="mt-4 rounded-lg">
@@ -74,6 +88,7 @@
          rows="12"
          class="resize-none mt-3 font-code text-base"
          bind:value={courseStructure}
+         placeholder={JSON.stringify(courseStructurePlaceholder, null, 3)}
       />
 
       <Button on:click={downloadVideos}>Download videos</Button>

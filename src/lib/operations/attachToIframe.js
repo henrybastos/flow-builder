@@ -1,13 +1,23 @@
-async function attach_to_iframe ({ name }) {
-    console.log('FRAMES', this.curr_page.frames());
-    const frame = await this.curr_page.frames().find((frame) => frame.name().match(name) || frame.url().match(name));
+const DEBUG_FRAMES = false;
 
-    console.log('IFRAME', frame);
-    this.curr_page = frame;
-    this.logger.logEvent('operation_log', {
-        message: `The iFrame ${ frame.url() } was set as the current page.`,
-        status_message: 'info'
-    });
+async function attach_to_iframe ({ xpath }) {
+    await this.curr_page.waitForSelector(`xpath/${ xpath }`, { timeout: 5000 });
+    const iframeElement = await this.curr_page.$(`xpath/${ xpath }`);
+    
+    if (iframeElement) {
+        const iframeElementContent = await iframeElement.contentFrame();
+        this.curr_page = iframeElementContent;
+
+        this.logger.logEvent('operation_log', {
+            message: `The iFrame ${ xpath } was set as the current page.`,
+            status_message: 'info'
+        });
+    } else {
+        this.logger.logEvent('operation_log', {
+            message: `No iFrame found: ${ xpath }`,
+            status_message: 'error'
+        });
+    }
 }
 
 export default attach_to_iframe;

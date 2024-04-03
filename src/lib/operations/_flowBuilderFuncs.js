@@ -62,7 +62,7 @@ export const async_eval = async (maxAttempts = 5, interval = 5000, cb) => {
                   if (attempt >= maxAttempts) {
                      clearInterval(timeInterval);
                      if (cbError) { resolve(cbError); } 
-                     else { resolve({ warning: `Max attempts reached: ${ maxAttempts }` }) }
+                     else { resolve({ '@private:warning': `Max attempts reached: ${ maxAttempts }` }) }
                   }
               } catch (err) {
                 resolve({ error: err });

@@ -20,10 +20,10 @@ export async function POST({ request }) {
    }
 
    async function downloadCollection() {
-      for (let [module_index, module] of Object.entries(collection)) {
+      for (let [module_index, module] of Object.entries(JSON.parse(collection))) {
          for (let lesson of module.module_lessons) {
             let filename = `MOD_${(module_index + 1).toString().padStart(2, '0')}_${genUppercasedFilename(lesson.lesson_title)}`
-            let command = `yt-dlp "${lesson.lesson_link}" -o "${config?.destination_folder || 'videos'}/${filename}" -f "mp4" -S "res:720,fps"`
+            let command = `yt-dlp "${lesson.lesson_link}" -o "${config?.destination_folder || '~/desktop/videos'}/${filename}" -f "mp4" -S "res:720,fps"`
             console.log('[RUNNING COMMAND] :: ', command);
             const videoStatus = await execTypedCommand(command);
             console.log('[VIDEO STATUS]', videoStatus);
@@ -57,7 +57,7 @@ export async function POST({ request }) {
 
    async function checkYTDLP() {
       let downloaderStatus = null;
-      const checkYTDLP = await execTypedCommand('yt-dlp');
+      const checkYTDLP = await execTypedCommand('yt-dlp --version');
 
       handleOutput(checkYTDLP, {
          stderr: {
