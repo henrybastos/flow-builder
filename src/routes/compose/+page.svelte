@@ -20,6 +20,8 @@
    import { env } from "$env/dynamic/public"
    import { setContext } from "svelte";
    import UserSettingsPanel from "./UserSettingsPanel.svelte";
+    import { HeartFilled } from "radix-icons-svelte";
+    import DevModeAccess from "./DevModeAccess.svelte";
 
    let isFlowBlockPanelOpen = false;
    let isEnvPanelOpen = false;
@@ -28,6 +30,7 @@
    let isStopExecutionOpen = false;
    let isDevSettingsPanelOpen = false;
    let isUserSettingsPanelOpen = false;
+   let isDevAccessPanelOpen = false;
    let isPayloadRunning = false;
    let isPageLoading = true;
 
@@ -238,9 +241,9 @@
                      Logs
                   </Button>
 
-                  <Button on:click={gitUpdate} variant="outline" size="icon">
+                  <!-- <Button on:click={gitUpdate} variant="outline" size="icon">
                      <i class="ti ti-download text-green-500"></i>
-                  </Button>
+                  </Button> -->
 
                   <Button on:click={() => isUserSettingsPanelOpen = true} variant="outline" size="icon">
                      <i class="ti ti-adjustments text-neutral-500"></i>
@@ -248,7 +251,7 @@
 
                   {#if DEV_MODE}   
                      <Button on:click={() => isDevSettingsPanelOpen = true} variant="dev" size="icon">
-                        <i class="ti ti-settings-code text-purple-600"></i>
+                        <i class="ti ti-settings-code"></i>
                      </Button>
                   {/if}
                </div>
@@ -310,36 +313,46 @@
          {/if}
       </Card.Content>
 
-      <Card.Footer class="grid grid-cols-2 gap-y-2 gap-x-2 p-0">
+      <Card.Footer class="flex flex-row space-x-3 p-0">
          {#if isPageLoading}
             <Skeleton class="h-[1.75rem] col-span-1" />
             <Skeleton class="h-[1.75rem] col-span-1" />
             <Skeleton class="h-[1.75rem] col-span-1" />
             <Skeleton class="h-[1.75rem] col-span-1" />
          {:else}
-            <Button variant="outline" class="text-base col-span-1" on:click={openCombinedBlocksDialog}>
-               Carga final
-            </Button>
-            <Button disabled={flowBlocksList.length === 0} variant="outline" class="text-base col-span-1" on:click={openEnvPanel}>
-               Painel de Variáveis
+            <Button variant="ghost" size="icon" class="text-base col-span-1" on:click={openCombinedBlocksDialog}>
+               <i class="ti ti-file-code"></i>
             </Button>
 
             {#if isPayloadRunning}
-               <Button class="text-base col-span-1" disabled on:click={runCombinedPayload}>
+               <!-- <Button class="text-base col-span-1" disabled on:click={runCombinedPayload}>
                   <i class="ti ti-loader-2 animate-spin mr-2"></i>
                   Carga final sendo executada
+               </Button> -->
+               <Button variant="destructive" class="text-base w-[16rem]"
+                  on:click={() => (isStopExecutionOpen = true)}
+               >
+                  Interromper execução
                </Button>
             {:else}
-               <Button disabled={flowBlocksList.length === 0} class="text-base col-span-1" on:click={runCombinedPayload}
+               <Button disabled={flowBlocksList.length === 0} class="text-base w-[16rem]" on:click={runCombinedPayload}
                   >Executar carga final</Button
                >
             {/if}
 
-            <Button disabled={!isPayloadRunning} variant="destructive" class="text-base col-span-1"
-               on:click={() => (isStopExecutionOpen = true)}
-            >
-               Interromper execução
+            <Button disabled={flowBlocksList.length === 0} variant="outline" class="flex grow text-base" on:click={openEnvPanel}>
+               Painel de Variáveis
             </Button>
+
+            {#if !DEV_MODE}
+               <Button variant="dev" size="icon" on:click={() => isDevAccessPanelOpen = true}>
+                  <i class="ti ti-droplet-code"></i>
+               </Button>
+            {:else}
+               <Button variant="ghost" size="icon" on:click={() => window.location.href = 'http://localhost:5173/compose'}>
+                  <i class="ti ti-flower"></i>
+               </Button>
+            {/if}
          {/if}
       </Card.Footer>
    </Card.Root>
@@ -378,7 +391,10 @@
 <DevSettingsPanel bind:devSettings bind:isPanelOpen={isDevSettingsPanelOpen} />
 <UserSettingsPanel bind:userSettings bind:isPanelOpen={isUserSettingsPanelOpen} />
 <ComposeFlowbar />
+<DevModeAccess bind:isPanelOpen={isDevAccessPanelOpen} />
 
-{#if env?.PUBLIC_ENV?.toUpperCase() === 'DEV'}
-   <span class="absolute bottom-0 w-full bg-purple-600 text-base text-center font-code py-1">DEV ENVIRONMENT</span>
+{#if env?.PUBLIC_ENV?.toUpperCase() === 'DEV' || DEV_MODE}
+   <span class="absolute bottom-0 w-full bg-purple-600 text-base text-center font-code py-1">
+      DEV MODE {#if env?.PUBLIC_ENV?.toUpperCase() === 'DEV'} / ENVIRONMENT {/if}
+   </span>
 {/if}

@@ -6,7 +6,7 @@ export async function POST({ request }) {
    const { collection, config } = await request.json();
 
    function genUppercasedFilename(str) {
-      return str.toUpperCase().match(/[^\s-_]*/g).filter(v => v).join('_') + '.mp4';
+      return str.toUpperCase().match(/[^\s-_\/]*/g).filter(v => v).join('_') + '.mp4';
    }
 
    async function execTypedCommand(command) {

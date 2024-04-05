@@ -1,7 +1,7 @@
 import puppeteer from "puppeteer-extra";
 import pluginStealth from 'puppeteer-extra-plugin-stealth';
 import { EnvHandler } from "$lib/EnvHandler";
-import { removeKeyFlags, replaceEnvPlaceholders } from "./operationUtils";
+import { removeKeyFlags, replaceEnvPlaceholders, fillUndefinedQueryMembers } from "./operationUtils";
 
 import ServerLogger from "./ServerLogger"
 import Operations from "./Operations";
@@ -86,6 +86,7 @@ export async function POST ({ request }) {
                 ...(import.meta.env.VITE_PUPPETEER_EXECUTABLE_PATH && {executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe'}),
                 args: [
                     `--window-size=${ width },${ height + 200 }`,
+                    // '--disable-features=IsolateOrigins,site-per-process'
                 ]
             });
             console.log(`New browser launched: ${ _browser.wsEndpoint() }`);
@@ -162,34 +163,25 @@ export async function POST ({ request }) {
                         flags.query = key.match(/@query:/g);
 
                         // Cleans out the flags from the key
-                        // key = key.replace(/(@query:|@scoped:|@exposed:)/g, '');
+                        // key = key.replace(/(@query:|@scoped:|@expose:)/g, '');
                         key = removeKeyFlags(key);
 
                         if (flags.query) {
-                            let query = '';
-                        
-                            key.split('.').forEach((v, index, array) => {
-                                // if (v.match(/\s/g)) { 
-                                //     v = `['${ v }']` 
-                                // } else {
-                                //     v = `.${ v }` 
-                                // }
-
-                                v = `.${ v }`
-                                query = `${ query || '' }${ v }`
-                        
-                                let objQuery = `payload.env${ query }`;
-                        
-                                if (eval(`!${ objQuery }`) ) { eval(`${ objQuery } = {}`) }
-
-                                if (index == array.length - 1) { 
-                                    console.log(`${ objQuery } = value`);
-                                    eval(`${ objQuery } = value`)
-                                }
-
-                                console.log(objQuery);
-                            })
+                            if (flags.scoped) {
+                                fillUndefinedQueryMembers(`${key}`, _env);
+                                eval(`_env.${key} = value`);
+                            } else {
+                                fillUndefinedQueryMembers(`${key}`, payload.env);
+                                eval(`payload.env.${key} = value`);
+                            }
+            
+                            if (!flags.private) {
+                                fillUndefinedQueryMembers(`${key}`, responsePayload);
+                                eval(`responsePayload.${key} = value`);
+                            }
                         } else {
+                            console.log('ENV VALUE', value);
+
                             if (flags.scoped) {
                                 _env[key] = value;
                             } else {
@@ -268,6 +260,36 @@ export async function POST ({ request }) {
             ServerLogger.closeStream();
         }
     }   
+
+    function evalQueryObject (raw_query) {
+        let query = '';
+    
+        raw_query.split('.').forEach((v, index, array) => {
+            // if (v.match(/\s/g)) { 
+            //     v = `['${ v }']` 
+            // } else {
+            //     v = `.${ v }` 
+            // }
+
+            // v = `.${ v }`
+            // query = `${ query || '' }${ v }`
+    
+            // let objQuery = `${parent_name}${query} = value`;
+    
+            
+            query.split('.').reduce((a,b) => {
+                if (eval(`!${a}.${b}`) ) { eval(`${a}.${b} = {}`) }
+                console.log(eval(`[QueryObject] ${a}.${b}\n`)); 
+                return `${a}.${b}`; 
+            })
+
+            // if (index == array.length - 1) { 
+            //     eval(objQuery);
+            // }
+
+            // console.log(objQuery);
+        })
+    }
     
     return new Response(stream, {
         headers: {

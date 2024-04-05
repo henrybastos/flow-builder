@@ -56,6 +56,17 @@
          </div>
       </div>
 
+      <Separator />
+
+      <div>
+         <h2 class="text-lg font-semibold mb-2">Atualizações</h2>
+
+         <div class="space-x-2">
+            <Button class="border-green-500" variant="outline">Atualizar Flow Builder</Button>
+            <Button class="border-blue-500" variant="outline">Atualizar Flow Blocks</Button>
+         </div>
+      </div>
+
       <Dialog.Footer>
          {#if changesMade}
             <span transition:fade={{ duration: 250 }} class="mr-auto text-green-600 pt-3">Configurações salvas</span>

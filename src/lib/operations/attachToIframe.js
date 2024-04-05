@@ -7,6 +7,7 @@ async function attach_to_iframe ({ xpath }) {
     if (iframeElement) {
         const iframeElementContent = await iframeElement.contentFrame();
         this.curr_page = iframeElementContent;
+        // console.log('IFRAME CONTENT', await this.curr_page.content());
 
         this.logger.logEvent('operation_log', {
             message: `The iFrame ${ xpath } was set as the current page.`,

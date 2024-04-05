@@ -2,7 +2,7 @@ import { EnvHandler } from "$lib/EnvHandler";
 
 export function removeKeyFlags (key) {
    const flags = [
-       '@exposed:', 
+       '@expose:', 
        '@scoped:',
        '@query:',
        '@private:'
@@ -19,4 +19,21 @@ export function replaceEnvPlaceholders (_operation, _env) {
            console.log(_operation[_input_name]);
        }
    }
+}
+
+export function fillUndefinedQueryMembers (query, obj) {
+    query.split('.').reduce((a,b) => {
+        console.log(`Checking ${a} ...`);
+        if (eval(`!obj.${a}`)) { 
+            eval(`obj.${a} = {}`) 
+        }
+
+        console.log(`Checking ${a}.${b} ...`);
+        if (eval(`!obj.${a}.${b}`)) { 
+            eval(`obj.${a}.${b} = {}`) 
+        }
+        console.log(eval(`obj.${a}.${b}\n`)); 
+        return `${a}.${b}`; 
+    })
+    return obj;
 }

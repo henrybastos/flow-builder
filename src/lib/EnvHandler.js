@@ -63,7 +63,7 @@ export class EnvHandler {
             return envVar;
          });
 
-         // console.log('[DEBUG #05 - RESULT]', result);
+         console.log('[DEBUG #05 - RESULT]', result, _env);
          return result.slice(-1)[0];
       } else {
          return _str;
