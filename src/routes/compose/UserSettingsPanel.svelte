@@ -6,6 +6,7 @@
    import Button from "$lib/components/ui/button/button.svelte";
    import { fade } from "svelte/transition";
    import Separator from "$lib/components/ui/separator/separator.svelte";
+   import { toast } from "svelte-sonner";
 
    let changesMade = false;
    let defaultUserSettings = {
@@ -29,13 +30,36 @@
       localStorage.setItem('userSettings', JSON.stringify(userSettings));
    }
 
-   async function gitUpdate (scope) {
+   async function gitUpdate () {
       console.log('Updating...');
-      const response = await fetch('/api/git-update', {
-         method: 'POST',
-         body: JSON.stringify({ scope })
-      });
-      const result = await response.json();
+
+      const updatePromise = new Promise(async (resolve, reject) => {
+         try {
+            const response = await fetch('/api/git-update');
+   
+            resolve(await response.json());
+         } catch (err) {
+            reject(err);
+         }
+      })
+
+      toast.promise(updatePromise, {
+         loading: 'Verificando atualizações...',
+         success: (data) => {
+            console.log(data);
+            if (data.output === 'Already up to date.') {
+               return 'Última versão bombando'
+            }
+
+            return 'AAAA';
+         }, 
+         error: () => {
+            return 'Falha na atualização'
+         }
+      })
+
+      // const response = ;
+      // const result = await response.json();
       
       // if (result?.status === 500) {
       //    toast.error('ERRO - Falha na atualização');
@@ -43,7 +67,7 @@
       //    toast.success('Projeto atualizado');
       // }
 
-      console.log(result);
+      // console.log(result);
    }
 
    onMount(() => {
@@ -80,12 +104,8 @@
 
          <div class="space-x-2">
             <Button class="border-green-500" on:click={() => gitUpdate('flow-builder')} variant="outline">
-               <i class="ti ti-cloud-download"></i>
-               <!-- Atualizar Flow Builder -->
-            </Button>
-            <Button class="border-blue-500" on:click={() => gitUpdate('flow-blocks')} variant="outline">
-               <i class="ti ti-cloud-download"></i>
-               <!-- Atualizar Flow Blocks -->
+               <i class="ti ti-cloud-download mr-3"></i>
+               Atualizar Flow Builder
             </Button>
          </div>
       </div>

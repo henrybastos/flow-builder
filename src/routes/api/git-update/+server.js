@@ -2,10 +2,11 @@ import { spawnSync, exec } from 'child_process';
 import util from 'node:util';
 const execProcess = util.promisify(exec);
 
-export async function POST({ request }) {
-   const { scope } = await request.json();
-   console.log(scope);
+export async function GET() {
+   // const { scope } = await request.json();
+   // console.log(scope);
    let exitCode;
+   let output;
 
    // async function execTypedCommand(command) {
    //    try {
@@ -77,28 +78,35 @@ export async function POST({ request }) {
    // handlePrompt('git pull origin dev_lab', 'Kbk@1234');
    // handlePrompt('git remote -v');
 
-   if (scope === 'flow-builder') {
-      // exitCode = handlePromptSync('git remote -v').status;
-      exitCode = handlePromptSync('git pull origin main').status;
-   } else if (scope === 'flow-blocks') {
-      const cwdCmd = handlePromptSync('echo %cd%');
-      const gitPullCmd = handlePromptSync('git pull origin main', { cwd: `${cwdCmd.output}/src/lib/flow-blocks` });
-      exitCode = gitPullCmd.status
-      console.log(gitPullCmd);
-      // console.log(`${cwd.output}/src/lib/flow-blocks`);
-      // const result = handlePromptSync('echo %cd%');
-      // const result = handlePromptSync('cmatrix');
-      // exitCode = result.status
-      // console.log(cwd);
+   // exitCode = handlePromptSync('git remote -v').status;
+   
+   let gitPullCmd = handlePromptSync('git pull origin main');
+   exitCode = gitPullCmd.status;
+   output = gitPullCmd.output;
+   console.log(gitPullCmd);
+   
+   const cwdCmd = handlePromptSync('echo %cd%');
+   gitPullCmd = handlePromptSync('git pull origin main', { cwd: `${cwdCmd.output}/src/lib/flow-blocks` });
+   exitCode = gitPullCmd.status
+   output = gitPullCmd.output;
+   console.log(gitPullCmd);
+   
+   // if (scope === 'flow-builder') {
+   // } else if (scope === 'flow-blocks') {
+   //    // console.log(`${cwd.output}/src/lib/flow-blocks`);
+   //    // const result = handlePromptSync('echo %cd%');
+   //    // const result = handlePromptSync('cmatrix');
+   //    // exitCode = result.status
+   //    // console.log(cwd);
 
-      // console.log('[CWD]', cwd);
-      // handlePrompt('cd ./src/lib/flow-blocks');
-      // handlePrompt('git remote -v');
-      // handlePrompt('git pull origin main');
-   }
+   //    // console.log('[CWD]', cwd);
+   //    // handlePrompt('cd ./src/lib/flow-blocks');
+   //    // handlePrompt('git remote -v');
+   //    // handlePrompt('git pull origin main');
+   // }
    
    // await waitForExit();
-   return new Response(JSON.stringify({ status: exitCode == 0 ? 200 : 500, exitCode }));
+   return new Response(JSON.stringify({ status: exitCode == 0 ? 200 : 500, exitCode, output }));
 
    // await execTypedCommand('echo %cd%');
    // console.log(await execTypedCommand('echo %cd%'));
