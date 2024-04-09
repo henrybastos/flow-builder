@@ -25,6 +25,7 @@
     let activeTab = "input_tab";
     let outputCodeEl;
     let responseTextarea;
+    let isAnyInputFocused = false;
 
     const DEV_MODE = $page.url.searchParams.has('dev_mode');
 
@@ -38,8 +39,10 @@
     $: if (activeTab == 'output_tab' && isEnvPanelOpen && !outputCodeEl?.dataset?.highlighted && outputCodeEl) { 
         hljs.highlightElement(outputCodeEl);
     };
+    $: canClosePanel = userSettings?.close_env_panel_on_outside_click && !changesMade && !isAnyInputFocused;
 
     function closeEnvPanel () {
+        // console.log('Closing Env Panel...');
         envClone = structuredClone(combinedEnvPayload);
         isConfirmAlertDialogOpen = false;
         isEnvPanelOpen = false;
@@ -118,8 +121,8 @@
 
 <Dialog.Root 
     closeOnEscape={!changesMade} 
-    closeOnOutsideClick={false} 
-    onOutsideClick={() => userSettings?.close_env_panel_on_outside_click && handleCloseEnvPanel()}
+    bind:closeOnOutsideClick={canClosePanel}
+    onOutsideClick={() => handleCloseEnvPanel()}
     bind:open={isEnvPanelOpen}
 >
     <Dialog.Content class="max-w-[60rem]">
@@ -148,6 +151,8 @@
                                     bind:changesMade={changesMade} 
                                     bind:data={data} 
                                     bind:value={data.value}
+                                    on:focus={() => isAnyInputFocused = true}
+                                    on:focusout={() => isAnyInputFocused = false}
                                 />
                             {/if}
                         {/each}

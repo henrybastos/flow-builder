@@ -1,10 +1,10 @@
-<script lang="ts">
+<script>
     import { cn } from "$lib/utils";
     import * as Tooltip from "$lib/components/ui/tooltip";
     import Button from "$lib/components/ui/button/button.svelte";
 
     export let isReadOnly = false;
-    export let items: any[];
+    export let items;
     export let externalStorage = items;
     export let schema;
     export let template_schema;

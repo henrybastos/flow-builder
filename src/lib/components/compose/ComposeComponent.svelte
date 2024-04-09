@@ -74,6 +74,8 @@
          value={value}
          bind:readonly={isInputReadonly}
          on:change={(evt) => triggerChange(() => (value = evt.target.value))}
+         on:focus
+         on:focusout
       />
    {:else}
       <ComposeLabel tooltip={data?.tooltip}>{data.label}</ComposeLabel>
@@ -83,6 +85,8 @@
          bind:value
          bind:readonly={isInputReadonly}
          on:change
+         on:focus
+         on:focusout
       />
    {/if}
 {:else if data?.schema?.fields_type === "array"}
@@ -113,6 +117,8 @@
                         bind:changesMade={changesMade}
                         bind:value={item[item_key]}
                         bind:data={data.schema.fields[item_key]}
+                        on:focus
+                        on:focusout
                      />
                   {/each}
                </div>
@@ -133,6 +139,8 @@
                            bind:changesMade={changesMade}
                            bind:value={item[item_key]}
                            bind:data={data.schema.fields[item_key]}
+                           on:focus
+                           on:focusout
                         />
                      {/each}
                      <Button on:click={() => removeItemFromList(index)} class="col-span-full ml-auto uppercase mt-2 h-7 w-7" variant="destructive" size="icon">
@@ -156,6 +164,8 @@
             inputType={field.type}
             placeholder={field.placeholder}
             on:change={(evt) => updateObject(evt, data.value, field_name)}
+            on:focus
+            on:focusout
          />
       {/each}
    </div>

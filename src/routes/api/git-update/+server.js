@@ -1,61 +1,103 @@
-import { spawn, exec } from 'child_process';
+import { spawnSync, exec } from 'child_process';
 import util from 'node:util';
 const execProcess = util.promisify(exec);
 
-export async function GET() {
+export async function POST({ request }) {
+   const { scope } = await request.json();
+   console.log(scope);
    let exitCode;
 
-   async function execTypedCommand(command) {
-      try {
-         const { stdout, stderr } = await execProcess(command);
-         return stdout ? { stdout } : { stderr };
-      } catch (error) {
-         console.log('[ERROR]', error.message);
-         return { error }
+   // async function execTypedCommand(command) {
+   //    try {
+   //       const { stdout, stderr } = await execProcess(command);
+   //       return stdout ? { stdout } : { stderr };
+   //    } catch (error) {
+   //       console.log('[ERROR]', error.message);
+   //       return { error }
+   //    }
+   // }
+
+   // function handlePrompt(command, options) {
+   //    const child = spawn(command.split(' ')[0], command.split(' ').slice(1), { ...options, shell: true }); // Separate command and arguments
+   //    let result;
+
+   //    child.stdout.on('data', (data) => {
+   //       result = data.toString().trim();
+   //       console.log('[STDOUT]', result);
+   //       return result;
+   //    });
+
+   //    child.stderr.on('data', (data) => {
+   //       result = data.toString().trim();
+   //       console.error('[STDERR]', result);
+   //       return result;
+   //    });
+
+   //    child.on('exit', (code) => {
+   //       console.log(`[EXIT CODE] ${code}`);
+   //       exitCode = code;
+   //    });
+   // }
+
+   function handlePromptSync(command, options) {
+      const child = spawnSync(command.split(' ')[0], command.split(' ').slice(1), { ...options, shell: true }); // Separate command and arguments
+      
+      let result;
+
+      if (child.stdout) {
+         result = child.stdout.toString().trim();
+         console.log('[STDOUT]', result);
+         
+      } else if (child.stderr) {
+         result = child.stderr.toString().trim();
+         console.error('[STDERR]', result);
       }
+
+      return { output: result, status: child.status };
+
+      // child.on('exit', (code) => {
+      //    console.log(`[EXIT CODE] ${code}`);
+      //    exitCode = code;
+      // });
    }
 
-   function handlePrompt(command, input) {
-      const child = spawn(command.split(' ')[0], command.split(' ').slice(1)); // Separate command and arguments
+   // async function waitForExit () {
+   //    const hasExited = await new Promise((res) => {
+   //       setTimeout(() => {
+   //          res(!(exitCode === undefined));
+   //       }, 200);
+   //    });
 
-      // if (input) {
-         // child.stdin.write(input); // Replace with actual user input handling
-         // child.stdin.end();
-         // child.stdout.pipe(spawn('Kbk@1234', [], { shell: true }).stdin);
-      // }
-
-      child.stdout.on('data', (data) => {
-         console.log(data.toString());
-      });
-
-      child.stderr.on('data', (data) => {
-         console.error(data.toString());
-      });
-
-      child.on('exit', (code) => {
-         console.log(`[EXIT CODE] ${code}`);
-         exitCode = code;
-      });
-   }
-
-   async function waitForExit () {
-      const hasExited = await new Promise((res) => {
-         setTimeout(() => {
-            res(exitCode === undefined ? false : true);
-         }, 200);
-      });
-
-      // console.log('[HAS EXITED?] ', hasExited);
-      if (!hasExited) { await waitForExit() };
-   }
+   //    // console.log('[HAS EXITED?] ', hasExited);
+   //    if (!hasExited) { await waitForExit() };
+   // }
 
    // handlePrompt('git remote -v');
    // handlePrompt('git config --local --list');
    // handlePrompt('git pull origin dev_lab', 'Kbk@1234');
    // handlePrompt('git remote -v');
-   handlePrompt('git pull origin main');
+
+   if (scope === 'flow-builder') {
+      // exitCode = handlePromptSync('git remote -v').status;
+      exitCode = handlePromptSync('git pull origin main').status;
+   } else if (scope === 'flow-blocks') {
+      const cwdCmd = handlePromptSync('echo %cd%');
+      const gitPullCmd = handlePromptSync('git pull origin main', { cwd: `${cwdCmd.output}/src/lib/flow-blocks` });
+      exitCode = gitPullCmd.status
+      console.log(gitPullCmd);
+      // console.log(`${cwd.output}/src/lib/flow-blocks`);
+      // const result = handlePromptSync('echo %cd%');
+      // const result = handlePromptSync('cmatrix');
+      // exitCode = result.status
+      // console.log(cwd);
+
+      // console.log('[CWD]', cwd);
+      // handlePrompt('cd ./src/lib/flow-blocks');
+      // handlePrompt('git remote -v');
+      // handlePrompt('git pull origin main');
+   }
    
-   await waitForExit();
+   // await waitForExit();
    return new Response(JSON.stringify({ status: exitCode == 0 ? 200 : 500, exitCode }));
 
    // await execTypedCommand('echo %cd%');

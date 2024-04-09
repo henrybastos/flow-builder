@@ -5,7 +5,7 @@
    import { onMount } from "svelte"
    import Button from "$lib/components/ui/button/button.svelte";
    import { fade } from "svelte/transition";
-    import Separator from "$lib/components/ui/separator/separator.svelte";
+   import Separator from "$lib/components/ui/separator/separator.svelte";
 
    let changesMade = false;
    let defaultUserSettings = {
@@ -27,6 +27,23 @@
    function resetSettings () {
       userSettings = defaultUserSettings;
       localStorage.setItem('userSettings', JSON.stringify(userSettings));
+   }
+
+   async function gitUpdate (scope) {
+      console.log('Updating...');
+      const response = await fetch('/api/git-update', {
+         method: 'POST',
+         body: JSON.stringify({ scope })
+      });
+      const result = await response.json();
+      
+      // if (result?.status === 500) {
+      //    toast.error('ERRO - Falha na atualização');
+      // } else if (result?.status === 200) {
+      //    toast.success('Projeto atualizado');
+      // }
+
+      console.log(result);
    }
 
    onMount(() => {
@@ -62,8 +79,14 @@
          <h2 class="text-lg font-semibold mb-2">Atualizações</h2>
 
          <div class="space-x-2">
-            <Button class="border-green-500" variant="outline">Atualizar Flow Builder</Button>
-            <Button class="border-blue-500" variant="outline">Atualizar Flow Blocks</Button>
+            <Button class="border-green-500" on:click={() => gitUpdate('flow-builder')} variant="outline">
+               <i class="ti ti-cloud-download"></i>
+               <!-- Atualizar Flow Builder -->
+            </Button>
+            <Button class="border-blue-500" on:click={() => gitUpdate('flow-blocks')} variant="outline">
+               <i class="ti ti-cloud-download"></i>
+               <!-- Atualizar Flow Blocks -->
+            </Button>
          </div>
       </div>
 

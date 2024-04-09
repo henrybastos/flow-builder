@@ -6,6 +6,7 @@
     "css": "src/app.postcss",
     "baseColor": "neutral"
   },
+  "typescript": true,
   "aliases": {
     "components": "$lib/components",
     "utils": "$lib/utils"

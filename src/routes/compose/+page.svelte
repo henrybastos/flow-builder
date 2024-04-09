@@ -20,8 +20,11 @@
    import { env } from "$env/dynamic/public"
    import { setContext } from "svelte";
    import UserSettingsPanel from "./UserSettingsPanel.svelte";
-    import { HeartFilled } from "radix-icons-svelte";
-    import DevModeAccess from "./DevModeAccess.svelte";
+   import { HeartFilled } from "radix-icons-svelte";
+   import DevModeAccess from "./DevModeAccess.svelte";
+   import * as ContextMenu from "$lib/components/ui/context-menu";
+
+   export let data;
 
    let isFlowBlockPanelOpen = false;
    let isEnvPanelOpen = false;
@@ -199,7 +202,7 @@
       combinedEnvPayload = newCombinedEnvPayload;
    }
 
-   async function gitUpdate () {
+   async function gitUpdate (scope) {
       console.log('Updating...');
       const response = await fetch('/api/git-update');
       const result = await response.json();
@@ -215,6 +218,10 @@
 
    onMount(() => {
       isPageLoading = false;
+      
+      if (data?.missingFlowBlocksFile) {
+         toast.error('Missing FlowBlocks.ts file at /src/lib/flow-blocks');
+      }
    });
 </script>
 
@@ -225,8 +232,8 @@
 <main class="flex flex-col items-center mt-3">
    <span class="flex text-neutral-500 font-semibold">Flow Composer • {VERSION}</span>
 
-   <Card.Root class="flex flex-col p-3 border border-neutral-800 rounded-lg w-[40rem] mt-3">
-      <Card.Header class="p-1 mb-3">
+   <Card.Root class="flex flex-col p-3 border border-neutral-800 bg-transparent rounded-lg w-[40rem] mt-3 shadow-lg shadow-black">
+      <Card.Header class="p-1 mb-3 ">
          <Card.Title class="text-2xl text-left flex justify-between">
             {#if isPageLoading}
                <div class="flex flex-row w-full justify-between">
@@ -386,12 +393,22 @@
 
 <FlowBlockPayloadViewerPanel bind:isPanelOpen={isFlowBlockPanelOpen} bind:flowBlock={currentFlowBlock}/>
 <EnvPanel bind:userSettings bind:combinedEnvPayload bind:isEnvPanelOpen bind:isPayloadRunning />
-<AddFlowBlockPanel {DEV_MODE} bind:combinedEnvPayload bind:flowBlocksList={flowBlocksList} bind:isPanelOpen={isAddFlowBlockOpen} />
+<AddFlowBlockPanel flowBlocks={data?.flowBlocks} {DEV_MODE} bind:combinedEnvPayload bind:flowBlocksList={flowBlocksList} bind:isPanelOpen={isAddFlowBlockOpen} />
 <PayloadLogsPanel {toast} bind:isPanelOpen={isLogsPanelOpen} bind:isPayloadRunning />
 <DevSettingsPanel bind:devSettings bind:isPanelOpen={isDevSettingsPanelOpen} />
 <UserSettingsPanel bind:userSettings bind:isPanelOpen={isUserSettingsPanelOpen} />
 <ComposeFlowbar />
 <DevModeAccess bind:isPanelOpen={isDevAccessPanelOpen} />
+
+<ContextMenu.Root>
+   <ContextMenu.Trigger>Right click</ContextMenu.Trigger>
+   <ContextMenu.Content>
+     <ContextMenu.Item>Profile</ContextMenu.Item>
+     <ContextMenu.Item>Billing</ContextMenu.Item>
+     <ContextMenu.Item>Team</ContextMenu.Item>
+     <ContextMenu.Item>Subscription</ContextMenu.Item>
+   </ContextMenu.Content>
+ </ContextMenu.Root>
 
 {#if env?.PUBLIC_ENV?.toUpperCase() === 'DEV' || DEV_MODE}
    <span class="absolute bottom-0 w-full bg-purple-600 text-base text-center font-code py-1">

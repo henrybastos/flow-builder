@@ -47,50 +47,13 @@
    </Card.Header>
 
    <Card.Content>
-      <!-- <Tabs.Root value="kronus_data" class="w-full">
-         <Tabs.List class="grid w-full grid-cols-2">
-            <Tabs.Trigger value="kronus_data">Dados do Kronus</Tabs.Trigger>
-            <Tabs.Trigger value="flow_composer_data"
-               >Dados do Flow Composer</Tabs.Trigger
-            >
-         </Tabs.List>
-
-         <Tabs.Content value="kronus_data">
-            <Label class="text-lg">Dados do Kronus</Label>
-            <Textarea
-               rows="12"
-               class="resize-none mt-3 font-code text-base"
-               bind:value={kronusPayload}
-            />
-
-            <div class="flex flex-row gap-x-2 mt-4">
-               <Button on:click={convertKronusPayload}>Converter</Button>
-           </div>
-         </Tabs.Content>
-
-         <Tabs.Content value="flow_composer_data">
-            <Label class="text-lg">Dados do Flow Composer</Label>
-            
-            <Textarea
-               rows="12"
-               class="resize-none mt-3 font-code text-base"
-               bind:value={flowComposerPayload}
-            />
-
-            <div class="flex flex-row gap-x-2 mt-4">
-               <Clipboard let:copyToClipboard bind:clipboardContent={flowComposerPayload} {toast}>
-                  <Button variant="default" on:click={copyToClipboard}>Copiar saída</Button>
-               </Clipboard>
-           </div>
-         </Tabs.Content>
-      </Tabs.Root> -->
       <Textarea
          rows="12"
-         class="resize-none mt-3 font-code text-base"
+         class="resize-none mt-3 p-6 font-code text-base rounded-lg"
          bind:value={courseStructure}
          placeholder={JSON.stringify(courseStructurePlaceholder, null, 3)}
       />
 
-      <Button on:click={downloadVideos}>Download videos</Button>
+      <Button class="mt-6" on:click={downloadVideos}>Baixar vídeos</Button>
    </Card.Content>
 </Card.Root>
