@@ -67,7 +67,7 @@
                lesson_link: vid.lesson_link
             }))
          }
-         convertedPlaylistData = JSON.stringify(convertedData, null, 3);
+         convertedPlaylistData = JSON.stringify([{ ...convertedData }], null, 3);
          toast.success('Playlist convertida');
       } catch (err) {
          console.error(err);
