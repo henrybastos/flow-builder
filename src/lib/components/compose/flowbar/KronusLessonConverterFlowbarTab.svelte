@@ -5,7 +5,7 @@
    import Label from "$lib/components/ui/label/label.svelte";
    import Textarea from "$lib/components/ui/textarea/textarea.svelte";
    import { getContext } from "svelte";
-    import Clipboard from "$lib/components/Clipboard.svelte";
+   import Clipboard from "$lib/components/Clipboard.svelte";
 
    let modulesIndex = 0;
    let kronusPayload = "";

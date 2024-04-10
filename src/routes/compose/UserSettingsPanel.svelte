@@ -8,18 +8,24 @@
    import Separator from "$lib/components/ui/separator/separator.svelte";
    import { toast } from "svelte-sonner";
 
+   const COMMANDS_ERROR_OUTPUT_SCHEMA = {
+      flow_builder_update: 'Falha ao atualizar o Flow Builder',
+      flow_blocks_update: 'Falha ao atualizar o Flow Compose Blocks'
+   }
+
    let changesMade = false;
    let defaultUserSettings = {
       close_env_panel_on_outside_click: false
    };
 
    export let isPanelOpen = false;
-   export let userSettings = defaultUserSettings;
+   export let userSettings;
 
-   $: close_env_panel_on_outside_click = userSettings?.close_env_panel_on_outside_click;
+   $: close_env_panel_on_outside_click = userSettings?.close_env_panel_on_outside_click ?? false;
 
    function updateLS (setting, value) {
       changesMade = true;
+      console.log(userSettings, setting, value);
       userSettings[setting] = value;
       localStorage.setItem('userSettings', JSON.stringify(userSettings));
       setTimeout(() => changesMade = false, 3000);
@@ -45,29 +51,29 @@
 
       toast.promise(updatePromise, {
          loading: 'Verificando atualizações...',
-         success: (data) => {
-            console.log(data);
-            if (data.output === 'Already up to date.') {
-               return 'Última versão bombando'
-            }
+         success: ({ commands_output }) => {
+            // console.log(commands_output);
 
-            return 'AAAA';
+            const errorMessage = commands_output.map(output => {
+               if (output.exit_code === 1) {
+                  return COMMANDS_ERROR_OUTPUT_SCHEMA[output.label];
+               }
+            }).filter(v => v);
+            
+            if (errorMessage.length > 0) {
+               console.log(errorMessage);
+               throw new Error(errorMessage[0]);
+            }
+            
+            console.log('Update done.');
+            return 'Atualização feita com sucesso';
          }, 
-         error: () => {
-            return 'Falha na atualização'
+         error: (err) => {
+            console.log('[ERROR]', err.message);
+            console.log('Update done.');
+            return err.message;
          }
       })
-
-      // const response = ;
-      // const result = await response.json();
-      
-      // if (result?.status === 500) {
-      //    toast.error('ERRO - Falha na atualização');
-      // } else if (result?.status === 200) {
-      //    toast.success('Projeto atualizado');
-      // }
-
-      // console.log(result);
    }
 
    onMount(() => {
@@ -75,6 +81,9 @@
 
       if (userSettingsLS) { 
          userSettings = JSON.parse(userSettingsLS);
+      } else {
+         localStorage.setItem('userSettings', JSON.stringify(defaultUserSettings));
+         userSettings = defaultUserSettings;
       };
    })
 </script>
