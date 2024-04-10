@@ -20,9 +20,7 @@
    import { env } from "$env/dynamic/public"
    import { setContext } from "svelte";
    import UserSettingsPanel from "./UserSettingsPanel.svelte";
-   import { HeartFilled } from "radix-icons-svelte";
    import DevModeAccess from "./DevModeAccess.svelte";
-   import * as ContextMenu from "$lib/components/ui/context-menu";
 
    export let data;
 
@@ -399,16 +397,6 @@
 <UserSettingsPanel bind:userSettings bind:isPanelOpen={isUserSettingsPanelOpen} />
 <ComposeFlowbar />
 <DevModeAccess bind:isPanelOpen={isDevAccessPanelOpen} />
-
-<ContextMenu.Root>
-   <ContextMenu.Trigger>Right click</ContextMenu.Trigger>
-   <ContextMenu.Content>
-     <ContextMenu.Item>Profile</ContextMenu.Item>
-     <ContextMenu.Item>Billing</ContextMenu.Item>
-     <ContextMenu.Item>Team</ContextMenu.Item>
-     <ContextMenu.Item>Subscription</ContextMenu.Item>
-   </ContextMenu.Content>
- </ContextMenu.Root>
 
 {#if env?.PUBLIC_ENV?.toUpperCase() === 'DEV' || DEV_MODE}
    <span class="absolute bottom-0 w-full bg-purple-600 text-base text-center font-code py-1">
