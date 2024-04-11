@@ -1,16 +1,6 @@
 import ServerLogger from "./ServerLogger";
 import { EnvHandler } from "$lib/EnvHandler";
-import { 
-    env,
-    env_query,
-    x, 
-    xxx, 
-    set_element_value,
-    goto as goto_fn, 
-    download_blob, 
-    // download_yt_video,
-    async_eval
-} from "$lib/operations/_flowBuilderFuncs";
+import * as fbFuncs from "$lib/operations/_flowBuilderFuncs";
 
 import scrape_attr from "$lib/operations/scrapeAttribute";
 import goto from "$lib/operations/goto";
@@ -62,15 +52,16 @@ export default class Operations {
 
     // static __flow_builder_are_funcs_injected__ = false;
     static _flowBuilderInjectionFuncs = {
-        env,
-        env_query,
-        x,
-        xxx,
-        set_element_value,
-        goto: goto_fn,
-        download_blob,
-        // download_yt_video,
-        async_eval
+        env: fbFuncs.env,
+        env_query: fbFuncs.env_query,
+        x: fbFuncs.x,
+        xxx: fbFuncs.xxx,
+        set_element_value: fbFuncs.set_element_value,
+        wait_for_element: fbFuncs.wait_for_element,
+        goto: fbFuncs.goto,
+        download_blob: fbFuncs.download_blob,
+        // download_yt_video: //fbFuncs.download_yt_video,
+        async_eval: fbFuncs.async_eval
     }
 
     /**

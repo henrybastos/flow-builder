@@ -76,7 +76,11 @@ export const async_eval = async (maxAttempts = 5, interval = 5000, cb) => {
  
     console.log('[ASYNC EVAL RESULT]', evalReturnValue);
     return evalReturnValue;
- }
+}
+
+export const wait_for_element = async (secs, xpath) => {
+    return async_eval(secs, 1000, (res) => { x(xpath) && res(true); })
+}
 
 export const download_blob = async (filename, link) => {
     // Hoping it resolves CORS problems
