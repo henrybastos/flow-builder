@@ -33,6 +33,8 @@
     let pageSettingsWSEndpoint;
     let payloadModalTextearea;
 
+    let flowsToDraggy;
+
     function checkAndLoadTempPreset () {
         if (localStorage?.getItem('temp_preset')) {
             PAYLOAD.loadPayload(JSON.parse(localStorage.getItem('temp_preset')));
