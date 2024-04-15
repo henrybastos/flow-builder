@@ -1,10 +1,14 @@
-<script>
+<script lang="ts">
 	import { ContextMenu as ContextMenuPrimitive } from "bits-ui";
 	import Check from "svelte-radix/Check.svelte";
-	import { cn } from "$lib/utils.ts";
-	let className = undefined;
+	import { cn } from "$lib/utils.js";
+
+	type $$Props = ContextMenuPrimitive.CheckboxItemProps;
+	type $$Events = ContextMenuPrimitive.CheckboxItemEvents;
+
+	let className: $$Props["class"] = undefined;
 	export { className as class };
-	export let checked = undefined;
+	export let checked: $$Props["checked"] = undefined;
 </script>
 
 <ContextMenuPrimitive.CheckboxItem

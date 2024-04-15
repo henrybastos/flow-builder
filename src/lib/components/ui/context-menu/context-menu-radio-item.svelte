@@ -1,9 +1,13 @@
-<script>
+<script lang="ts">
 	import { ContextMenu as ContextMenuPrimitive } from "bits-ui";
 	import DotFilled from "svelte-radix/DotFilled.svelte";
-	import { cn } from "$lib/utils.ts";
-	let className = undefined;
-	export let value;
+	import { cn } from "$lib/utils.js";
+
+	type $$Props = ContextMenuPrimitive.RadioItemProps;
+	type $$Events = ContextMenuPrimitive.RadioItemEvents;
+
+	let className: $$Props["class"] = undefined;
+	export let value: $$Props["value"];
 	export { className as class };
 </script>
 

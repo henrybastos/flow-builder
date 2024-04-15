@@ -227,7 +227,7 @@
    <title>Flow Composer</title>
 </svelte:head>
 
-<main class="flex flex-col items-center mt-3">
+<main class="flex flex-col items-center mt-3 relative">
    <span class="flex text-neutral-500 font-semibold">Flow Composer • {VERSION}</span>
 
    <Card.Root class="flex flex-col p-3 border border-neutral-800 bg-transparent rounded-lg w-[40rem] mt-3 shadow-lg shadow-black">
@@ -363,6 +363,12 @@
    </Card.Root>
 </main>
 
+{#if env?.PUBLIC_ENV?.toUpperCase() === 'DEV' || DEV_MODE}
+   <span class="absolute bottom-0 left-0 right-0 w-full bg-purple-600 text-base text-center font-code py-1">
+      DEV MODE {#if env?.PUBLIC_ENV?.toUpperCase() === 'DEV'} / ENVIRONMENT {/if}
+   </span>
+{/if}
+
 <AlertDialog.Root bind:open={isStopExecutionOpen}>
    <AlertDialog.Content>
       <AlertDialog.Header>
@@ -397,9 +403,3 @@
 <UserSettingsPanel bind:userSettings bind:isPanelOpen={isUserSettingsPanelOpen} />
 <ComposeFlowbar />
 <DevModeAccess bind:isPanelOpen={isDevAccessPanelOpen} />
-
-{#if env?.PUBLIC_ENV?.toUpperCase() === 'DEV' || DEV_MODE}
-   <span class="absolute bottom-0 w-full bg-purple-600 text-base text-center font-code py-1">
-      DEV MODE {#if env?.PUBLIC_ENV?.toUpperCase() === 'DEV'} / ENVIRONMENT {/if}
-   </span>
-{/if}
