@@ -1,13 +1,13 @@
 <script>
    import { toast } from 'svelte-sonner';
    import * as Card from '$lib/components/ui/card';
-   
    import Draggy from '$lib/components/draggy/Draggy.svelte';
    import DraggyItem from '$lib/components/draggy/DraggyItem.svelte';
    import DraggyPlaceholder from '$lib/components/draggy/DraggyPlaceholder.svelte';
    import DraggyVoid from "$lib/components/draggy/DraggyVoid.svelte";
    import Button from '$lib/components/ui/button/button.svelte';
-    import FlowDropdown from './FlowDropdown.svelte';
+   import FlowDropdown from './FlowDropdown.svelte';
+   import FlowOperation from './FlowOperation.svelte';
 
    let PAYLOAD = {
       "env": {
@@ -149,18 +149,15 @@
                {#each list as flow}
                   <Card.Root class="w-full h-min">
                      <Card.Header class="flex flex-row justify-between items-center">
-                        <Card.Title class="text-2xl">{ flow.context_id }</Card.Title>
+                        <Card.Title class="text-2xl capitalize">{ flow.context_id.replaceAll('_', ' ') }</Card.Title>
 
-                        <FlowDropdown />
+                        <FlowDropdown flow={PAYLOAD.flows[flow.context_id]} />
                      </Card.Header>
             
-                     <Card.Content class="space-y-3">
-                        {#each flow.list as operation}    
+                     <Card.Content class="space-y-6">
+                        {#each flow.list as operation (operation.id)}
                            <DraggyItem item={operation}>
-                                 <div class="flex flex-row p-3 border-2 border-neutral-700 rounded-md">
-                                    <i data-draggy-grab class="ti ti-menu-2 mr-3 cursor-grab"></i>
-                                    <h6>{ operation.data.command }</h6>
-                                 </div>
+                              <FlowOperation flows={PAYLOAD.flows} operation={operation.data} />
                            </DraggyItem>
                         {:else}
                            <DraggyVoid contextID={flow.context_id}>

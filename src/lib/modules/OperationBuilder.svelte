@@ -76,7 +76,7 @@
                 {/if}
 
                 <!-- Determines which kind of Input Field it its -->
-                {#if field.type === 'text'}
+                {#if field.type === 'text' || field.type === 'textarea'}
                     <input 
                         class:code_font={field.code_font}
                         class={`col-start-2 input-md ${ field.value.match(placeholderMatchRegExp) ? 'font-code text-green-600' : 'font-sans' }`}

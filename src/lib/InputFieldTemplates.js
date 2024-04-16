@@ -137,7 +137,7 @@ export const FLOW_BUILDER_INPUT_FIELD_TEMPLATES = {
     },
     expression: {
         code_font: true,
-        type: 'text',
+        type: 'textarea',
         label: 'Expression',
         placeholder: 'window.location.href = "http://google.com.br";',
         value: ''
