@@ -146,14 +146,13 @@
             </Card.Header>
    
             <Card.Content class="flex flex-col w-full space-y-6 justify-center">
-               {#each list as flow}
+               {#each list as flow (flow.context_id)}
                   <Card.Root class="w-full h-min">
                      <Card.Header class="flex flex-row justify-between items-center">
-                        <Card.Title class="text-2xl capitalize">{ flow.context_id.replaceAll('_', ' ') }</Card.Title>
-
+                        <Card.Title class="text-2xl capitalize text-blue-500">{ flow.context_id.replaceAll('_', ' ') }</Card.Title>
                         <FlowDropdown flow={PAYLOAD.flows[flow.context_id]} />
                      </Card.Header>
-            
+                        
                      <Card.Content class="space-y-6">
                         {#each flow.list as operation (operation.id)}
                            <DraggyItem item={operation}>

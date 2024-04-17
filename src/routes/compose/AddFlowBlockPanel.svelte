@@ -21,7 +21,8 @@
         dev: 'bg-purple-500',
         youtube: 'bg-red-500',
         kronus: 'bg-orange-500',
-        google: 'bg-blue-500'
+        google: 'bg-blue-500',
+        tool: 'bg-cyan-500'
     }
 
     function addBlock (block) {

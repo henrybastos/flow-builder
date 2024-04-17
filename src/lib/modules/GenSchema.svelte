@@ -56,6 +56,10 @@ export const @@block_filename@: BlockProps = {
         {
             label: 'Google',
             value: 'google'
+        },
+        {
+            label: 'Tool',
+            value: 'tool'
         }
     ]
 

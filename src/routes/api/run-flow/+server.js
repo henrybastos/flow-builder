@@ -83,7 +83,7 @@ export async function POST ({ request }) {
             _browser = await puppeteer.launch({
                 dumpio: true,
                 headless: payload.config.headless,
-                ...(import.meta.env.VITE_PUPPETEER_EXECUTABLE_PATH && {executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe'}),
+                ...(import.meta.env.VITE_PUPPETEER_EXECUTABLE_PATH && {executablePath: import.meta.env.VITE_PUPPETEER_EXECUTABLE_PATH}),
                 args: [
                     `--window-size=${ width },${ height + 200 }`,
                     // '--disable-features=IsolateOrigins,site-per-process'

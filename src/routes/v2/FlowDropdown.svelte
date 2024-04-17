@@ -3,6 +3,7 @@
    import Button from "$lib/components/ui/button/button.svelte";
    import ScrollArea from "$lib/components/ui/scroll-area/scroll-area.svelte";
    import { FLOW_BUILDER_OPERATION_TEMPLATES as OPERATIONS_SCHEMA } from "$lib/OperationTemplates";
+    import { error } from "@sveltejs/kit";
 
    export let flow;
 
@@ -35,14 +36,6 @@
             {
                label: 'Type',
                value: 'keyboard_type'
-            },
-            {
-               label: 'Select option',
-               value: 'select_option'
-            },
-            {
-               label: 'Combo keys',
-               value: 'combo_keys'
             },
             {
                label: 'Press key',
@@ -136,8 +129,29 @@
 
    function addOperation (operation) {
       // console.log(operation, flow);
-      for (let field of OPERATIONS_SCHEMA[operation].input_fields) {
-         console.log(field);
+      let operationPayload = {};
+      
+      try {
+         const operationSchema = OPERATIONS_SCHEMA[operation];
+         console.log(operationSchema);
+
+         operationPayload.command = operationSchema.command;
+         operationPayload.enabled = true;
+
+         if (OPERATIONS_SCHEMA[operation]?.input_fields) {
+            for (let [field_name, field] of Object.entries(OPERATIONS_SCHEMA[operation].input_fields)) {
+               operationPayload[field_name] = field.value;
+            }
+         }
+
+         flow = [
+            ...flow,
+            operationPayload
+         ];
+
+         console.log(flow);
+      } catch (err) {
+         console.error(err);
       }
    }
 
