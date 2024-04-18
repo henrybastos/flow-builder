@@ -79,7 +79,7 @@ export const async_eval = async (maxAttempts = 5, interval = 5000, cb) => {
 }
 
 export const wait_for_element = async (secs, xpath) => {
-    return async_eval(secs, 1000, (res) => { x(xpath) && res(true); })
+    return async_eval((secs * 5), 200, (res) => { const el = x(xpath); res(el ? true : false); })
 }
 
 export const download_blob = async (filename, link) => {

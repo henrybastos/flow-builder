@@ -1,13 +1,19 @@
 <script>
    import { toast } from 'svelte-sonner';
    import * as Card from '$lib/components/ui/card';
-   import Draggy from '$lib/components/draggy/Draggy.svelte';
-   import DraggyItem from '$lib/components/draggy/DraggyItem.svelte';
-   import DraggyPlaceholder from '$lib/components/draggy/DraggyPlaceholder.svelte';
-   import DraggyVoid from "$lib/components/draggy/DraggyVoid.svelte";
+   
+   import {
+      Draggy,
+      DraggyItem,
+      DraggyPlaceholder,
+      DraggyVoid
+   } from '$lib/components/draggy/index.js';
+   
    import Button from '$lib/components/ui/button/button.svelte';
    import FlowDropdown from './FlowDropdown.svelte';
    import FlowOperation from './FlowOperation.svelte';
+    import Ihi from '$lib/components/Ihi.svelte';
+    import { onMount } from 'svelte';
 
    let PAYLOAD = {
       "env": {
@@ -132,11 +138,35 @@
          "headless": false
       }
    };
+
+   onMount(() => {
+      document.addEventListener('keypress', (evt) => {
+         if (evt.code === 'KeyI' && evt.ctrlKey) {
+            const selectedElement = document.activeElement;
+            const [ selStart, selEnd ] = [selectedElement.selectionStart, selectedElement.selectionEnd];
+            console.log(selStart, selEnd);
+
+            selectedElement.value = [
+               selectedElement.value.slice(0, selStart),
+               'Ihi',
+               selectedElement.value.slice(selEnd)
+            ].join('');
+
+            // console.log(document.activeElement.value.substring(
+            //    document.activeElement.selectionStart,
+            //    document.activeElement.selectionEnd,
+            // ));
+            // document.activeElement.value = 'Ctrl + K!';
+         }
+      })
+   })
 </script>
+
+<Ihi />
 
 <main class="flex flex-col w-screen overflow-hidden">
    {#if PAYLOAD}    
-      <Draggy class="flex flex-row p-6 justify-center" let:list bind:list={PAYLOAD.flows}>
+      <Draggy class="flex flex-row p-6 justify-center" let:list bind:list={PAYLOAD.flows} let:update>
          <Card.Root class="w-[60rem] h-min">
             <Card.Header class="flex flex-row justify-between items-center">
                <Card.Title class="text-3xl">Flow Builder</Card.Title>
@@ -150,10 +180,12 @@
                   <Card.Root class="w-full h-min">
                      <Card.Header class="flex flex-row justify-between items-center">
                         <Card.Title class="text-2xl capitalize text-blue-500">{ flow.context_id.replaceAll('_', ' ') }</Card.Title>
-                        <FlowDropdown flow={PAYLOAD.flows[flow.context_id]} />
+                        <FlowDropdown on:new_operation={update} bind:flow={PAYLOAD.flows[flow.context_id]} />
                      </Card.Header>
-                        
+                     
                      <Card.Content class="space-y-6">
+                        <!-- <pre>{ JSON.stringify(PAYLOAD.flows[flow.context_id], null ,3) }</pre>
+                        <pre>{ JSON.stringify(flow.list, null ,3) }</pre> -->
                         {#each flow.list as operation (operation.id)}
                            <DraggyItem item={operation}>
                               <FlowOperation flows={PAYLOAD.flows} operation={operation.data} />
@@ -185,8 +217,6 @@
          </DraggyPlaceholder>
       </Draggy>
    
-      <pre class="p-6 w-[40rem]">{ JSON.stringify(PAYLOAD.flows, null, 3) }</pre>
-      <pre class="p-6 w-[40rem]">{ JSON.stringify(PAYLOAD.flows, null, 3) }</pre>
-      <pre class="p-6 w-[40rem]">{ JSON.stringify(PAYLOAD.flows, null, 3) }</pre>
+      <!-- <pre class="p-6 w-[40rem]">{ JSON.stringify(PAYLOAD.flows, null, 3) }</pre> -->
    {/if}
 </main>

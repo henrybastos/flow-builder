@@ -1,12 +1,14 @@
 <script>
+   import { createEventDispatcher } from "svelte";
+   import { FLOW_BUILDER_OPERATION_TEMPLATES as OPERATIONS_SCHEMA } from "$lib/OperationTemplates";
    import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
    import Button from "$lib/components/ui/button/button.svelte";
    import ScrollArea from "$lib/components/ui/scroll-area/scroll-area.svelte";
-   import { FLOW_BUILDER_OPERATION_TEMPLATES as OPERATIONS_SCHEMA } from "$lib/OperationTemplates";
-    import { error } from "@sveltejs/kit";
 
+    
    export let flow;
-
+    
+   const dispatch = createEventDispatcher();
    const HIDDEN_OPERATIONS = [
       'set_payload_slot',
       'download_image',
@@ -150,6 +152,7 @@
          ];
 
          console.log(flow);
+         dispatch('new_operation');
       } catch (err) {
          console.error(err);
       }
