@@ -151,18 +151,16 @@
                'Ihi',
                selectedElement.value.slice(selEnd)
             ].join('');
-
-            // console.log(document.activeElement.value.substring(
-            //    document.activeElement.selectionStart,
-            //    document.activeElement.selectionEnd,
-            // ));
-            // document.activeElement.value = 'Ctrl + K!';
          }
       })
    })
 </script>
 
 <Ihi />
+
+<svelte:head>
+   <title>Flow Builder 2.0</title>
+</svelte:head>
 
 <main class="flex flex-col w-screen overflow-hidden">
    {#if PAYLOAD}    
@@ -188,7 +186,7 @@
                         <pre>{ JSON.stringify(flow.list, null ,3) }</pre> -->
                         {#each flow.list as operation (operation.id)}
                            <DraggyItem item={operation}>
-                              <FlowOperation flows={PAYLOAD.flows} operation={operation.data} />
+                              <FlowOperation flows={PAYLOAD.flows} {operation} />
                            </DraggyItem>
                         {:else}
                            <DraggyVoid contextID={flow.context_id}>

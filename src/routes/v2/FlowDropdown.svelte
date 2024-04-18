@@ -163,10 +163,6 @@
    }
 </script>
 
-<svelte:head>
-   <title>Flow Builder 2.0</title>
-</svelte:head>
-
 <DropdownMenu.Root>
    <DropdownMenu.Trigger asChild let:builder>
       <Button builders={[builder]} variant="ghost" size="icon">

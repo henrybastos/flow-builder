@@ -9,6 +9,7 @@ export interface Operation {
    command: string
    enabled: boolean
    target?: string
+   description?: string
    value?: string
    name?: string
    flow?: string

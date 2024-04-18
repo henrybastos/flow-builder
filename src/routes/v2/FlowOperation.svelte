@@ -4,26 +4,48 @@
    import * as Select from "$lib/components/ui/select";
    import * as Card from '$lib/components/ui/card';
    import { FLOW_BUILDER_OPERATION_TEMPLATES as OPERATIONS_SCHEMA } from "$lib/OperationTemplates";
-    import Textarea from "$lib/components/ui/textarea/textarea.svelte";
+   import Textarea from "$lib/components/ui/textarea/textarea.svelte";
+   import FlowOperationDropdown from "./FlowOperationDropdown.svelte";
+    import Button from "$lib/components/ui/button/button.svelte";
 
    export let flows;
    export let operation;
 
-   const operationSchema = OPERATIONS_SCHEMA[operation.command];
-   
-   // if(operationSchema.input_fields) {
-   //    for (let [command_name, command] of Object.entries(operationSchema.input_fields)) {
-   //       console.log(command);
-   //    }
-   // }
+   const operationSchema = OPERATIONS_SCHEMA[operation.data.command];
+   let operationDescription = '';
+   let canEditDescription = false;
+   let editDescriptionInputValue;
 
-   // console.log(Object.keys(flows));
+   function saveEditedDescription () {
+      operation.data.description = editDescriptionInputValue;
+      canEditDescription = false;
+   }
 </script>
 
 <Card.Root class="data-[draggy-active]:border-neutral-500">
-   <Card.Header class="flex flex-row items-center">
-      <i data-draggy-grab class="ti ti-menu-2 mr-3 cursor-grab text-blue-500"></i>
-      <Card.Title class="text-xl">{ operationSchema.label }</Card.Title>
+   <Card.Header>
+      <div class="inline-flex justify-between">
+         <div class="inline-flex">
+            <i data-draggy-grab class="ti ti-menu-2 mr-3 cursor-grab text-blue-500"></i>
+            <Card.Title class="text-xl">{ operationSchema.label }</Card.Title>
+         </div>
+         <FlowOperationDropdown bind:operation={operation} />
+      </div>
+
+      {#if operation.data?.description}   
+         <div class="inline-flex group/edit-description space-x-3">
+            {#if canEditDescription}
+               <Input on:change={(evt) => editDescriptionInputValue = evt.target.value} value={operation.data.description} type="text" />
+               <Button on:click={saveEditedDescription}>Save</Button>
+               <Button on:click={() => canEditDescription = false} size="icon" variant="destructive">
+                  <i class="ti ti-x"></i>
+               </Button>
+            {:else}
+               <Card.Description class="text-base">{ operation.data.description }</Card.Description>
+               <i on:click={() => canEditDescription = true} class="ti ti-pencil ml-3 invisible text-neutral-700 cursor-pointer hover:text-neutral-200 group-hover/edit-description:visible"></i>
+            {/if}
+         </div>
+      {/if}
    </Card.Header>
 
    <Card.Content class="space-y-3">
@@ -35,13 +57,13 @@
                <div>
                   <Label class="text-lg">{ command.label }</Label>
                   
-                  {#key operation[command_name]}   
-                     {#if operation[command_name].match(/(?<=@@)([^@]+)(?=@)/g)}
-                        <Input value={operation[command_name]} on:change={({ target }) => operation[command_name] = target.value} class="text-base mt-1 font-code text-orange-500" type="text" />                     
+                  {#key operation.data[command_name]}   
+                     {#if operation.data[command_name].match(/(?<=@@)([^@]+)(?=@)/g)}
+                        <Input value={operation.data[command_name]} on:change={({ target }) => operation.data[command_name] = target.value} class="text-base mt-1 font-code text-orange-500" type="text" />                     
                      {:else if command.code_font}
-                        <Input value={operation[command_name]} on:change={({ target }) => operation[command_name] = target.value} class="text-base mt-1 font-code text-green-500" type="text" />
+                        <Input value={operation.data[command_name]} on:change={({ target }) => operation.data[command_name] = target.value} class="text-base mt-1 font-code text-green-500" type="text" />
                      {:else}
-                        <Input value={operation[command_name]} on:change={({ target }) => operation[command_name] = target.value} class="text-base mt-1" type="text" />
+                        <Input value={operation.data[command_name]} on:change={({ target }) => operation.data[command_name] = target.value} class="text-base mt-1" type="text" />
                      {/if}
                   {/key}
                </div>
@@ -52,14 +74,14 @@
                <div>
                   <Label class="text-lg">{ command.label }</Label>
 
-                  {#key operation[command_name]}   
-                     {#if operation[command_name].match(/(?<=@@)([^@]+)(?=@)/g)}
-                        <Textarea wrap='off' rows="6" value={operation[command_name]} on:change={({ target }) => operation[command_name] = target.value} class="text-base mt-1 font-code text-orange-500" />
+                  {#key operation.data[command_name]}   
+                     {#if operation.data[command_name].match(/(?<=@@)([^@]+)(?=@)/g)}
+                        <Textarea wrap='off' rows="6" value={operation.data[command_name]} on:change={({ target }) => operation.data[command_name] = target.value} class="text-base mt-1 font-code text-orange-500" />
                         <!-- <Input  type="text" />                      -->
                      {:else if command.code_font}
-                        <Textarea wrap='off' rows="6" value={operation[command_name]} on:change={({ target }) => operation[command_name] = target.value} class="text-base mt-1 font-code text-green-500" />
+                        <Textarea wrap='off' rows="6" value={operation.data[command_name]} on:change={({ target }) => operation.data[command_name] = target.value} class="text-base mt-1 font-code text-green-500" />
                      {:else}
-                        <Textarea wrap='off' rows="6" value={operation[command_name]} on:change={({ target }) => operation[command_name] = target.value} class="text-base mt-1" />
+                        <Textarea wrap='off' rows="6" value={operation.data[command_name]} on:change={({ target }) => operation.data[command_name] = target.value} class="text-base mt-1" />
                      {/if}
                   {/key}
                </div>
@@ -70,7 +92,7 @@
                <div>
                   <Label class="text-lg">{ command.label }</Label>
                   
-                  <Select.Root onSelectedChange={(option) => operation[command_name] = option.value}>
+                  <Select.Root onSelectedChange={(option) => operation.data[command_name] = option.value}>
                      <Select.Trigger class="mt-1 text-base capitalize">
                         <Select.Value placeholder="-" />
                      </Select.Trigger>
