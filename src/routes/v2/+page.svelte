@@ -4,6 +4,7 @@
    import { toast } from 'svelte-sonner';
    import { ServerHandler } from '$lib/ServerHandler';
    import { LOGGER, TAGS } from "$lib/LogStore";
+   import * as Dialog from "$lib/components/ui/dialog";
    import * as Card from '$lib/components/ui/card';
    import Button from '$lib/components/ui/button/button.svelte';
    import FlowDropdown from './FlowDropdown.svelte';
@@ -49,7 +50,7 @@
       },
       "config": {
          "ws_endpoint": "",
-         "close_browser_on_finish": false,
+         "close_browser_on_finish": true,
          "close_browser_on_cancel_request": false,
          "headless": false
       }
@@ -105,6 +106,20 @@
    setContext('footerMessage', $footerMessage);
    setContext('footerFixedMessage', $footerFixedMessage);
    setContext('footerLoading', $footerLoading);
+
+   let responseTextareaEl;
+
+   function copyResponsePayloadToClipboard () {
+        if (navigator.clipboard && window.isSecureContext) {
+            window.navigator.clipboard.writeText(JSON.stringify(JSON.parse(ServerHandler.responsePayload), null ,3));
+        } else {
+            console.warn(`Context is not secure (${ window.isSecureContext }). Using select and copy.`);
+            responseTextareaEl.select();
+            document.execCommand('copy')
+        }
+        
+        toast.success('Saída copiada para a Área de Transferência!');
+    }
 
    onMount(() => {
       Array.from(document.querySelectorAll('[data-footer-message]')).forEach(el => {
