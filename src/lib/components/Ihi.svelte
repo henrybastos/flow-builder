@@ -1,20 +1,54 @@
 <script>
    import { onMount } from 'svelte';
    let showMichael = null;
+   let playMichael = 1;
+   let wowSfx, heeSfx;
+   const enableAudio = true;
+   const enableImage = true;
 
    onMount(() => {
       document.addEventListener('keypress', (evt) => {
          if (evt.key === 'i') {
-            showMichael = Math.round(Math.random() * 4);
-            console.log('Ihi')
+            if (enableAudio) {
+               playMichael = Math.ceil(Math.random() * 2);
+               if (playMichael === 1) {
+                  wowSfx.volume = 0.1;
+                  wowSfx.currentTime = 0.2;
+                  wowSfx.play();
+               } else if (playMichael === 2) {
+                  heeSfx.currentTime = 1;
+                  heeSfx.volume = 0.1;
+                  heeSfx.play();
+               }
+   
+               setTimeout(() => {
+                  wowSfx.pause();
+                  heeSfx.pause();
+               }, 200);
+            }
 
-            setTimeout(() => {
-               showMichael = null;
-            }, 24);
+            if (enableImage) {
+               showMichael = Math.round(Math.random() * 4);
+               console.log('Ihi');
+               
+               setTimeout(() => {
+                  showMichael = null;
+               }, 20);
+            }
          }
       })
    })
 </script>
+
+<audio bind:this={wowSfx} id="myAudio">
+   <source src="wow.mp3" type="audio/mp3">
+   Your browser does not support the audio element.
+</audio>
+
+<audio bind:this={heeSfx} id="myAudio">
+   <source src="hee-hee.mp3" type="audio/mp3">
+   Your browser does not support the audio element.
+</audio>
 
 {#if showMichael !== null}
    {#if showMichael === 1}

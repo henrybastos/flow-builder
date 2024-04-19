@@ -80,10 +80,6 @@
          icon: 'binary',
          ops: [      
             {
-               label: 'Goto',
-               value: 'goto'
-            },
-            {
                label: 'Eval expression',
                value: 'eval_expression'
             },
@@ -93,6 +89,10 @@
          category: 'Page',
          icon: 'browser',
          ops: [
+            {
+               label: 'Goto',
+               value: 'goto'
+            },
             {
                label: 'New page',
                value: 'new_page'

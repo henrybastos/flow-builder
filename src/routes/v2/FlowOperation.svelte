@@ -94,7 +94,7 @@
                   
                   <Select.Root onSelectedChange={(option) => operation.data[command_name] = option.value}>
                      <Select.Trigger class="mt-1 text-base capitalize">
-                        <Select.Value placeholder="-" />
+                        <Select.Value class="text-base capitalize" placeholder={operation.data[command_name].replaceAll('_', ' ')} />
                      </Select.Trigger>
                      <Select.Content>
                         {#each Object.keys(flows) as flow}

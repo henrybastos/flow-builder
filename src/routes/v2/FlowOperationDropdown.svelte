@@ -20,6 +20,11 @@
    function addDescription () {
       operation.data.description = 'Operation description.';
    }
+
+   function removeDescription () {
+      delete operation.data.description;
+      operation = operation;
+   }
 </script>
 
 <DropdownMenu.Root>
@@ -29,9 +34,15 @@
       </Button>
    </DropdownMenu.Trigger>
    <DropdownMenu.Content class="w-56">
-      <DropdownMenu.Item on:click={addDescription}>
-         Add description
-      </DropdownMenu.Item>
+      {#if !operation.data?.description}
+         <DropdownMenu.Item on:click={addDescription}>
+            Add description
+         </DropdownMenu.Item>
+      {:else}
+         <DropdownMenu.Item class="text-red-600" on:click={removeDescription}>
+            Remove description
+         </DropdownMenu.Item>
+      {/if}
 
       <DropdownMenu.Item on:click={deleteOperation} class="text-red-600">
          Delete operation
