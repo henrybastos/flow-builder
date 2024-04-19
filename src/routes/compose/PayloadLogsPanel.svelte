@@ -17,8 +17,6 @@
         const loggerMessages = Object.values($LOGGER.messages);
         const lastMessage = loggerMessages[loggerMessages.length - 1];
         
-        console.log(loggerMessages);
-
         if (lastMessage) {
             if (lastMessage.tag.type === 'running') {
                 logsGroups = [ [lastMessage], ...logsGroups ];

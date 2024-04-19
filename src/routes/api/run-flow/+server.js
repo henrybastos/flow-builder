@@ -244,8 +244,6 @@ export async function POST ({ request }) {
                 message: 'All operations done.',
                 payload: responsePayload
             });
-
-            ServerLogger.closeStream();
         } catch (err) {
             console.log(err);
 
@@ -257,6 +255,7 @@ export async function POST ({ request }) {
 
             await Operations.screenshot({ filename: 'last_error.png' });
             
+        } finally {
             ServerLogger.closeStream();
         }
     }   

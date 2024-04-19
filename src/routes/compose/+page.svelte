@@ -2,7 +2,6 @@
    import { VERSION } from "$lib/store.js";
    import { LOGGER, TAGS } from "$lib/LogStore";
    import { onMount } from "svelte";
-   import * as AlertDialog from "$lib/components/ui/alert-dialog";
    import * as Card from "$lib/components/ui/card";
    import Button from "$lib/components/ui/button/button.svelte";
    import DraggableList from "$lib/components/DraggableList.svelte";
@@ -21,6 +20,7 @@
    import { setContext } from "svelte";
    import UserSettingsPanel from "./UserSettingsPanel.svelte";
    import DevModeAccess from "./DevModeAccess.svelte";
+    import AlertStopExecution from "./AlertStopExecution.svelte";
 
    export let data;
 
@@ -28,7 +28,7 @@
    let isEnvPanelOpen = false;
    let isAddFlowBlockOpen = false;
    let isLogsPanelOpen = false;
-   let isStopExecutionOpen = false;
+   let isStopExecutionPanelOpen = false;
    let isDevSettingsPanelOpen = false;
    let isUserSettingsPanelOpen = false;
    let isDevAccessPanelOpen = false;
@@ -335,7 +335,7 @@
                   Carga final sendo executada
                </Button> -->
                <Button variant="destructive" class="text-base w-[16rem]"
-                  on:click={() => (isStopExecutionOpen = true)}
+                  on:click={() => (isStopExecutionPanelOpen = true)}
                >
                   Interromper execução
                </Button>
@@ -369,32 +369,7 @@
    </span>
 {/if}
 
-<AlertDialog.Root bind:open={isStopExecutionOpen}>
-   <AlertDialog.Content>
-      <AlertDialog.Header>
-         <AlertDialog.Title
-            >Você gostaria mesmo de interromper a execução?</AlertDialog.Title
-         >
-         <AlertDialog.Description class="text-base"
-            >Todas as operações já executadas não serão revertidas, podendo
-            deixar efeitos colaterais.</AlertDialog.Description
-         >
-      </AlertDialog.Header>
-
-      <AlertDialog.Footer>
-         <AlertDialog.Cancel asChild let:builder>
-            <Button
-               variant="destructive"
-               builders={[builder]}
-               on:click={async () => await ServerHandler.closeBrowser()}
-               >Interromper execução</Button
-            >
-         </AlertDialog.Cancel>
-         <AlertDialog.Action>Continuar a execução</AlertDialog.Action>
-      </AlertDialog.Footer>
-   </AlertDialog.Content>
-</AlertDialog.Root>
-
+<AlertStopExecution bind:isPanelOpen={isStopExecutionPanelOpen} stopServerAction={ServerHandler.closeBrowser} />
 <FlowBlockPayloadViewerPanel bind:isPanelOpen={isFlowBlockPanelOpen} bind:flowBlock={currentFlowBlock}/>
 <EnvPanel bind:userSettings bind:combinedEnvPayload bind:isEnvPanelOpen bind:isPayloadRunning />
 <AddFlowBlockPanel flowBlocks={data?.flowBlocks} {DEV_MODE} bind:combinedEnvPayload bind:flowBlocksList={flowBlocksList} bind:isPanelOpen={isAddFlowBlockOpen} />

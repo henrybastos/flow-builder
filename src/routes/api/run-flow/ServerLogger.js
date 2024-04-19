@@ -26,6 +26,10 @@ export default class ServerLogger {
     }
 
     static closeStream () {
-        this.controller.close();       
+        try {
+            this.controller.close();       
+        } catch (err) {
+            throw new Error('Controller closed by user.')
+        }
     }
 }
