@@ -178,8 +178,8 @@
    <title>Flow Builder 2.0</title>
 </svelte:head>
 
-<main class="flex flex-col w-screen overflow-hidden">
-   <header class="fixed w-full h-fit bg-neutral-900">
+<main class="flex flex-col w-screen overflow-hidden items-center">
+   <header class="fixed top-2 w-[60rem] h-fit bg-white bg-opacity-5 backdrop-blur-md rounded-lg">
       <div class="p-2">
          {#if isPayloadRunning}
             <Button on:click={() => isStopExecutionPanelOpen = true} data-footer-message='[StopBrowser]: Stops the payload execution.' variant="ghost">
@@ -203,7 +203,7 @@
 
    {#if PAYLOAD} 
       {#key isEditPayloadPanelOpen}
-         <Draggy class="flex flex-row mt-12 p-6 justify-center" let:list bind:list={PAYLOAD.flows} bind:this={draggyRoot}>
+         <Draggy class="flex flex-row mt-11 p-6 justify-center" let:list bind:list={PAYLOAD.flows} bind:this={draggyRoot}>
             <Card.Root class="w-[60rem] h-min">
                <Card.Header class="flex flex-row justify-between items-center">
                   <Card.Title class="text-3xl">Flow Builder</Card.Title>
@@ -241,7 +241,7 @@
                            {/each}
                         </Card.Content>
                         
-                        <Card.Footer class="p-6">
+                        <Card.Footer class="p-3">
                            <p class="text-neutral-600 w-full text-center">{ flow.list.length } operations</p>
                         </Card.Footer>
                      </Card.Root>
