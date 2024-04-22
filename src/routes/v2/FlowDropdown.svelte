@@ -8,6 +8,7 @@
    export let flowID;
     
    const dispatch = createEventDispatcher();
+
    const HIDDEN_OPERATIONS = [
       'set_payload_slot',
       'download_image',
@@ -173,7 +174,7 @@
 
       <DropdownMenu.Separator />
 
-      <DropdownMenu.Item class="text-red-600">
+      <DropdownMenu.Item on:click={() => dispatch('deleteflow', { flowID })} class="text-red-600">
          Delete flow
       </DropdownMenu.Item>
    </DropdownMenu.Content>

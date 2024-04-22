@@ -145,6 +145,10 @@
       draggyRoot.addList(detail.flowName);
    }
 
+   function deleteFlow ({ detail }) {
+      console.log(detail.flowID);
+   }
+
    onMount(() => {
       Array.from(document.querySelectorAll('[data-footer-message]')).forEach(el => {
          el.addEventListener('mouseenter', () => {
@@ -224,7 +228,12 @@
                      <Card.Root class="w-full h-min">
                         <Card.Header class="flex flex-row justify-between items-center">
                            <Card.Title class="text-2xl capitalize text-blue-500">{ flow.context_id.replaceAll('_', ' ') }</Card.Title>
-                           <FlowDropdown on:addoperation={openAddOperationPanel} bind:flow={PAYLOAD.flows[flow.context_id]} bind:flowID={flow.context_id} />
+                           <FlowDropdown 
+                              on:addoperation={openAddOperationPanel} 
+                              on:deleteflow={deleteFlow}
+                              bind:flow={PAYLOAD.flows[flow.context_id]} 
+                              bind:flowID={flow.context_id} 
+                           />
                         </Card.Header>
                         
                         <Card.Content class="p-0 divide-y divide-neutral-800 border-y border-neutral-800">
