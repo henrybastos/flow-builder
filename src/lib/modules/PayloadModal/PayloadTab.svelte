@@ -9,7 +9,6 @@
     import { PAYLOAD } from "$lib/PayloadStore";
     import LogMessage from "$lib/components/LogMessage.svelte";
     import CodeMirrorModule from "../CodeMirrorModule/CodeMirrorModule.svelte";
-    import { transformToJSON } from "$lib/utils";
 
     export let showToast;
     export let payloadModal;

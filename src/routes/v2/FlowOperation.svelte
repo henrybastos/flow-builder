@@ -6,10 +6,13 @@
    import { FLOW_BUILDER_OPERATION_TEMPLATES as OPERATIONS_SCHEMA } from "$lib/OperationTemplates";
    import Textarea from "$lib/components/ui/textarea/textarea.svelte";
    import FlowOperationDropdown from "./FlowOperationDropdown.svelte";
-    import Button from "$lib/components/ui/button/button.svelte";
+   import Button from "$lib/components/ui/button/button.svelte";
+   import { getContext } from "svelte";
 
    export let flows;
    export let operation;
+
+   let isDragActive = getContext('isDragActive');
 
    const operationSchema = OPERATIONS_SCHEMA[operation.data.command];
    let operationDescription = '';
@@ -22,11 +25,11 @@
    }
 </script>
 
-<Card.Root class="data-[draggy-active]:border-neutral-500">
+<Card.Root class="data-[draggy-active]:opacity-30 border-0 rounded-none">
    <Card.Header>
       <div class="inline-flex justify-between">
          <div class="inline-flex">
-            <i data-draggy-grab class="ti ti-menu-2 mr-3 cursor-grab text-blue-500"></i>
+            <i data-draggy-grab class="ti ti-grip-vertical mr-3 cursor-grab text-blue-500"></i>
             <Card.Title class="text-xl">{ operationSchema.label }</Card.Title>
          </div>
          <FlowOperationDropdown bind:operation={operation} />

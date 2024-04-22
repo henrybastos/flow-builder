@@ -32,4 +32,4 @@
     }
 </script>
 
-<CodeMirror bind:value={value} styles={codeMirrorStyle} lang={json()} />
+<CodeMirror on:change bind:value={value} styles={codeMirrorStyle} lang={json()} />

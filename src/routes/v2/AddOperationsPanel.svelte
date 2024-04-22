@@ -1,25 +1,15 @@
 <script>
    import { createEventDispatcher } from "svelte";
+   import Button from '$lib/components/ui/button/button.svelte';
+   import * as Dialog from '$lib/components/ui/dialog';
+   import ScrollArea from '$lib/components/ui/scroll-area/scroll-area.svelte';
    import { FLOW_BUILDER_OPERATION_TEMPLATES as OPERATIONS_SCHEMA } from "$lib/OperationTemplates";
-   import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
-   import Button from "$lib/components/ui/button/button.svelte";
 
-   export let flow;
+   export let isPanelOpen;
    export let flowID;
-    
+   export let flow;
+
    const dispatch = createEventDispatcher();
-   const HIDDEN_OPERATIONS = [
-      'set_payload_slot',
-      'download_image',
-      'eval_regex',
-      'extract_param_from_url',
-      'extract_route_from_url',
-      'chrome_picker_set_color',
-      'scrape_attr',
-      'scrape_multiple_attr',
-      'set_attr',
-      'set_env',
-   ]
 
    const OPERATIONS = [
       {
@@ -48,6 +38,14 @@
          category: 'Flow',
          icon: 'arrow-fork',
          ops: [      
+            {
+               label: 'Run flow',
+               value: 'run_flow'
+            },
+            {
+               label: 'Run flow for each',
+               value: 'run_flow_for_each'
+            },
             {
                label: 'Branch eval',
                value: 'branch_eval'
@@ -128,53 +126,50 @@
       }
    ]
 
-   function copyJSON () {
-      console.log(JSON.stringify(flow, null, 3));
+   function addOperation (operation) {
+      let operationPayload = {};
+      
+      try {
+         const operationSchema = OPERATIONS_SCHEMA[operation];
+         console.log(operationSchema);
+
+         operationPayload.command = operationSchema.command;
+         operationPayload.enabled = true;
+
+         if (OPERATIONS_SCHEMA[operation]?.input_fields) {
+            for (let [field_name, field] of Object.entries(OPERATIONS_SCHEMA[operation].input_fields)) {
+               operationPayload[field_name] = field.value;
+            }
+         }
+         
+         isPanelOpen = false;
+         dispatch('newoperation', { operation: operationPayload });
+      } catch (err) {
+         console.error(err);
+      }
    }
 </script>
 
-<DropdownMenu.Root>
-   <DropdownMenu.Trigger asChild let:builder>
-      <Button builders={[builder]} variant="ghost" size="icon">
-         <i class="ti ti-dots-vertical"></i>
-      </Button>
-   </DropdownMenu.Trigger>
-   <DropdownMenu.Content class="w-56">
-      <DropdownMenu.Group>
-         <DropdownMenu.Item disabled>Rename</DropdownMenu.Item>
-         <DropdownMenu.Item on:click={copyJSON}>Copy JSON</DropdownMenu.Item>
-         <DropdownMenu.Item on:click={() => dispatch('addoperation', { flowID })}>Add operation</DropdownMenu.Item>
+<Dialog.Root bind:open={isPanelOpen}>
+   <Dialog.Content class="max-w-[36rem]">
+      <Dialog.Header>
+         <Dialog.Title class="text-2xl">Add operation</Dialog.Title>
+      </Dialog.Header>
 
-         <!-- <DropdownMenu.Sub>
-            <DropdownMenu.SubTrigger>Add operation</DropdownMenu.SubTrigger>
-            <DropdownMenu.SubContent>
-               <ScrollArea class="h-[20rem]" orientation="vertical">
-                  {#each Object.entries(OPERATIONS) as [index, operation]}
-                     {#if operation.category}
-                        {#if index != 0}
-                           <DropdownMenu.Separator />
-                        {/if}
-                        <DropdownMenu.Label>
-                           <i class={`ti ti-${ operation.icon } text-lg text-blue-500 mr-1`}></i>
-                           { operation.category }
-                        </DropdownMenu.Label>
-                        <DropdownMenu.Separator />
-                     {/if}
-   
-                     {#each operation.ops as op}
-                        <DropdownMenu.Item on:click={() => addOperation(op.value)}>{ op.label }</DropdownMenu.Item>
-                     {/each}
-                  {/each}
-               </ScrollArea>
-            </DropdownMenu.SubContent>
-         </DropdownMenu.Sub> -->
+      <ScrollArea class="h-[30rem] px-4" orientation="vertical">
+         {#each OPERATIONS as operation}
+            <h2 class="text-xl capitalize py-4 border-t border-neutral-800">
+               <i class={`ti ti-${ operation.icon } text-xl text-blue-500 mr-1`}></i>
+               { operation.category }
+            </h2>
 
-      </DropdownMenu.Group>
-
-      <DropdownMenu.Separator />
-
-      <DropdownMenu.Item class="text-red-600">
-         Delete flow
-      </DropdownMenu.Item>
-   </DropdownMenu.Content>
-</DropdownMenu.Root>
+            <div class="space-y-2 mb-4">
+               {#each operation.ops as op}
+                  <Button on:click={() => addOperation(op.value)} variant="ghost" class="w-full text-base">{ op.label }</Button>
+               {/each}
+            </div>
+            <!-- <Separator /> -->
+         {/each}
+      </ScrollArea>
+   </Dialog.Content>
+</Dialog.Root>

@@ -4,17 +4,14 @@
    import Button from "$lib/components/ui/button/button.svelte";
    
    let list = getContext('list');
+   let deleteItem = getContext('deleteItem');
    const dispatch = createEventDispatcher();
 
    export let operation;
    
    function deleteOperation () {
-      let thisList = $list.find(list => list.context_id === operation.context_id).list
-      thisList = thisList.filter(op => op.id !== operation.id);
-      $list.find(list => list.context_id === operation.context_id).list = thisList;
-      
+      deleteItem(operation.context_id, operation.id);
       console.log(`Deleted operation ${ operation.id }`);
-      $list = $list;
    }
 
    function addDescription () {
