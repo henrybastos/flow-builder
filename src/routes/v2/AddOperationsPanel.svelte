@@ -17,18 +17,22 @@
          icon: 'keyboard',
          ops: [      
             {
+               icon: 'ti-hand-click',
                label: 'User click',
                value: 'user_click'
             },
             {
+               icon: 'ti-pointer',
                label: 'Click',
                value: 'click'
             },
             {
+               icon: 'ti-keyboard',
                label: 'Type',
                value: 'keyboard_type'
             },
             {
+               icon: 'ti-command',
                label: 'Press key',
                value: 'press_key'
             },
@@ -39,34 +43,42 @@
          icon: 'arrow-fork',
          ops: [      
             {
+               icon: 'ti-arrow-bear-right-2',
                label: 'Run flow',
                value: 'run_flow'
             },
             {
+               icon: 'ti-zoom-scan',
                label: 'Run flow for each',
                value: 'run_flow_for_each'
             },
             {
+               icon: 'ti-terminal',
                label: 'Branch eval',
                value: 'branch_eval'
             },
             {
+               icon: 'ti-clock-search',
                label: 'Wait for selector',
                value: 'wait_for_selector'
             },
             {
+               icon: 'ti-speedboat',
                label: 'Wait for navigation',
                value: 'wait_for_navigation'
             },
             {
+               icon: 'ti-clock',
                label: 'Wait seconds',
                value: 'wait_seconds'
             },
             {
+               icon: 'ti-folders',
                label: 'Wait for element',
                value: 'wait_for_element'
             },
             {
+               icon: 'ti-zoom-scan',
                label: 'Check element',
                value: 'check_element'
             },
@@ -77,6 +89,7 @@
          icon: 'binary',
          ops: [      
             {
+               icon: 'ti-terminal-2',
                label: 'Eval expression',
                value: 'eval_expression'
             },
@@ -87,38 +100,47 @@
          icon: 'browser',
          ops: [
             {
+               icon: 'ti-send',
                label: 'Goto',
                value: 'goto'
             },
             {
+               icon: 'ti-folder-plus',
                label: 'New page',
                value: 'new_page'
             },
             {
+               icon: 'ti-folders',
                label: 'Select page',
                value: 'select_page'
             },
             {
-               label: 'Wait for DOM render',
+               icon: 'ti-crane',
+               label: 'Wait for DOM',
                value: 'wait_for_dom_render'
             },
             {
+               icon: 'ti-box-margin',
                label: 'Attach to iFrame',
                value: 'attach_to_iframe'
             },
             {
+               icon: 'ti-box-padding',
                label: 'Detach from iFrame',
                value: 'detach_from_iframe'
             },
             {
+               icon: 'ti-refresh',
                label: 'Reload',
                value: 'reload'
             },
             {
+               icon: 'ti-focus-centered',
                label: 'Screenshot',
                value: 'screenshot'
             },
             {
+               icon: 'ti-clock',
                label: 'Close browser',
                value: 'close_browser'
             },
@@ -163,9 +185,14 @@
                { operation.category }
             </h2>
 
-            <div class="space-y-2 mb-4">
+            <div class="grid grid-cols-2 mb-4 gap-3">
                {#each operation.ops as op}
-                  <Button on:click={() => addOperation(op.value)} variant="ghost" class="w-full text-base">{ op.label }</Button>
+                  <Button on:click={() => addOperation(op.value)} variant="outline" class="w-full text-base">
+                     {#if op.icon}
+                     <i class={`ti ${ op.icon } text-blue-500 mr-1 text-xl`}></i>
+                     {/if}
+                     { op.label }
+                  </Button>
                {/each}
             </div>
             <!-- <Separator /> -->

@@ -137,7 +137,7 @@
 <DropdownMenu.Root>
    <DropdownMenu.Trigger asChild let:builder>
       <Button builders={[builder]} variant="ghost" size="icon">
-         <i class="ti ti-dots-vertical"></i>
+         <i class="ti ti-settings"></i>
       </Button>
    </DropdownMenu.Trigger>
    <DropdownMenu.Content class="w-56">

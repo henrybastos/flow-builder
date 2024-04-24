@@ -21,6 +21,7 @@
    import EditPayloadPanel from './EditPayloadPanel.svelte';
    import AddOperationsPanel from './AddOperationsPanel.svelte';
    import AddFlowPanel from './AddFlowPanel.svelte';
+   import { Skeleton } from '$lib/components/ui/skeleton';
 
    let isLogsPanelOpen = false;
    let isPayloadRunning = false;
@@ -35,8 +36,9 @@
    let responseTextareaEl;
    let activeFlow;
    let draggyRoot;
+   let hasLoadFinished = false;
 
-   let PAYLOAD = {
+   const DEFAULT_PAYLOAD = {
       "env": {
          "_$fb": {
             "pages": {
@@ -45,26 +47,16 @@
          }
       },
       "flows": {
-         "main_flow": [
-            {
-               "command": "goto",
-               "enabled": true,
-               "target": "https://tabler.io/icons/icon/loader-2"
-            },
-            {
-               "command": "eval_expression",
-               "enabled": true,
-               "expression": "env({ icon_title: x(`//a[@data-title=\"Copy name\"]`).innerText })"
-            }
-         ]
+         "main_flow": []
       },
       "config": {
          "ws_endpoint": "",
-         "close_browser_on_finish": true,
+         "close_browser_on_finish": false,
          "close_browser_on_cancel_request": false,
          "headless": false
       }
    };
+   let PAYLOAD = DEFAULT_PAYLOAD;
 
    ServerHandler.logger = LOGGER;
    ServerHandler.logger_tags = TAGS;
@@ -146,10 +138,41 @@
    }
 
    function deleteFlow ({ detail }) {
-      console.log(detail.flowID);
+      draggyRoot.deleteList(detail.flowID);
+   }
+
+   function savePayloadToLS () {
+      localStorage.setItem('tempPayload', JSON.stringify(PAYLOAD));
+      toast.success('Temp payload saved to Local Storage.');
+   }
+
+   function loadPayloadFromLS () {
+      try {
+         const LSPayload = JSON.parse(localStorage.getItem('tempPayload'));
+         PAYLOAD = LSPayload;
+         draggyRoot.setList(LSPayload.flows);
+         console.log('Payload loaded from the Local Storage.');
+         toast.info('Payload loaded from the Local Storage.');
+      } catch (err) {
+         toast.error('Failed to load the payload from the Local Storage.');
+         console.log('Failed to load the payload from the Local Storage.');
+         loadDefaultPayload();
+         console.error(err);
+      }
+      hasLoadFinished = true;
+   }
+
+   function loadDefaultPayload () {
+      PAYLOAD = DEFAULT_PAYLOAD;
+      draggyRoot.setList(DEFAULT_PAYLOAD.flows);
+      console.log('New blank payload loaded');
+      toast.info('New blank payload loaded');
    }
 
    onMount(() => {
+      // console.log('LS PAYLOAD', localStorage.getItem('tempPayload'), PAYLOAD);
+      loadPayloadFromLS();
+
       Array.from(document.querySelectorAll('[data-footer-message]')).forEach(el => {
          el.addEventListener('mouseenter', () => {
             setFooterMessage(el.dataset.footerMessage);
@@ -184,24 +207,44 @@
 
 <main class="flex flex-col w-screen overflow-hidden items-center">
    <header class="fixed top-2 w-[60rem] h-fit bg-white bg-opacity-5 backdrop-blur-md rounded-lg">
-      <div class="p-2">
-         {#if isPayloadRunning}
-            <Button on:click={() => isStopExecutionPanelOpen = true} data-footer-message='[StopBrowser]: Stops the payload execution.' variant="ghost">
-               <i class="ti ti-player-stop text-red-500 mr-2"></i> Stop
+      <div class="flex flex-row p-2 w-full justify-between">
+         <div>
+            {#if isPayloadRunning}
+               <Button on:click={() => isStopExecutionPanelOpen = true} data-footer-message='[StopBrowser]: Stops the payload execution.' variant="ghost">
+                  <i class="ti ti-player-stop text-red-500 mr-2"></i> Stop
+               </Button>
+            {:else}
+               <Button on:click={runCombinedPayload} data-footer-message='[RunMainFlow]: Executes the payload.' variant="ghost">
+                  <i class="ti ti-player-play-filled mr-2"></i> Run 
+               </Button>
+            {/if}
+            
+            <Button variant="ghost" data-footer-message='[Logs]: Opens the Logs panel.' on:click={() => isLogsPanelOpen = true}>
+               <i class="ti ti-logs mr-2"></i> Logs
             </Button>
-         {:else}
-            <Button on:click={runCombinedPayload} data-footer-message='[RunMainFlow]: Executes the payload.' variant="ghost">
-               <i class="ti ti-player-play-filled mr-2"></i> Run 
+   
+            <Button variant="ghost" data-footer-message='[Output]: Opens the Output panel.' on:click={() => isOutputPanelOpen = true}>
+               <i class="ti ti-toilet-paper mr-2"></i> Output
             </Button>
-         {/if}
-         
-         <Button variant="ghost" data-footer-message='[Logs]: Opens the Logs panel.' on:click={() => isLogsPanelOpen = true}>
-            <i class="ti ti-logs mr-2"></i> Logs
-         </Button>
 
-         <Button variant="ghost" data-footer-message='[Output]: Opens the Output panel.' on:click={() => isOutputPanelOpen = true}>
-            <i class="ti ti-toilet-paper mr-2"></i> Output
-         </Button>
+            <Button on:click={() => isEditPayloadPanelOpen = true} data-footer-message='[EditPayloadPanel]: Edits the payload.' variant="ghost">
+               <i class="ti ti-braces mr-2"></i> Payload
+            </Button>
+
+            <Button on:click={() => isAddFlowPanelOpen = true} data-footer-message='[AddFlowPanel]: Adds a new flow to the payload.' variant="ghost">
+               <i class="ti ti-cube-plus mr-2"></i>Add flow
+            </Button>
+         </div>
+         
+         <div>
+            <Button variant="ghost" size="icon" on:click={savePayloadToLS} data-footer-message='[LocalStorageSave]: Saves the current payload in the Local Storage, overwriting the previous payload.'>
+               <i class="ti ti-device-floppy text-green-500"></i>
+            </Button>
+            
+            <Button variant="ghost" size="icon" on:click={loadDefaultPayload} data-footer-message='[NewPayload]: Loads a new blank payload.'>
+               <i class="ti ti-file text-red-500"></i> 
+            </Button>
+         </div>
       </div>
    </header>
 
@@ -211,22 +254,12 @@
             <Card.Root class="w-[60rem] h-min">
                <Card.Header class="flex flex-row justify-between items-center">
                   <Card.Title class="text-3xl">Flow Builder</Card.Title>
-
-                  <div class="space-x-1">
-                     <Button on:click={() => isEditPayloadPanelOpen = true} data-footer-message='[EditPayloadPanel]: Edits the payload.' size="icon" variant="ghost">
-                        <i class="ti ti-braces"></i>
-                     </Button>
-   
-                     <Button on:click={() => isAddFlowPanelOpen = true} data-footer-message='[AddFlowPanel]: Adds a new flow to the payload.' size="icon" variant="ghost">
-                        <i class="ti ti-playlist-add"></i>
-                     </Button>
-                  </div>
                </Card.Header>
 
                <Card.Content class="flex flex-col w-full space-y-6 justify-center">
                   {#each list as flow (flow.context_id)}
                      <Card.Root class="w-full h-min">
-                        <Card.Header class="flex flex-row justify-between items-center">
+                        <Card.Header class="flex flex-row justify-between items-center border-b-2 border-b-blue-500">
                            <Card.Title class="text-2xl capitalize text-blue-500">{ flow.context_id.replaceAll('_', ' ') }</Card.Title>
                            <FlowDropdown 
                               on:addoperation={openAddOperationPanel} 
@@ -237,17 +270,21 @@
                         </Card.Header>
                         
                         <Card.Content class="p-0 divide-y divide-neutral-800 border-y border-neutral-800">
-                           {#each flow.list as operation (operation.id)}
-                              <DraggyItem item={operation}>
-                                 <FlowOperation flows={PAYLOAD.flows} {operation} />
-                              </DraggyItem>
+                           {#if hasLoadFinished}
+                              {#each flow.list as operation (operation.id)}
+                                 <DraggyItem item={operation}>
+                                    <FlowOperation flows={PAYLOAD.flows} {operation} />
+                                 </DraggyItem>
+                              {:else}
+                                 <DraggyVoid class="text-neutral-600" contextID={flow.context_id}>
+                                    <div class="m-4 p-4 border-2 border-neutral-800 border-dashed rounded-lg">
+                                       <h6>No operations</h6>
+                                    </div>
+                                 </DraggyVoid>
+                              {/each}
                            {:else}
-                              <DraggyVoid class="text-neutral-600" contextID={flow.context_id}>
-                                 <div class="m-4 p-4 border-2 border-neutral-800 border-dashed rounded-lg">
-                                    <h6>No operations</h6>
-                                 </div>
-                              </DraggyVoid>
-                           {/each}
+                              <Skeleton class="h-[15rem] m-6 rounded-xl" />
+                           {/if}
                         </Card.Content>
                         
                         <Card.Footer class="p-3">
@@ -280,7 +317,7 @@
 </main>
 
 <AlertStopExecution bind:isPanelOpen={isStopExecutionPanelOpen} stopAction={stopPayloadRequest} />
-<PayloadOutputPanel bind:isPanelOpen={isOutputPanelOpen} bind:isPayloadRunning />
+<PayloadOutputPanel {toast} bind:isPanelOpen={isOutputPanelOpen} bind:isPayloadRunning />
 <PayloadLogsPanel {toast} bind:isPanelOpen={isLogsPanelOpen} bind:isPayloadRunning />
 <EditPayloadPanel bind:payload={PAYLOAD} bind:isPanelOpen={isEditPayloadPanelOpen} />
 <AddOperationsPanel bind:isPanelOpen={isAddOperationPanelOpen} on:newoperation={addOperation} bind:flowID={activeFlow} bind:flow={PAYLOAD.flows}/>

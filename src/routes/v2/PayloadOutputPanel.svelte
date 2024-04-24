@@ -6,9 +6,11 @@
    import json from 'highlight.js/lib/languages/json';
    import { ServerHandler } from '$lib/ServerHandler';
    import { LOGGER, TAGS } from "$lib/LogStore";
+    import Clipboard from "$lib/components/Clipboard.svelte";
 
    export let isPanelOpen;
    export let isPayloadRunning;
+   export let toast;
 
    let responseTextareaEl;
    let outputCodeEl;
@@ -18,23 +20,13 @@
 
    hljs.registerLanguage('json', json);
 
+   $: clipboardContent = JSON.stringify(JSON.parse(ServerHandler.responsePayload), null, 3);
+
    $: {
       if (isPanelOpen && !outputCodeEl?.dataset?.highlighted && outputCodeEl) {
          hljs.highlightElement(outputCodeEl);
       }
    }
-
-   function copyResponsePayloadToClipboard () {
-        if (navigator.clipboard && window.isSecureContext) {
-            window.navigator.clipboard.writeText(JSON.stringify(JSON.parse(ServerHandler.responsePayload), null ,3));
-        } else {
-            console.warn(`Context is not secure (${ window.isSecureContext }). Using select and copy.`);
-            responseTextareaEl.select();
-            document.execCommand('copy')
-        }
-        
-        toast.success('Saída copiada para a Área de Transferência!');
-    }
 </script>
 
 <Dialog.Root bind:open={isPanelOpen}>
@@ -48,15 +40,14 @@
             bind:this={outputCodeEl}
          >{ JSON.stringify(JSON.parse(ServerHandler.responsePayload), null ,3) }
          </pre>
-         <textarea bind:this={responseTextareaEl} class="absolute opacity-0">
-            {JSON.stringify(JSON.parse(ServerHandler.responsePayload), null, 3)}
-         </textarea>
       {/key}
 
       <div class="flex flex-row-reverse gap-x-2">
-         <Button variant="default" on:click={copyResponsePayloadToClipboard}>
-            Copiar saída
-         </Button>
+         <Clipboard let:copyToClipboard bind:clipboardContent={clipboardContent} {toast}>
+            <Button variant="default" on:click={copyToClipboard}>
+               Copy output
+            </Button>
+         </Clipboard>
       </div>
    </Dialog.Content>
 </Dialog.Root>

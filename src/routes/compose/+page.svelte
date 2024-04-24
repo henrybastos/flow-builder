@@ -370,7 +370,7 @@
 {/if}
 
 <AlertStopExecution bind:isPanelOpen={isStopExecutionPanelOpen} stopServerAction={ServerHandler.closeBrowser} />
-<FlowBlockPayloadViewerPanel bind:isPanelOpen={isFlowBlockPanelOpen} bind:flowBlock={currentFlowBlock}/>
+<FlowBlockPayloadViewerPanel {toast} bind:isPanelOpen={isFlowBlockPanelOpen} bind:flowBlock={currentFlowBlock}/>
 <EnvPanel bind:userSettings bind:combinedEnvPayload bind:isEnvPanelOpen bind:isPayloadRunning />
 <AddFlowBlockPanel flowBlocks={data?.flowBlocks} {DEV_MODE} bind:combinedEnvPayload bind:flowBlocksList={flowBlocksList} bind:isPanelOpen={isAddFlowBlockOpen} />
 <PayloadLogsPanel {toast} bind:isPanelOpen={isLogsPanelOpen} bind:isPayloadRunning />

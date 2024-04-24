@@ -33,10 +33,15 @@ export const xxx = (path, root) => {
  */
 export const set_element_value = (x_path, value, attribute = 'value') => {
     const element = x(x_path);
-    element.focus();
-    element[attribute] = value;
-    element.dispatchEvent(new Event('input', { bubbles: true }));
-    element.dispatchEvent(new Event('change', { bubbles: true }));
+    try {
+        element.focus();
+        element[attribute] = value;
+        element.dispatchEvent(new Event('input', { bubbles: true }));
+        element.dispatchEvent(new Event('change', { bubbles: true }));
+    } catch (err) {
+        console.log('Failed to set element value');
+        return ({ error: 'Failed to set element value' });
+    }
  }
 
 export const goto = (href) => { window.location.href = href };

@@ -200,7 +200,7 @@ export const FLOW_BUILDER_OPERATION_TEMPLATES = {
     wait_for_dom_render: {
         command: 'wait_for_dom_render',
         enabled: true,
-        label: 'Wait For DOM to Render',
+        label: 'Wait For DOM',
         icon: 'ti-crane',
         input_fields: {
             time: {

@@ -4,7 +4,7 @@
    let playMichael = 1;
    let wowSfx, heeSfx;
    const enableAudio = true;
-   const enableImage = true;
+   const enableImage = false;
 
    onMount(() => {
       document.addEventListener('keypress', (evt) => {
@@ -13,10 +13,14 @@
                playMichael = Math.ceil(Math.random() * 2);
                if (playMichael === 1) {
                   wowSfx.volume = 0.1;
-                  wowSfx.currentTime = 0.2;
+                  if (wowSfx.currentTime) {
+                     wowSfx.currentTime = 0.2;
+                  }
                   wowSfx.play();
                } else if (playMichael === 2) {
-                  heeSfx.currentTime = 1;
+                  if (heeSfx.currentTime) {
+                     heeSfx.currentTime = 1;
+                  }
                   heeSfx.volume = 0.1;
                   heeSfx.play();
                }
