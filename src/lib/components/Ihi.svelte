@@ -4,7 +4,8 @@
    let playMichael = 1;
    let wowSfx, heeSfx;
    const enableAudio = true;
-   const enableImage = false;
+   const enableImage = true;
+   const volume = 0.1;
 
    onMount(() => {
       document.addEventListener('keypress', (evt) => {
@@ -12,7 +13,7 @@
             if (enableAudio) {
                playMichael = Math.ceil(Math.random() * 2);
                if (playMichael === 1) {
-                  wowSfx.volume = 0.1;
+                  wowSfx.volume = volume;
                   if (wowSfx.currentTime) {
                      wowSfx.currentTime = 0.2;
                   }
@@ -21,7 +22,7 @@
                   if (heeSfx.currentTime) {
                      heeSfx.currentTime = 1;
                   }
-                  heeSfx.volume = 0.1;
+                  heeSfx.volume = volume;
                   heeSfx.play();
                }
    
@@ -56,12 +57,12 @@
 
 {#if showMichael !== null}
    {#if showMichael === 1}
-      <img alt="michale"  class="fixed h-[100vh] w-[100vw]" src="https://media.tenor.com/BU2modgehEgAAAAM/mug-shot-michael-jackson.gif">
+      <img alt="michale"  class="fixed h-[100vh] w-[100vw]" src="mj-1.gif">
    {:else if showMichael === 2}
-      <img alt="michale"  class="fixed h-[100vh] w-[100vw]" src="https://imgb.ifunny.co/images/93e2e40cc516c98308cf66fad08d36ff80179d577d26c0ea51ddce781c9d0910_1.jpg">
+      <img alt="michale"  class="fixed h-[100vh] w-[100vw]" src="mj-1.gif">
    {:else if showMichael === 3}
-      <img alt="michale" class="fixed h-[100vh] w-[100vw]" src="https://media.tenor.com/bocqs5LYGegAAAAM/jackson-michael-jackson.gif">
+      <img alt="michale" class="fixed h-[100vh] w-[100vw]" src="mj-3.gif">
    {:else if showMichael === 4}
-      <img alt="michale" class="fixed h-[100vh] w-[100vw]" src="https://images3.memedroid.com/images/UPLOADED697/6489aa21a6e4b.jpeg">
+      <img alt="michale" class="fixed h-[100vh] w-[100vw]" src="mj-4.gif">
    {/if}
 {/if}
