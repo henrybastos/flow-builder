@@ -3,7 +3,6 @@
    import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
    import Button from "$lib/components/ui/button/button.svelte";
    
-   let list = getContext('list');
    let deleteItem = getContext('deleteItem');
    const dispatch = createEventDispatcher();
 

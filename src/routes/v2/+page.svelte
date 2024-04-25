@@ -22,14 +22,19 @@
    import AddOperationsPanel from './AddOperationsPanel.svelte';
    import AddFlowPanel from './AddFlowPanel.svelte';
    import { Skeleton } from '$lib/components/ui/skeleton';
+   import Navbar from './Navbar.svelte';
+   import PayloadPresetsPanel from './PayloadPresetsPanel.svelte';
 
-   let isLogsPanelOpen = false;
    let isPayloadRunning = false;
-   let isOutputPanelOpen = false;
+   
    let isStopExecutionPanelOpen = false;
+   let isLogsPanelOpen = false;
+   let isOutputPanelOpen = false;
    let isEditPayloadPanelOpen = false;
-   let isAddOperationPanelOpen = false;
    let isAddFlowPanelOpen = false;
+   let isAddOperationPanelOpen = false;
+   let isPayloadPresetsPanelOpen = false;
+
    let footerMessage = writable('');
    let footerFixedMessage = writable('');
    let footerLoading = writable(false);
@@ -169,6 +174,10 @@
       toast.info('New blank payload loaded');
    }
 
+   function loadBlankPayload () {
+      loadDefaultPayload();
+   }
+
    onMount(() => {
       // console.log('LS PAYLOAD', localStorage.getItem('tempPayload'), PAYLOAD);
       loadPayloadFromLS();
@@ -199,64 +208,27 @@
    })
 </script>
 
-<Ihi />
-
 <svelte:head>
    <title>Flow Builder 2.0</title>
 </svelte:head>
 
 <main class="flex flex-col w-screen overflow-hidden items-center">
-   <header class="fixed top-2 w-[60rem] h-fit bg-white bg-opacity-5 backdrop-blur-md rounded-lg">
-      <div class="flex flex-row p-2 w-full justify-between">
-         <div>
-            {#if isPayloadRunning}
-               <Button on:click={() => isStopExecutionPanelOpen = true} data-footer-message='[StopBrowser]: Stops the payload execution.' variant="ghost">
-                  <i class="ti ti-player-stop text-red-500 mr-2"></i> Stop
-               </Button>
-            {:else}
-               <Button on:click={runCombinedPayload} data-footer-message='[RunMainFlow]: Executes the payload.' variant="ghost">
-                  <i class="ti ti-player-play-filled mr-2"></i> Run 
-               </Button>
-            {/if}
-            
-            <Button variant="ghost" data-footer-message='[Logs]: Opens the Logs panel.' on:click={() => isLogsPanelOpen = true}>
-               <i class="ti ti-logs mr-2"></i> Logs
-            </Button>
-   
-            <Button variant="ghost" data-footer-message='[Output]: Opens the Output panel.' on:click={() => isOutputPanelOpen = true}>
-               <i class="ti ti-toilet-paper mr-2"></i> Output
-            </Button>
-
-            <Button on:click={() => isEditPayloadPanelOpen = true} data-footer-message='[EditPayloadPanel]: Edits the payload.' variant="ghost">
-               <i class="ti ti-braces mr-2"></i> Payload
-            </Button>
-
-            <Button on:click={() => isAddFlowPanelOpen = true} data-footer-message='[AddFlowPanel]: Adds a new flow to the payload.' variant="ghost">
-               <i class="ti ti-cube-plus mr-2"></i>Add flow
-            </Button>
-         </div>
-         
-         <div>
-            <Button variant="ghost" size="icon" on:click={savePayloadToLS} data-footer-message='[LocalStorageSave]: Saves the current payload in the Local Storage, overwriting the previous payload.'>
-               <i class="ti ti-device-floppy text-green-500"></i>
-            </Button>
-            
-            <Button variant="ghost" size="icon" on:click={loadDefaultPayload} data-footer-message='[NewPayload]: Loads a new blank payload.'>
-               <i class="ti ti-file text-red-500"></i> 
-            </Button>
-         </div>
-      </div>
-   </header>
+   <Navbar 
+      bind:isStopExecutionPanelOpen bind:isLogsPanelOpen bind:isOutputPanelOpen bind:isEditPayloadPanelOpen bind:isAddFlowPanelOpen
+      {runCombinedPayload} {savePayloadToLS} {loadBlankPayload}
+      bind:isPayloadRunning 
+   />
 
    {#if PAYLOAD} 
-      {#key isEditPayloadPanelOpen}
-         <Draggy class="flex flex-row mt-11 p-6 justify-center" let:list bind:list={PAYLOAD.flows} bind:this={draggyRoot}>
+      <Draggy class="flex flex-row mt-11 p-6 justify-center" let:list bind:list={PAYLOAD.flows} bind:this={draggyRoot}>
+         {#key isEditPayloadPanelOpen}
             <Card.Root class="w-[60rem] h-min">
                <Card.Header class="flex flex-row justify-between items-center">
                   <Card.Title class="text-3xl">Flow Builder</Card.Title>
                </Card.Header>
 
                <Card.Content class="flex flex-col w-full space-y-6 justify-center">
+                  <p>{ new Date().toLocaleTimeString() }</p>
                   {#each list as flow (flow.context_id)}
                      <Card.Root class="w-full h-min">
                         <Card.Header class="flex flex-row justify-between items-center border-b-2 border-b-blue-500">
@@ -301,8 +273,8 @@
                      <h6>Operation</h6>
                   </div>
             </DraggyPlaceholder>
-         </Draggy>
-      {/key}   
+         {/key}   
+      </Draggy>
    {/if}
 
    <footer class="inline-flex items-center fixed w-full bottom-0 bg-neutral-900 h-8 p-1">
@@ -319,6 +291,8 @@
 <AlertStopExecution bind:isPanelOpen={isStopExecutionPanelOpen} stopAction={stopPayloadRequest} />
 <PayloadOutputPanel {toast} bind:isPanelOpen={isOutputPanelOpen} bind:isPayloadRunning />
 <PayloadLogsPanel {toast} bind:isPanelOpen={isLogsPanelOpen} bind:isPayloadRunning />
+<Ihi />
 <EditPayloadPanel bind:payload={PAYLOAD} bind:isPanelOpen={isEditPayloadPanelOpen} />
 <AddOperationsPanel bind:isPanelOpen={isAddOperationPanelOpen} on:newoperation={addOperation} bind:flowID={activeFlow} bind:flow={PAYLOAD.flows}/>
 <AddFlowPanel bind:isPanelOpen={isAddFlowPanelOpen} on:addflow={addFlow} />
+<!-- <PayloadPresetsPanel bind:isPanelOpen={isPayloadPresetsPanelOpen} /> -->
