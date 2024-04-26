@@ -2,9 +2,9 @@ import { spawnSync, exec } from 'child_process';
 import util from 'node:util';
 const execProcess = util.promisify(exec);
 
-export async function GET() {
-   // const { scope } = await request.json();
-   // console.log(scope);
+export async function POST({ request }) {
+   const { branch } = await request.json();
+
    let exitCode;
    let commandsOutput = [];
 
@@ -25,7 +25,7 @@ export async function GET() {
       return { output: result, status: child.status };
    }
    
-   const cmdGitPullFlowBuilder = handlePromptSync('git pull origin main');
+   const cmdGitPullFlowBuilder = handlePromptSync(`git pull origin ${ branch }`);
    console.log(cmdGitPullFlowBuilder);
    exitCode = cmdGitPullFlowBuilder.status;
    commandsOutput.push({

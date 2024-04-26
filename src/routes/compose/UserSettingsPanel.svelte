@@ -36,12 +36,15 @@
       localStorage.setItem('userSettings', JSON.stringify(userSettings));
    }
 
-   async function gitUpdate () {
+   async function gitUpdate (branch) {
       console.log('Updating...');
 
       const updatePromise = new Promise(async (resolve, reject) => {
          try {
-            const response = await fetch('/api/git-update');
+            const response = await fetch('/api/git-update', {
+               method: 'POST',
+               body: JSON.stringify({ branch })
+            });
    
             resolve(await response.json());
          } catch (err) {
@@ -112,7 +115,7 @@
          <h2 class="text-lg font-semibold mb-2">Atualizações</h2>
 
          <div class="space-x-2">
-            <Button class="border-green-500" on:click={() => gitUpdate('flow-builder')} variant="outline">
+            <Button class="border-green-500" on:click={() => gitUpdate('main')} variant="outline">
                <i class="ti ti-cloud-download mr-3"></i>
                Atualizar Flow Builder
             </Button>
