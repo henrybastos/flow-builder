@@ -3,10 +3,12 @@
    import Button from "$lib/components/ui/button/button.svelte";
    import CodeMirrorModule from '$lib/modules/CodeMirrorModule/CodeMirrorModule.svelte';
    import { fade } from "svelte/transition";
+    import { createEventDispatcher } from "svelte";
 
    export let payload;
    export let isPanelOpen;
 
+   const dispatch = createEventDispatcher();
    let stringifiedPayload;
    let canClose = true;
    let footerCaption = {
@@ -31,10 +33,13 @@
       try {
          if (JSON.parse(stringifiedPayload)) {
             canClose = true;
-            payload = JSON.parse(stringifiedPayload);
+            const newPayload = JSON.parse(stringifiedPayload);
             footerCaption.message = '';
             footerCaption.type = '';
+            // console.log(JSON.stringify(payload, null, 3));
+            // console.log(stringifiedPayload);
             isPanelOpen = false;
+            dispatch('updatepayload', { payload: newPayload });
          }
       } catch (err) {
          footerCaption.message = 'Invalid JSON payload';

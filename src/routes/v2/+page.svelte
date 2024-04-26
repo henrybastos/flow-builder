@@ -178,6 +178,20 @@
       loadDefaultPayload();
    }
 
+   function saveEditedPayload ({ detail }) {
+      draggyRoot.setList(detail.payload.flows);
+      PAYLOAD = detail.payload;
+   }
+
+
+   $: {
+      if (isEditPayloadPanelOpen !== undefined) {
+         if (draggyRoot) {
+            draggyRoot.updateUI();
+         }
+      }
+   }
+
    onMount(() => {
       // console.log('LS PAYLOAD', localStorage.getItem('tempPayload'), PAYLOAD);
       loadPayloadFromLS();
@@ -214,21 +228,19 @@
 
 <main class="flex flex-col w-screen overflow-hidden items-center">
    <Navbar 
-      bind:isStopExecutionPanelOpen bind:isLogsPanelOpen bind:isOutputPanelOpen bind:isEditPayloadPanelOpen bind:isAddFlowPanelOpen
+      bind:isPayloadPresetsPanelOpen bind:isStopExecutionPanelOpen bind:isLogsPanelOpen bind:isOutputPanelOpen bind:isEditPayloadPanelOpen bind:isAddFlowPanelOpen
       {runCombinedPayload} {savePayloadToLS} {loadBlankPayload}
       bind:isPayloadRunning 
    />
 
    {#if PAYLOAD} 
       <Draggy class="flex flex-row mt-11 p-6 justify-center" let:list bind:list={PAYLOAD.flows} bind:this={draggyRoot}>
-         {#key isEditPayloadPanelOpen}
             <Card.Root class="w-[60rem] h-min">
                <Card.Header class="flex flex-row justify-between items-center">
                   <Card.Title class="text-3xl">Flow Builder</Card.Title>
                </Card.Header>
 
                <Card.Content class="flex flex-col w-full space-y-6 justify-center">
-                  <p>{ new Date().toLocaleTimeString() }</p>
                   {#each list as flow (flow.context_id)}
                      <Card.Root class="w-full h-min">
                         <Card.Header class="flex flex-row justify-between items-center border-b-2 border-b-blue-500">
@@ -273,7 +285,6 @@
                      <h6>Operation</h6>
                   </div>
             </DraggyPlaceholder>
-         {/key}   
       </Draggy>
    {/if}
 
@@ -292,7 +303,7 @@
 <PayloadOutputPanel {toast} bind:isPanelOpen={isOutputPanelOpen} bind:isPayloadRunning />
 <PayloadLogsPanel {toast} bind:isPanelOpen={isLogsPanelOpen} bind:isPayloadRunning />
 <Ihi />
-<EditPayloadPanel bind:payload={PAYLOAD} bind:isPanelOpen={isEditPayloadPanelOpen} />
+<EditPayloadPanel bind:payload={PAYLOAD} bind:isPanelOpen={isEditPayloadPanelOpen} on:updatepayload={saveEditedPayload} />
 <AddOperationsPanel bind:isPanelOpen={isAddOperationPanelOpen} on:newoperation={addOperation} bind:flowID={activeFlow} bind:flow={PAYLOAD.flows}/>
 <AddFlowPanel bind:isPanelOpen={isAddFlowPanelOpen} on:addflow={addFlow} />
-<!-- <PayloadPresetsPanel bind:isPanelOpen={isPayloadPresetsPanelOpen} /> -->
+<PayloadPresetsPanel bind:isPanelOpen={isPayloadPresetsPanelOpen} />

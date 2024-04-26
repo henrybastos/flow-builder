@@ -6,13 +6,13 @@
    export let isPayloadRunning;
    export let loadBlankPayload;
    export let savePayloadToLS;
-   export let update;
 
-   export let isStopExecutionPanelOpen = false;
-   export let isLogsPanelOpen = false;
-   export let isOutputPanelOpen = false;
-   export let isEditPayloadPanelOpen = false;
-   export let isAddFlowPanelOpen = false;
+   export let isStopExecutionPanelOpen;
+   export let isLogsPanelOpen;
+   export let isOutputPanelOpen;
+   export let isEditPayloadPanelOpen;
+   export let isAddFlowPanelOpen;
+   export let isPayloadPresetsPanelOpen;
 
    let isHoverOpen = false;
 </script>
@@ -60,9 +60,9 @@
                      <i class="ti ti-device-floppy text-green-500 mr-2"></i> Save temp preset
                   </Button>
 
-                  <!-- <Button variant="ghost" data-footer-message='[LocalStorageSave]: Saves the current payload in the Local Storage, overwriting the previous payload.'>
+                  <Button variant="ghost" on:click={() => { isHoverOpen = false; isPayloadPresetsPanelOpen = true }} data-footer-message='[LocalStorageSave]: Saves the current payload in the Local Storage, overwriting the previous payload.'>
                      <i class="ti ti-device-floppy mr-2"></i> Browser presets
-                  </Button> -->
+                  </Button>
                   
                   <Button variant="ghost" on:click={() => { isHoverOpen = false; loadBlankPayload() }} data-footer-message='[NewPayload]: Loads a new blank payload.'>
                      <i class="ti ti-file mr-2"></i> New blank preset
