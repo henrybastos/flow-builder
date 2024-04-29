@@ -12,7 +12,7 @@
    export let isOutputPanelOpen;
    export let isEditPayloadPanelOpen;
    export let isAddFlowPanelOpen;
-   export let isPayloadPresetsPanelOpen;
+   export let isPresetsBrowserPanelOpen;
 
    let isHoverOpen = false;
 </script>
@@ -56,15 +56,15 @@
              </Popover.Trigger>
             <Popover.Content class="w-fit p-2" side="top-end" sideOffset={16}>
                <div class="flex flex-col">
-                  <Button variant="ghost" on:click={savePayloadToLS} data-footer-message='[LocalStorageSave]: Saves the current payload in the Local Storage, overwriting the previous payload.'>
-                     <i class="ti ti-device-floppy text-green-500 mr-2"></i> Save temp preset
+                  <Button class="justify-start" variant="ghost" on:click={savePayloadToLS} data-footer-message='[LocalStorageSave]: Saves the current payload in the Local Storage, overwriting the previous payload.'>
+                     <i class="ti ti-device-floppy mr-2"></i> Save temp preset
                   </Button>
 
-                  <Button variant="ghost" on:click={() => { isHoverOpen = false; isPayloadPresetsPanelOpen = true }} data-footer-message='[LocalStorageSave]: Saves the current payload in the Local Storage, overwriting the previous payload.'>
-                     <i class="ti ti-device-floppy mr-2"></i> Browser presets
+                  <Button class="justify-start" variant="ghost" on:click={() => { isHoverOpen = false; isPresetsBrowserPanelOpen = true }} data-footer-message='[LocalStorageSave]: Saves the current payload in the Local Storage, overwriting the previous payload.'>
+                     <i class="ti ti-list-search mr-2"></i> Preset Browser
                   </Button>
                   
-                  <Button variant="ghost" on:click={() => { isHoverOpen = false; loadBlankPayload() }} data-footer-message='[NewPayload]: Loads a new blank payload.'>
+                  <Button class="justify-start" variant="ghost" on:click={() => { isHoverOpen = false; loadBlankPayload() }} data-footer-message='[NewPayload]: Loads a new blank payload.'>
                      <i class="ti ti-file mr-2"></i> New blank preset
                   </Button>
              </div>

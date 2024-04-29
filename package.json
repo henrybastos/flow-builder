@@ -40,6 +40,7 @@
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2",
     "radix-icons-svelte": "^1.2.1",
+    "sqlite3": "^5.1.7",
     "svelte-codemirror-editor": "^1.2.0",
     "svelte-radix": "^1.1.0",
     "svelte-sonner": "^0.3.11",

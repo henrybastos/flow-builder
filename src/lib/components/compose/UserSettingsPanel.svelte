@@ -101,24 +101,28 @@
       <Separator />
 
       <div>
-         <h2 class="text-lg font-semibold mb-2">Painel de variáveis</h2>
+         <h2 class="text-lg font-semibold mb-3">Painel de variáveis</h2>
    
-         <div class="inline-flex items-center">
-            <Switch bind:checked={close_env_panel_on_outside_click} onCheckedChange={(checked) => updateLS('close_env_panel_on_outside_click', checked)} id="close_env_panel_on_outside_click_option" />
-            <Label class="text-base ml-2" for="close_env_panel_on_outside_click_option">Fechar ao clicar fora</Label>
+         <div class="flex flex-col space-y-2">
+            <div class="inline-flex items-center">
+               <Switch bind:checked={close_env_panel_on_outside_click} onCheckedChange={(checked) => updateLS('close_env_panel_on_outside_click', checked)} id="close_env_panel_on_outside_click_option" />
+               <Label class="text-base ml-2" for="close_env_panel_on_outside_click_option">Fechar ao clicar fora</Label>
+            </div>
          </div>
       </div>
 
       <Separator />
 
       <div>
-         <h2 class="text-lg font-semibold mb-2">Atualizações</h2>
+         <h2 class="text-lg font-semibold mb-3">Atualizações</h2>
 
-         <div class="space-x-2">
-            <Button class="border-green-500" on:click={() => gitUpdate('main')} variant="outline">
-               <i class="ti ti-cloud-download mr-3"></i>
-               Atualizar Flow Builder
-            </Button>
+         <div class="flex flex-col space-y-2">
+            <div class="space-x-2">
+               <Button class="border-green-500" on:click={() => gitUpdate('main')} variant="outline">
+                  <i class="ti ti-cloud-download mr-3"></i>
+                  Atualizar Flow Builder
+               </Button>
+            </div>
          </div>
       </div>
 

@@ -5,22 +5,22 @@
    import * as Card from "$lib/components/ui/card";
    import Button from "$lib/components/ui/button/button.svelte";
    import DraggableList from "$lib/components/DraggableList.svelte";
-   import EnvPanel from "./EnvPanel.svelte";
+   import EnvPanel from "$lib/components/compose/EnvPanel.svelte";
    import { initStruct } from "$lib/PayloadStore";
    import { ServerHandler } from "$lib/ServerHandler";
    import { toast } from "svelte-sonner";
    import { page } from "$app/stores";
-   import FlowBlockPayloadViewerPanel from "./FlowBlockPayloadViewerPanel.svelte";
-   import AddFlowBlockPanel from "./AddFlowBlockPanel.svelte";
-   import PayloadLogsPanel from "./PayloadLogsPanel.svelte";
-   import DevSettingsPanel from "./DevSettingsPanel.svelte";
+   import FlowBlockPayloadViewerPanel from "$lib/components/compose/FlowBlockPayloadViewerPanel.svelte";
+   import AddFlowBlockPanel from "$lib/components/compose/AddFlowBlockPanel.svelte";
+   import PayloadLogsPanel from "$lib/components/compose/PayloadLogsPanel.svelte";
+   import DevSettingsPanel from "$lib/components/compose/DevSettingsPanel.svelte";
    import Skeleton from "$lib/components/ui/skeleton/skeleton.svelte";
    import ComposeFlowbar from "$lib/components/compose/ComposeFlowbar.svelte";
    import { env } from "$env/dynamic/public"
    import { setContext } from "svelte";
-   import UserSettingsPanel from "./UserSettingsPanel.svelte";
-   import DevModeAccess from "./DevModeAccess.svelte";
-    import AlertStopExecution from "./AlertStopExecution.svelte";
+   import UserSettingsPanel from "$lib/components/compose/UserSettingsPanel.svelte";
+   import DevModeAccess from "$lib/components/compose/DevModeAccess.svelte";
+    import AlertStopExecution from "$lib/components/compose/AlertStopExecution.svelte";
 
    export let data;
 

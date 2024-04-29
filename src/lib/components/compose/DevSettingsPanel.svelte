@@ -4,8 +4,8 @@
    import Label from "$lib/components/ui/label/label.svelte";
    import { onMount } from "svelte"
    import Button from "$lib/components/ui/button/button.svelte";
-    import Separator from "$lib/components/ui/separator/separator.svelte";
-    import Badge from "$lib/components/ui/badge/badge.svelte";
+   import Separator from "$lib/components/ui/separator/separator.svelte";
+   import Badge from "$lib/components/ui/badge/badge.svelte";
 
    let defaultDevSettings = {
       headless: true,
@@ -15,6 +15,12 @@
    export let toast;
    export let isPanelOpen = false;
    export let devSettings = defaultDevSettings;
+
+   const COMMANDS_ERROR_OUTPUT_SCHEMA = {
+      flow_builder_update: 'Falha ao atualizar o Flow Builder',
+      flow_blocks_update: 'Falha ao atualizar o Flow Compose Blocks',
+      git_branch: 'A branch atual não é a "dev_lab"'
+   }
 
    $: headless = devSettings?.headless;
    $: close_browser_on_finish = devSettings?.close_browser_on_finish;
@@ -49,9 +55,11 @@
          loading: 'Verificando atualizações...',
          success: ({ commands_output }) => {
             // console.log(commands_output);
-
+            
             const errorMessage = commands_output.map(output => {
-               if (output.exit_code === 1) {
+               const branchDevLabCheck = output.label === 'git_branch' ? output.output.match(/\* dev_lab/g) : true;
+               
+               if (output.exit_code === 1 || !branchDevLabCheck) {
                   return COMMANDS_ERROR_OUTPUT_SCHEMA[output.label];
                }
             }).filter(v => v);
@@ -90,9 +98,9 @@
       </Dialog.Header>
       
       <div>
-         <h2 class="text-lg font-semibold mb-2">Config</h2>
+         <h2 class="text-lg font-semibold mb-3">Config</h2>
          
-         <div>
+         <div class="flex flex-col space-y-2">
             <div class="inline-flex items-center">
                <Switch bind:checked={headless} onCheckedChange={(checked) => updateLS('headless', checked)} id="headless_mode" />
                <Label class="text-base ml-2" for="headless_mode">Headless mode</Label>
@@ -108,7 +116,7 @@
       <Separator />
 
       <div>
-         <h2 class="text-lg font-semibold mb-2">Updates</h2>
+         <h2 class="text-lg font-semibold mb-3">Updates</h2>
 
          <div class="space-x-2">
             <Button class="border-purple-600" on:click={() => gitUpdate('dev_lab')} variant="outline">

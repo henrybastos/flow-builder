@@ -24,6 +24,17 @@ export async function POST({ request }) {
 
       return { output: result, status: child.status };
    }
+
+   if (branch == 'dev_lab') {
+      const cmdGitBranch = handlePromptSync(`git branch -v`);
+      console.log(cmdGitBranch);
+      exitCode = cmdGitBranch.status;
+      commandsOutput.push({
+         label: 'git_branch',
+         output: cmdGitBranch.output,
+         exit_code: cmdGitBranch.status
+      });   
+   }
    
    const cmdGitPullFlowBuilder = handlePromptSync(`git pull origin ${ branch }`);
    console.log(cmdGitPullFlowBuilder);

@@ -87,10 +87,24 @@
    <Card.Content>
       <Tabs.Root value="download_videos" class="w-full">
          <Tabs.List class="grid w-full grid-cols-2">
+            <Tabs.Trigger value="download_videos">Download de Vídeos</Tabs.Trigger>
             <Tabs.Trigger value="playlist_data">Dados da Playlist</Tabs.Trigger>
-            <Tabs.Trigger value="download_videos">Download de Vídeos</Tabs.Trigger
-            >
          </Tabs.List>
+
+         <Tabs.Content value="download_videos">
+            <Label class="text-lg">Download de Vídeos</Label>
+            
+            <Textarea
+               rows="12"
+               class="resize-none mt-3 font-code text-base rounded-lg"
+               bind:value={courseStructure}
+               placeholder={JSON.stringify(courseStructurePlaceholder, null, 3)}
+            />
+
+            <div class="flex flex-row gap-x-2 mt-4">
+               <Button on:click={downloadVideos}>Baixar vídeos</Button>
+           </div>
+         </Tabs.Content>
 
          <Tabs.Content value="playlist_data">
             <Label class="text-lg">Dados da playlist</Label>
@@ -107,21 +121,6 @@
                <Clipboard let:copyToClipboard bind:clipboardContent={convertedPlaylistData} {toast}>
                   <Button variant="secondary" on:click={copyToClipboard}>Copiar saída</Button>
                </Clipboard>
-           </div>
-         </Tabs.Content>
-
-         <Tabs.Content value="download_videos">
-            <Label class="text-lg">Download de Vídeos</Label>
-            
-            <Textarea
-               rows="12"
-               class="resize-none mt-3 font-code text-base rounded-lg"
-               bind:value={courseStructure}
-               placeholder={JSON.stringify(courseStructurePlaceholder, null, 3)}
-            />
-
-            <div class="flex flex-row gap-x-2 mt-4">
-               <Button on:click={downloadVideos}>Baixar vídeos</Button>
            </div>
          </Tabs.Content>
       </Tabs.Root>
