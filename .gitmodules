@@ -1,0 +1,3 @@
+[submodule "src/lib/components/src/lib/components/draggy"]
+	path = src/lib/components/src/lib/components/draggy
+	url = https://github.com/henrybastos/draggy.git
