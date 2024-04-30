@@ -14,7 +14,7 @@ export async function POST ({ request }) {
             ( !req?.description && 'Description' ),
             ( !req?.payload && 'Payload' )
          ].filter(v => v);
-         console.log(propertiesNotFound);
+         // console.log(propertiesNotFound);
 
          db.run(`
          CREATE TABLE IF NOT EXISTS presets (
@@ -78,7 +78,7 @@ export async function GET () {
       })
    
       db.close(() => {
-         console.log('[SQLITE] All presets:', allPresets);
+         // console.log('[SQLITE] All presets:', allPresets);
          resolve(new Response(JSON.stringify(allPresets, null, 3)));
       });
    })

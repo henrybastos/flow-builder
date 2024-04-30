@@ -9,7 +9,9 @@
    export let isPanelOpen = false;
    export let isPayloadRunning;
    export let toast;
+
    let logsGroups = [];
+   let hasScreenshot = false;
 
    $: triggerToasts(isPayloadRunning);
 
@@ -29,6 +31,18 @@
                 }
             }
         }
+   }
+
+   $: if (isPanelOpen) {
+        (async () => {
+            try {
+                if ((await fetch('http://localhost:5173/last_error.png')).status === 200) {
+                    hasScreenshot = true;
+                }
+            } catch (err) {
+                hasScreenshot = false;
+            }
+        })()
    }
 
    function triggerToasts (_isPayloadRunning) {
@@ -68,7 +82,7 @@
                 <Tabs.Trigger class="col-span-1" value="screenshot_tab">Screenshot</Tabs.Trigger>
             </Tabs.List>
 
-            <Tabs.Content value="logs_tab" class="h-[60vh] ">
+            <Tabs.Content value="logs_tab" class="h-[60vh]">
                 <div class="flex flex-col-reverse overflow-y-auto max-h-full h-full ">
                     {#if logsGroups.length === 0}
                         <p class="text-neutral-500 text-center my-auto">No logs yet</p>
@@ -114,9 +128,15 @@
             </Tabs.Content>
             
             <Tabs.Content value="screenshot_tab" class="h-[60vh]">
-                {#key isPayloadRunning}
-                    <img class="rounded-md object-contain h-full mx-auto" alt="No screenshot found." src="/last_error.png?{ Math.random().toString().slice(2,8) }" />
-                {/key}
+                <div class="flex flex-col h-full">
+                    {#if hasScreenshot}
+                        {#key isPayloadRunning}
+                            <img class="rounded-md object-contain h-full mx-auto" alt="No screenshot found." src="/last_error.png?{ Math.random().toString().slice(2,8) }" />
+                        {/key}
+                    {:else}
+                        <p class="text-neutral-500 text-center my-auto">No Last Error screenshot</p>
+                    {/if}
+                </div>
             </Tabs.Content>
         </Tabs.Root>
 
