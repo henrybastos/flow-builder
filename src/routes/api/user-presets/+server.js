@@ -1,6 +1,6 @@
 import sqlite3 from 'sqlite3';
 
-const DATABASE_FILENAME = 'src/database/data2.db';
+const DATABASE_FILENAME = 'src/database/data.db';
 
 export async function POST ({ request }) {
    const db = new sqlite3.Database(DATABASE_FILENAME);
@@ -53,40 +53,22 @@ export async function POST ({ request }) {
    })
 }
 
-export async function GET ({ url }) {
+export async function GET () {
    const db = new sqlite3.Database(DATABASE_FILENAME);
-   const id = url.searchParams.get('id');
    let allPresets = [];
    let responseErrorMessage;
 
    return await new Promise((resolve) => {
       db.serialize(() => {
-         if (id) {
-            db.prepare('SELECT * FROM presets WHERE id = ?')
-               .get(id, (error, row) => {
-                  if (error) {
-                     responseErrorMessage = `[SQLITE - GET // ERROR] ${ error?.message }`;
-                  } else if (row) {
-                     allPresets.push(row);
-                  } else {
-                     responseErrorMessage = '[SQLITE - GET // ERROR] No items found';
-                  }
-               }, (error) => {
-                  console.error('[SQLITE CONNECTION ERROR]', error);
-               })
-               .finalize();
-            
-         } else {
-            db.each('SELECT * FROM presets', (error, row) => {
-               if (row) {
-                  allPresets.push(row);
-               }
-      
-               if (error) {
-                  console.error('[SQLITE - GET] No items found.');
-               }
-            })
-         }
+         db.each('SELECT * FROM presets', (error, row) => {
+            if (row) {
+               allPresets.push(row);
+            }
+   
+            if (error) {
+               console.error('[SQLITE - GET] No items found.');
+            }
+         })
       })
    
       db.close(() => {
@@ -96,27 +78,18 @@ export async function GET ({ url }) {
    })
 }
 
-export async function DELETE ({ url }) {
+export async function DELETE () {
    const db = new sqlite3.Database(DATABASE_FILENAME);
-   const id = url.searchParams.get('id');
    let responseMessage;
 
    return await new Promise((resolve) => {
       db.serialize(() => {
-         if (id) {
-            db.prepare('DELETE FROM presets WHERE id = ?')
-               .run(id)
-               .finalize();
-            responseMessage = `[SQLITE - DELETE] Item ${ id } deleted.`;
-         } else {
-            db.run('DROP TABLE IF EXISTS presets');
-            responseMessage = '[SQLITE - DELETE] Table presets deleted.';
-         }
+         db.run('DROP TABLE IF EXISTS presets');
+         responseMessage = '[SQLITE - DELETE] Table presets deleted.';
       })
    
       db.close(() => {
-         console.log('[SQLITE] Database closed');
-         resolve(new Response('All presets!'));
+         resolve(new Response(responseMessage));
       });
    })
 
