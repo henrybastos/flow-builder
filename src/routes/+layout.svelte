@@ -5,5 +5,5 @@
 </script>
 
 <ModeWatcher defaultMode="dark" />
-<Toaster expand richColors visibleToasts={6}/>
+<Toaster closeButton richColors visibleToasts={6}/>
 <slot />

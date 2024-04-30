@@ -4,33 +4,26 @@ const DATABASE_FILENAME = 'src/database/data.db';
 
 export async function GET ({ params }) {
    const db = new sqlite3.Database(DATABASE_FILENAME);
-   let allPresets = [];
+   let selectedPreset;
    console.log(params, params.id, parseInt(params.id));
 
    return await new Promise((resolve) => {
       db.serialize(() => {
-         db.prepare('SELECT * FROM presets WHERE id = ').get((error, row) => {
-            console.log(row);
+         db.prepare('SELECT * FROM presets WHERE id = ?').get(params.id,
+            (error, row) => {
+               if (error) {
+                  responseErrorMessage = '[SQLITE/GET :: ERROR] No items found'
+               } else if (row) {
+                  selectedPreset = row;
+               }
          }).finalize();
-
-         // db.prepare('SELECT * FROM presets WHERE id = ?')
-         //    .get(parseInt(params.id), (error, row) => {
-         //       if (error) {
-         //          responseErrorMessage = `[SQLITE - GET // ERROR] ${ error?.message }`;
-         //       } else if (row) {
-         //          allPresets.push(row);
-         //       } else {
-         //          responseErrorMessage = '[SQLITE - GET // ERROR] No items found';
-         //       }
-         //    }, (error) => {
-         //       console.error('[SQLITE CONNECTION ERROR]', error);
-         //    })
-         //    .finalize();
       })
    
       db.close(() => {
-         console.log('[SQLITE] All presets:', allPresets);
-         resolve(new Response(JSON.stringify(allPresets, null, 3)));
+         if (selectedPreset) {
+            console.log('[SQLITE/GET] Selected preset:', selectedPreset);
+            resolve(new Response(JSON.stringify(selectedPreset, null, 3)));
+         }
       });
    })
 }
@@ -42,9 +35,9 @@ export async function DELETE ({ params }) {
    return await new Promise((resolve) => {
       db.serialize(() => {
          db.prepare('DELETE FROM presets WHERE id = ?')
-               .run(params.id)
-               .finalize();
-         responseMessage = `[SQLITE - DELETE] Item ${ params.id } deleted.`;
+            .run(params.id)
+            .finalize();
+         responseMessage = `[SQLITE/DELETE] Item ${ params.id } deleted.`;
       })
    
       db.close(() => {

@@ -9,27 +9,33 @@ export async function POST ({ request }) {
 
    return await new Promise((resolve) => {
       db.serialize(() => {
+         const propertiesNotFound = [
+            ( !req?.name && 'Name' ),
+            ( !req?.description && 'Description' ),
+            ( !req?.payload && 'Payload' )
+         ].filter(v => v);
+         console.log(propertiesNotFound);
+
          db.run(`
          CREATE TABLE IF NOT EXISTS presets (
-            id INTEGER PRIMARY KEY, 
-            name TEXT NOT NULL, 
-            description TEXT, 
-            date DATE DEFAULT CURRENT_DATE
+            id VARCHAR(64) PRIMARY KEY NOT NULL,
+            name TEXT NOT NULL,
+            description TEXT,
+            date DATE DEFAULT CURRENT_DATE,
+            payload TEXT
          );`);
             
-         if (!req?.name && !req?.description)  {
-            responseErrorMessage = '[SQLITE - POST // ERROR] NAME and DESCRIPTION are required, but were not found.';
-         } else if (!req?.name) {
-            responseErrorMessage = '[SQLITE - POST // ERROR] NAME is required, but was not found.';
-         } else if (!req?.description) {
-            responseErrorMessage = '[SQLITE - POST // ERROR] DESCRIPTION is required, but was not found.';
+         if (propertiesNotFound.length > 0)  {
+            responseErrorMessage = `[SQLITE/POST :: ERROR] ${ propertiesNotFound.join(' and ') } required but not found.`;
+            console.log('[SQLITE/POST] Request:', req);
          } else {
-            db.prepare('INSERT INTO presets VALUES (?, ?, ?, ?)')
+            db.prepare('INSERT INTO presets VALUES (?, ?, ?, ?, ?)')
                .run(
-                  parseInt(Math.random().toString().substring(2, 8)), 
+                  crypto.randomUUID(), 
                   req.name, 
                   req.description, 
-                  new Date().toLocaleDateString()
+                  new Date().toLocaleDateString(),
+                  req.payload
                , (error) => {
                   if (error) {
                      responseErrorMessage = `[SQLITE - POST // ERROR] ${ error?.message }`;

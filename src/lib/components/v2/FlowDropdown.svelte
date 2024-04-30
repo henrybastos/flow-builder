@@ -143,39 +143,16 @@
    <DropdownMenu.Content class="w-56">
       <DropdownMenu.Group>
          <DropdownMenu.Item disabled>Rename</DropdownMenu.Item>
-         <DropdownMenu.Item on:click={copyJSON}>Copy JSON</DropdownMenu.Item>
+         <DropdownMenu.Item disabled on:click={copyJSON}>Copy JSON</DropdownMenu.Item>
          <DropdownMenu.Item on:click={() => dispatch('addoperation', { flowID })}>Add operation</DropdownMenu.Item>
-
-         <!-- <DropdownMenu.Sub>
-            <DropdownMenu.SubTrigger>Add operation</DropdownMenu.SubTrigger>
-            <DropdownMenu.SubContent>
-               <ScrollArea class="h-[20rem]" orientation="vertical">
-                  {#each Object.entries(OPERATIONS) as [index, operation]}
-                     {#if operation.category}
-                        {#if index != 0}
-                           <DropdownMenu.Separator />
-                        {/if}
-                        <DropdownMenu.Label>
-                           <i class={`ti ti-${ operation.icon } text-lg text-blue-500 mr-1`}></i>
-                           { operation.category }
-                        </DropdownMenu.Label>
-                        <DropdownMenu.Separator />
-                     {/if}
-   
-                     {#each operation.ops as op}
-                        <DropdownMenu.Item on:click={() => addOperation(op.value)}>{ op.label }</DropdownMenu.Item>
-                     {/each}
-                  {/each}
-               </ScrollArea>
-            </DropdownMenu.SubContent>
-         </DropdownMenu.Sub> -->
-
       </DropdownMenu.Group>
 
       <DropdownMenu.Separator />
 
-      <DropdownMenu.Item on:click={() => dispatch('deleteflow', { flowID })} class="text-red-600">
-         Delete flow
-      </DropdownMenu.Item>
+      {#if flowID !== 'main_flow'}   
+         <DropdownMenu.Item on:click={() => dispatch('deleteflow', { flowID })} class="text-red-600">
+            Delete flow
+         </DropdownMenu.Item>
+      {/if}
    </DropdownMenu.Content>
 </DropdownMenu.Root>

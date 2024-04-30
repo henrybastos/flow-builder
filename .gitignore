@@ -9,10 +9,10 @@ node_modules
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 src/lib/flow-blocks
-.db
 public
 static/screenshots
 static/last_error.png
+.db
 .sh
 .jpg
 .jpeg

@@ -24,7 +24,7 @@
    import AddFlowPanel from '$lib/components/v2/AddFlowPanel.svelte';
    import { Skeleton } from '$lib/components/ui/skeleton';
    import Navbar from '$lib/components/v2/Navbar.svelte';
-   import PresetsBrowserPanel from '$lib/components/v2/PresetsBrowserPanel.svelte';
+   import PresetsBrowserPanel from '$lib/components/v2/PresetsBrowser/PresetsBrowserPanel.svelte';
 
    let isPayloadRunning = false;
    
@@ -81,6 +81,11 @@
    }
 
    async function runCombinedPayload() {
+      if (PAYLOAD.flows.main_flow.length === 0) {
+         toast.error('The Main Flow cannot be empty.');
+         return;
+      }
+
       const sendPayloadPromise = new Promise(async (resolve, reject) => {
          isPayloadRunning = true;
          setFooterMessage('Executing payload...', { loading: true, fixed: true });
@@ -192,14 +197,6 @@
       PAYLOAD = detail.payload;
    }
 
-   $: {
-      if (isEditPayloadPanelOpen !== undefined) {
-         if (draggyRoot) {
-            draggyRoot.updateUI();
-         }
-      }
-   }
-
    onMount(() => {
       // console.log('LS PAYLOAD', localStorage.getItem('tempPayload'), PAYLOAD);
       loadPayloadFromLS();
@@ -251,7 +248,6 @@
             <Card.Root class="w-[60rem] h-min">
                <Card.Header class="flex flex-row justify-between items-center">
                   <Card.Title class="text-3xl">Flow Builder</Card.Title>
-                  <p>{ env?.PUBLIC_ENABLE_MJ }</p>
                </Card.Header>
 
                <Card.Content class="flex flex-col w-full space-y-6 justify-center">
@@ -319,7 +315,7 @@
 <EditPayloadPanel bind:payload={PAYLOAD} bind:isPanelOpen={isEditPayloadPanelOpen} on:updatepayload={saveEditedPayload} />
 <AddOperationsPanel bind:isPanelOpen={isAddOperationPanelOpen} on:newoperation={addOperation} bind:flowID={activeFlow} bind:flow={PAYLOAD.flows}/>
 <AddFlowPanel bind:isPanelOpen={isAddFlowPanelOpen} on:addflow={addFlow} />
-<PresetsBrowserPanel on:loadpreset={loadPayloadPreset} bind:isPanelOpen={isPresetsBrowserPanelOpen} />
+<PresetsBrowserPanel {toast} bind:payload={PAYLOAD} on:loadpreset={loadPayloadPreset} bind:isPanelOpen={isPresetsBrowserPanelOpen} />
 
 {#if env?.PUBLIC_ENABLE_MJ}
    <Ihi />
