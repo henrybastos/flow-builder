@@ -6,7 +6,11 @@ async function click ({ target }) {
         status_message: 'info'
     });
 
-    await element.evaluate(el => el.click());
+    try {
+        await element.evaluate(el => el.click());
+    } catch (err) {
+        console.error(err);
+    }
 }
 
 export default click;

@@ -31,6 +31,7 @@
     "@codemirror/lang-json": "^6.0.1",
     "@codemirror/view": "^6.22.3",
     "@lezer/highlight": "^1.2.0",
+    "@sveltejs/adapter-node": "^5.0.1",
     "bits-ui": "^0.21.2",
     "clsx": "^2.1.0",
     "highlight.js": "^11.9.0",

@@ -25,6 +25,7 @@
    import { Skeleton } from '$lib/components/ui/skeleton';
    import Navbar from '$lib/components/v2/Navbar.svelte';
    import PresetsBrowserPanel from '$lib/components/v2/PresetsBrowser/PresetsBrowserPanel.svelte';
+   import GenSchema from '$lib/modules/GenSchema.svelte';
 
    let isPayloadRunning = false;
    
@@ -35,6 +36,7 @@
    let isAddFlowPanelOpen = false;
    let isAddOperationPanelOpen = false;
    let isPresetsBrowserPanelOpen = false;
+   let isGenSchemaPanelOpen = false;
 
    let footerMessage = writable('');
    let footerFixedMessage = writable('');
@@ -215,7 +217,6 @@
          if (evt.code === 'KeyI' && evt.ctrlKey) {
             const selectedElement = document.activeElement;
             const [ selStart, selEnd ] = [selectedElement.selectionStart, selectedElement.selectionEnd];
-            console.log(selStart, selEnd);
 
             selectedElement.value = [
                selectedElement.value.slice(0, selStart),
@@ -231,17 +232,32 @@
    <title>Flow Builder</title>
 </svelte:head>
 
+{#if env?.PUBLIC_ENABLE_MJ}
+   <Ihi />
+{/if}
+
+<Navbar 
+   bind:isPresetsBrowserPanelOpen 
+   bind:isStopExecutionPanelOpen 
+   bind:isLogsPanelOpen 
+   bind:isOutputPanelOpen 
+   bind:isEditPayloadPanelOpen 
+   bind:isAddFlowPanelOpen
+   bind:isPayloadRunning 
+   bind:isGenSchemaPanelOpen 
+   {runCombinedPayload} {savePayloadToLS} {loadBlankPayload}
+/>
+
+<AlertStopExecution bind:isPanelOpen={isStopExecutionPanelOpen} stopAction={stopPayloadRequest} />
+<PayloadOutputPanel {toast} bind:isPanelOpen={isOutputPanelOpen} bind:isPayloadRunning />
+<PayloadLogsPanel {toast} bind:isPanelOpen={isLogsPanelOpen} bind:isPayloadRunning />
+<EditPayloadPanel bind:payload={PAYLOAD} bind:isPanelOpen={isEditPayloadPanelOpen} on:updatepayload={saveEditedPayload} />
+<AddOperationsPanel bind:isPanelOpen={isAddOperationPanelOpen} on:newoperation={addOperation} bind:flowID={activeFlow} bind:flow={PAYLOAD.flows}/>
+<AddFlowPanel bind:isPanelOpen={isAddFlowPanelOpen} on:addflow={addFlow} />
+<PresetsBrowserPanel {toast} bind:payload={PAYLOAD} on:loadpreset={loadPayloadPreset} bind:isPanelOpen={isPresetsBrowserPanelOpen} />
+<GenSchema bind:isPanelOpen={isGenSchemaPanelOpen} {toast} bind:payload={PAYLOAD} />
+
 <main class="flex flex-col w-screen overflow-hidden items-center">
-   <Navbar 
-      bind:isPresetsBrowserPanelOpen 
-      bind:isStopExecutionPanelOpen 
-      bind:isLogsPanelOpen 
-      bind:isOutputPanelOpen 
-      bind:isEditPayloadPanelOpen 
-      bind:isAddFlowPanelOpen
-      bind:isPayloadRunning 
-      {runCombinedPayload} {savePayloadToLS} {loadBlankPayload}
-   />
 
    {#if PAYLOAD} 
       <Draggy class="flex flex-row mt-11 p-6 justify-center" let:list bind:list={PAYLOAD.flows} bind:this={draggyRoot}>
@@ -308,15 +324,3 @@
       </p>
    </footer>
 </main>
-
-<AlertStopExecution bind:isPanelOpen={isStopExecutionPanelOpen} stopAction={stopPayloadRequest} />
-<PayloadOutputPanel {toast} bind:isPanelOpen={isOutputPanelOpen} bind:isPayloadRunning />
-<PayloadLogsPanel {toast} bind:isPanelOpen={isLogsPanelOpen} bind:isPayloadRunning />
-<EditPayloadPanel bind:payload={PAYLOAD} bind:isPanelOpen={isEditPayloadPanelOpen} on:updatepayload={saveEditedPayload} />
-<AddOperationsPanel bind:isPanelOpen={isAddOperationPanelOpen} on:newoperation={addOperation} bind:flowID={activeFlow} bind:flow={PAYLOAD.flows}/>
-<AddFlowPanel bind:isPanelOpen={isAddFlowPanelOpen} on:addflow={addFlow} />
-<PresetsBrowserPanel {toast} bind:payload={PAYLOAD} on:loadpreset={loadPayloadPreset} bind:isPanelOpen={isPresetsBrowserPanelOpen} />
-
-{#if env?.PUBLIC_ENABLE_MJ}
-   <Ihi />
-{/if}

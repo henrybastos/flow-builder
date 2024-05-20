@@ -11,7 +11,7 @@ async function eval_expression ({ expression }) {
     // const gotoFBI = () => { window.location.href = 'https://www.fbi.gov/' };// await this.curr_page.evaluate(`if (try { gotoFBI } catch (err) {false}) { const gotoFBI = ${gotoFBI}; };`);
     // await this.curr_page.exposeFunction('gotoFBI', gotoFBI );
     // await this.curr_page.evaluate(`gotoFBI()`);
-    
+
     let expressionResult = await this.curr_page.evaluate(expression);
 
     this.logger.logEvent("operation_log", {
@@ -78,7 +78,7 @@ async function eval_expression ({ expression }) {
             logMessage = JSON.stringify(expressionResult);
         } else if (['string', 'number', 'boolean'].includes(typeof expressionResult)) { 
             logMessage = expressionResult.toString();
-            expressionResult = { [`AUTO_${ Math.random().toString().slice(3, 12) }`]: expressionResult }
+            expressionResult = { [`@private:AUTO_${ Math.random().toString().slice(3, 12) }`]: expressionResult }
         } 
 
         this.logger.logEvent("operation_log", {

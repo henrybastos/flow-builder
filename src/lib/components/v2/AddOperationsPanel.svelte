@@ -153,7 +153,7 @@
       
       try {
          const operationSchema = OPERATIONS_SCHEMA[operation];
-         console.log(operationSchema);
+         // console.log(operationSchema);
 
          operationPayload.command = operationSchema.command;
          operationPayload.enabled = true;

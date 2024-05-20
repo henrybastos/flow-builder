@@ -57,6 +57,10 @@ export async function POST ({ request }) {
             if (page.url().match(/app.jivosite.com/gi)) { await dialog.accept() }
         });
 
+        page.on('close', () => {
+            console.log('Page is closed');
+        });
+
         await page.setExtraHTTPHeaders({ 
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko)  Safari/537.36', 
             'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8', 
@@ -222,13 +226,13 @@ export async function POST ({ request }) {
     }
 
     async function runFlow (_flow, _env) {
-        if (_flow) {
-            for(const operation of _flow) {
-                // Avoids replacement issues with repeatears like Run Flow For Each
-                let operationCopy = structuredClone(operation);
-                await evalOperation(operationCopy, _env);
-            }
-        } else { return };
+        if (!_flow) { return };
+
+        for(const operation of _flow) {
+            // Avoids replacement issues with repeatears like Run Flow For Each
+            let operationCopy = structuredClone(operation);
+            await evalOperation(operationCopy, _env);
+        }
     }
 
     async function _execStream (browser) {
@@ -259,36 +263,6 @@ export async function POST ({ request }) {
             ServerLogger.closeStream();
         }
     }   
-
-    function evalQueryObject (raw_query) {
-        let query = '';
-    
-        raw_query.split('.').forEach((v, index, array) => {
-            // if (v.match(/\s/g)) { 
-            //     v = `['${ v }']` 
-            // } else {
-            //     v = `.${ v }` 
-            // }
-
-            // v = `.${ v }`
-            // query = `${ query || '' }${ v }`
-    
-            // let objQuery = `${parent_name}${query} = value`;
-    
-            
-            query.split('.').reduce((a,b) => {
-                if (eval(`!${a}.${b}`) ) { eval(`${a}.${b} = {}`) }
-                console.log(eval(`[QueryObject] ${a}.${b}\n`)); 
-                return `${a}.${b}`; 
-            })
-
-            // if (index == array.length - 1) { 
-            //     eval(objQuery);
-            // }
-
-            // console.log(objQuery);
-        })
-    }
     
     return new Response(stream, {
         headers: {

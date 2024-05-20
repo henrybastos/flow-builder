@@ -21,6 +21,10 @@
       delete operation.data.description;
       operation = operation;
    }
+
+   function toggleOperation () {
+      operation.data.enabled = !operation.data.enabled;
+   }
 </script>
 
 <DropdownMenu.Root>
@@ -30,15 +34,27 @@
       </Button>
    </DropdownMenu.Trigger>
    <DropdownMenu.Content class="w-56">
-      {#if !operation.data?.description}
-         <DropdownMenu.Item on:click={addDescription}>
-            Add description
-         </DropdownMenu.Item>
-      {:else}
+      {#if operation.data?.description}
          <DropdownMenu.Item class="text-red-600" on:click={removeDescription}>
             Remove description
          </DropdownMenu.Item>
+      {:else}
+         <DropdownMenu.Item on:click={addDescription}>
+            Add description
+         </DropdownMenu.Item>
       {/if}
+
+      {#if operation.data.enabled}
+         <DropdownMenu.Item on:click={toggleOperation}>
+            Disable operation
+         </DropdownMenu.Item>
+      {:else}
+         <DropdownMenu.Item on:click={toggleOperation}>
+            Enable operation
+         </DropdownMenu.Item>
+      {/if}
+
+      <DropdownMenu.Separator />
 
       <DropdownMenu.Item on:click={deleteOperation} class="text-red-600">
          Delete operation

@@ -38,7 +38,7 @@
             }
 
             if (enableImage) {
-               showMichael = Math.round(Math.random() * 4);
+               showMichael = Math.round(Math.random() * 5);
                
                setTimeout(() => {
                   showMichael = null;
@@ -68,5 +68,7 @@
       <img alt="michale" class="fixed h-[100vh] w-[100vw]" src="mj-3.gif">
    {:else if showMichael === 4}
       <img alt="michale" class="fixed h-[100vh] w-[100vw]" src="mj-4.jpeg">
+   {:else if showMichael === 5}
+      <img alt="michale" class="fixed h-[100vh] w-[100vw]" src="mj-5.jpg">
    {/if}
 {/if}

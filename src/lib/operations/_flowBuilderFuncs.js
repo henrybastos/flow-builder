@@ -8,10 +8,10 @@
 export const env = (obj) => obj;
 
 /** Sets a value in env payload with a query. */
-export const env_query = (obj) => { 
+export const env_query = (obj) => {
     const [queryKey, value] = Object.entries(obj)?.[0];
-    console.log({ [`@query:${ queryKey }`]: value });
-    return { [`@query:${ queryKey }`]: value };
+    console.log({ [`@query:${queryKey}`]: value });
+    return { [`@query:${queryKey}`]: value };
 };
 
 export const x = (path, root) => document.evaluate(path, root || document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
@@ -42,43 +42,46 @@ export const set_element_value = (x_path, value, attribute = 'value') => {
         console.log('Failed to set element value');
         return ({ error: 'Failed to set element value' });
     }
- }
+}
 
 export const goto = (href) => { window.location.href = href };
 
-export const async_eval = async (maxAttempts = 5, interval = 5000, cb) => {
+export const async_eval = async (maxAttempts = 5, interval = 5000, cb, elsePayload) => {
     let attempt = 0;
     let evalReturnValue = 'No response from async_eval Promise.';
 
-    if (cb) { 
+    if (cb) {
         evalReturnValue = await new Promise((resolve) => {
-           const timeInterval = setInterval(() => {
-              attempt++;
-              console.log(`Attempt ${attempt} of ${maxAttempts}`);
-     
-              const cbResolve = (value) => {
-                clearInterval(timeInterval);
-                resolve(value);
-              }
+            const timeInterval = setInterval(() => {
+                attempt++;
+                console.log(`Attempt ${attempt} of ${maxAttempts}`);
 
-              try {
-                  const cbError = cb(cbResolve);
-         
-                  if (attempt >= maxAttempts) {
-                     clearInterval(timeInterval);
-                     if (cbError) { resolve(cbError); } 
-                     else { resolve({ '@private:warning': `Max attempts reached: ${ maxAttempts }` }) }
-                  }
-              } catch (err) {
-                resolve({ error: err });
-                clearInterval(timeInterval);
-              }
-           }, interval)
+                const cbResolve = (value) => {
+                    clearInterval(timeInterval);
+                    resolve(value);
+                }
+
+                try {
+                    const cbError = cb(cbResolve);
+
+                    if (attempt >= maxAttempts) {
+                        clearInterval(timeInterval);
+                        if (cbError) { 
+                            resolve(cbError); 
+                        } else {
+                            resolve(elsePayload || { '@private:warning': `Max attempts reached: ${maxAttempts}` });
+                        }
+                    }
+                } catch (err) {
+                    resolve({ error: err });
+                    clearInterval(timeInterval);
+                }
+            }, interval)
         });
     } else {
         evalReturnValue = 'No callback function found to execute on the async_eval function.'
     }
- 
+
     console.log('[ASYNC EVAL RESULT]', evalReturnValue);
     return evalReturnValue;
 }
@@ -89,28 +92,28 @@ export const wait_for_element = async (secs, xpath) => {
 
 export const download_blob = async (filename, link) => {
     // Hoping it resolves CORS problems
-    
+
     let startTime = Date.now();
 
-    console.log(`[${ new Date().toLocaleTimeString() }] Fetching url...`);
+    console.log(`[${new Date().toLocaleTimeString()}] Fetching url...`);
     const response = await fetch(link);
-    console.log(`[${ new Date().toLocaleTimeString() }] Converting to blob...`);
+    console.log(`[${new Date().toLocaleTimeString()}] Converting to blob...`);
     const blobImage = await response.blob();
     const href = URL.createObjectURL(blobImage);
-    
+
     const anchor = document.createElement('a');
     anchor.setAttribute('download', filename);
     anchor.setAttribute('href', href);
-    
+
     document.querySelector('body').appendChild(anchor);
-    console.log(`[${ new Date().toLocaleTimeString() }] Downloading...`);
+    console.log(`[${new Date().toLocaleTimeString()}] Downloading...`);
     anchor.click();
 
     let elapsedTime = Math.ceil(Date.now() - startTime);
-    let formattedElapsedTime = `${ Math.floor((elapsedTime / 1000) / 60) }m ${ Math.floor((elapsedTime / 1000) % 60) }s ${ Math.floor(elapsedTime % 1000) }ms`
+    let formattedElapsedTime = `${Math.floor((elapsedTime / 1000) / 60)}m ${Math.floor((elapsedTime / 1000) % 60)}s ${Math.floor(elapsedTime % 1000)}ms`
 
-    console.log(`[${ new Date().toLocaleTimeString() }] Done`);
-    console.log(`Elapsed time: ${ formattedElapsedTime }`);
+    console.log(`[${new Date().toLocaleTimeString()}] Done`);
+    console.log(`Elapsed time: ${formattedElapsedTime}`);
 }
 
 // export const download_yt_video = async (filename) => {

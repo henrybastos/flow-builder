@@ -7,6 +7,7 @@
    import Textarea from "$lib/components/ui/textarea/textarea.svelte";
    import FlowOperationDropdown from "./FlowOperationDropdown.svelte";
    import Button from "$lib/components/ui/button/button.svelte";
+   import Badge from "$lib/components/ui/badge/badge.svelte";
    import { getContext } from "svelte";
 
    export let flows;
@@ -28,9 +29,14 @@
 <Card.Root class="data-[draggy-active]:opacity-30 border-0 rounded-none">
    <Card.Header>
       <div class="inline-flex justify-between">
-         <div class="inline-flex">
+         <div class="flex flex-row items-center">
             <i data-draggy-grab class="ti ti-grip-vertical mr-3 cursor-grab text-blue-500"></i>
-            <Card.Title class="text-xl">{ operationSchema.label }</Card.Title>
+            {#if operation.data.enabled}
+               <Card.Title class="text-xl">{ operationSchema.label }</Card.Title>
+            {:else}
+               <Card.Title class="text-xl text-muted-foreground">{ operationSchema.label }</Card.Title>
+               <Badge variant="destructive" class="uppercase text-xs ml-3">Disabled</Badge>
+            {/if}
          </div>
          <FlowOperationDropdown bind:operation={operation} />
       </div>
@@ -100,6 +106,7 @@
                         <Select.Value class="text-base capitalize" placeholder={operation.data[command_name].replaceAll('_', ' ')} />
                      </Select.Trigger>
                      <Select.Content>
+                        <Select.Item value='' label='' class="text-base">-</Select.Item>
                         {#each Object.keys(flows) as flow}
                            <Select.Item value={flow} label={flow.replaceAll('_', ' ')} class="text-base capitalize">{ flow.replaceAll('_', ' ') }</Select.Item>
                         {/each}

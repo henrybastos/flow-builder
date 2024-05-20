@@ -56,7 +56,7 @@ export class ServerHandler {
         for (let sse_event of SSEData) {
             switch (sse_event.event) {
                 case 'response':
-                    this.responsePayload = JSON.stringify(sse_event.data?.payload || { error: 'undefined payload' }, null, 3);
+                    this.responsePayload = JSON.stringify(sse_event.data?.payload || { error: 'Undefined payload. Check payload size (may be too big for text/stream).' }, null, 3);
                     // this.logger.logMessage(sse_event.data.message, this.logger_tags.info);
                     break;
                 case 'system':

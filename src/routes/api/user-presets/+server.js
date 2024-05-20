@@ -6,12 +6,12 @@ export async function POST ({ request }) {
    const db = new sqlite3.Database(DATABASE_FILENAME);
    const req = await request.json();
    let responseErrorMessage;
+   let newPresetID;
 
    return await new Promise((resolve) => {
       db.serialize(() => {
          const propertiesNotFound = [
             ( !req?.name && 'Name' ),
-            ( !req?.description && 'Description' ),
             ( !req?.payload && 'Payload' )
          ].filter(v => v);
          // console.log(propertiesNotFound);
@@ -21,24 +21,27 @@ export async function POST ({ request }) {
             id VARCHAR(64) PRIMARY KEY NOT NULL,
             name TEXT NOT NULL,
             description TEXT,
-            date DATE DEFAULT CURRENT_DATE,
-            payload TEXT
+            created_at DATE DEFAULT CURRENT_DATE,
+            updated_at DATE DEFAULT CURRENT_DATE,
+            payload TEXT NOT NULL
          );`);
             
          if (propertiesNotFound.length > 0)  {
-            responseErrorMessage = `[SQLITE/POST :: ERROR] ${ propertiesNotFound.join(' and ') } required but not found.`;
+            responseErrorMessage = `[SQLITE::POST / ERROR] ${ propertiesNotFound.join(' and ') } required but not found.`;
             console.log('[SQLITE/POST] Request:', req);
          } else {
-            db.prepare('INSERT INTO presets VALUES (?, ?, ?, ?, ?)')
+            newPresetID = crypto.randomUUID();
+            db.prepare('INSERT INTO presets VALUES (?, ?, ?, ?, ?, ?)')
                .run(
-                  crypto.randomUUID(), 
+                  newPresetID, 
                   req.name, 
-                  req.description, 
-                  new Date().toLocaleDateString(),
+                  req.description || '', 
+                  new Date().toLocaleDateString('pt-BR'),
+                  `${ new Date().toLocaleDateString('pt-BR')} - ${new Date().toLocaleTimeString('pt-BR') }`,
                   req.payload
                , (error) => {
                   if (error) {
-                     responseErrorMessage = `[SQLITE - POST // ERROR] ${ error?.message }`;
+                     responseErrorMessage = `[SQLITE::POST / ERROR] ${ error?.message }`;
                   }
                })
                .finalize();
@@ -51,9 +54,12 @@ export async function POST ({ request }) {
    
       db.close(() => {
          resolve(new Response(JSON.stringify({
-            message: responseErrorMessage || '[SQLITE - POST // SUCCESS] Item added',
+            message: responseErrorMessage || '[SQLITE::POST / SUCCESS] Item added',
             code: responseErrorMessage ? 1 : 0,
-            item: req
+            item: {
+               id: newPresetID,
+               ...req
+            }
          }, null, 3)));
       });
    })
@@ -91,7 +97,7 @@ export async function DELETE () {
    return await new Promise((resolve) => {
       db.serialize(() => {
          db.run('DROP TABLE IF EXISTS presets');
-         responseMessage = '[SQLITE - DELETE] Table presets deleted.';
+         responseMessage = '[SQLITE::DELETE] Table presets deleted.';
       })
    
       db.close(() => {

@@ -1,6 +1,7 @@
 <script>
    import { createEventDispatcher } from "svelte";
    import * as Dialog from "$lib/components/ui/dialog";
+   import * as AlertDialog from "$lib/components/ui/alert-dialog";
    import * as Table from "$lib/components/ui/table";
    import * as Collapsible from "$lib/components/ui/collapsible";
    import { ScrollArea } from "$lib/components/ui/scroll-area";
@@ -12,10 +13,11 @@
    export let isPanelOpen = false;
    export let payload;
    export let toast;
-
+   
    let presets = [];
    let activePresetID;
    let isFetchLoading = false;
+   let isConfirmAlertDialogOpen = false;
    let newPresetName;
    let newPresetDescription;
    const dispatch = createEventDispatcher();
@@ -103,8 +105,24 @@
       // console.log('RESPONSE', response);
    }
 
-   function editPreset () {
+   async function updatePreset () {
+      const targetPreset = presets.find(preset => preset.id === activePresetID );
 
+      const result = await fetch(`/api/user-presets/${ activePresetID }`, {
+         method: 'PATCH',
+         headers: {
+            'Content-Type': 'application/json'
+         },
+         body: JSON.stringify({
+            name: targetPreset.name,
+            description: targetPreset.description,
+            payload: JSON.stringify(payload)
+         })
+      })
+
+      getAllPresets();
+      // console.log(await result.json());
+      console.log('[PRESET UPDATED]');
    }
 
    async function removePreset () {
@@ -132,7 +150,7 @@
 </script>
 
 <Dialog.Root bind:open={isPanelOpen}>
-   <Dialog.Content class="max-w-[60rem]">
+   <Dialog.Content class="max-w-[62rem]">
       <Dialog.Header class="flex flex-row justify-between items-center">
          <Dialog.Title class="text-2xl">Payload Presets</Dialog.Title>
          <Button class="mr-3" variant="ghost" size="icon" on:click={getAllPresets}>
@@ -186,9 +204,10 @@
             <Table.Root class="text-base">
                <Table.Header>
                   <Table.Row>
-                     <Table.Head class="w-[16rem]">Name</Table.Head>
+                     <Table.Head class="w-[20rem]">Name</Table.Head>
                      <Table.Head>Description</Table.Head>
-                     <Table.Head class="w-[8rem]">Date</Table.Head>
+                     <Table.Head>Created at</Table.Head>
+                     <Table.Head class="w-[20rem]">Updated at</Table.Head>
                   </Table.Row>
                </Table.Header>
                <Table.Body>
@@ -197,13 +216,15 @@
                         <Table.Row class="cursor-pointer text-blue-500" on:click={() => changeSelectedPreset(preset.id)}>
                            <Table.Cell>{ preset.name }</Table.Cell>
                            <Table.Cell>{ preset.description }</Table.Cell>
-                           <Table.Cell>{ preset.date }</Table.Cell>
+                           <Table.Cell>{ preset.created_at }</Table.Cell>
+                           <Table.Cell>{ preset.updated_at }</Table.Cell>
                         </Table.Row>
                      {:else}
                         <Table.Row class="cursor-pointer" on:click={() => changeSelectedPreset(preset.id)}>
                            <Table.Cell>{ preset.name }</Table.Cell>
                            <Table.Cell class="text-neutral-300">{ preset.description }</Table.Cell>
-                           <Table.Cell class="text-neutral-400">{ preset.date }</Table.Cell>
+                           <Table.Cell class="text-neutral-400">{ preset.created_at }</Table.Cell>
+                           <Table.Cell class="text-neutral-400">{ preset.updated_at }</Table.Cell>
                         </Table.Row>
                      {/if}
                   {/each}
@@ -251,11 +272,11 @@
                <div class="flex flex-row items-center space-x-3">
                   {#if activePresetID}
                      <p>Preset: { presets.find(preset => preset.id === activePresetID ).name }</p>
-                     <Button variant="outline" on:click={editPreset}>Edit preset</Button>
+                     <Button variant="outline" on:click={() => isConfirmAlertDialogOpen = true}>Update preset</Button>
                      <Button variant="destructive" on:click={removePreset}>Delete preset</Button>
                   {:else}
                      <p>Select a preset</p>
-                     <Button disabled variant="outline">Edit preset</Button>
+                     <Button disabled variant="outline">Update preset</Button>
                      <Button disabled variant="destructive">Delete preset</Button>
                   {/if}
                </div>
@@ -264,3 +285,17 @@
       </Dialog.Footer>
    </Dialog.Content>
 </Dialog.Root>
+
+<AlertDialog.Root bind:open={isConfirmAlertDialogOpen}>
+   <AlertDialog.Content>
+       <AlertDialog.Header>
+           <AlertDialog.Title>Are you sure you want to update the preset { presets.find(preset => preset.id === activePresetID ).name }?</AlertDialog.Title>
+           <AlertDialog.Description class="text-base">This operation cannot be undone.</AlertDialog.Description>
+       </AlertDialog.Header>
+
+       <AlertDialog.Footer>
+          <AlertDialog.Action on:click={updatePreset}>Update</AlertDialog.Action>
+          <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+      </AlertDialog.Footer>
+   </AlertDialog.Content>
+</AlertDialog.Root>

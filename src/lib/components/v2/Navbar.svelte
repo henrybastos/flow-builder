@@ -13,6 +13,17 @@
    export let isEditPayloadPanelOpen;
    export let isAddFlowPanelOpen;
    export let isPresetsBrowserPanelOpen;
+   export let isGenSchemaPanelOpen;
+
+   const footerMessages = {
+      genSchemaPanel: '[GenSchemaPanel]: Transforms the current payload to a Typescrypt file compatible with Flow Composer.',
+      stopExecution: '[StopBrowser]: Stops the payload execution.',
+      runCombinedPayload: '[RunMainFlow]: Executes the payload.',
+      logs: '[Logs]: Opens the Logs panel.',
+      output: '[Output]: Opens the Output panel.',
+      editPayloadPanel: '[EditPayloadPanel]: Edits the payload.',
+      addFlowPanel: '[AddFlowPanel]: Adds a new flow to the payload.'
+   }
 
    let isHoverOpen = false;
 </script>
@@ -21,29 +32,33 @@
    <div class="flex flex-row p-2 w-full justify-between">
       <div>
          {#if isPayloadRunning}
-            <Button on:click={() => isStopExecutionPanelOpen = true} data-footer-message='[StopBrowser]: Stops the payload execution.' variant="ghost">
+            <Button on:click={() => isStopExecutionPanelOpen = true} data-footer-message={footerMessages.stopExecution} variant="ghost">
                <i class="ti ti-player-stop text-red-500 mr-2"></i> Stop
             </Button>
          {:else}
-            <Button on:click={runCombinedPayload} data-footer-message='[RunMainFlow]: Executes the payload.' variant="ghost">
+            <Button on:click={runCombinedPayload} data-footer-message={footerMessages.runCombinedPayload} variant="ghost">
                <i class="ti ti-player-play-filled mr-2"></i> Run 
             </Button>
          {/if}
          
-         <Button variant="ghost" data-footer-message='[Logs]: Opens the Logs panel.' on:click={() => isLogsPanelOpen = true}>
+         <Button variant="ghost" data-footer-message={footerMessages.logs} on:click={() => isLogsPanelOpen = true}>
             <i class="ti ti-logs mr-2"></i> Logs
          </Button>
 
-         <Button variant="ghost" data-footer-message='[Output]: Opens the Output panel.' on:click={() => isOutputPanelOpen = true}>
+         <Button variant="ghost" data-footer-message={footerMessages.output} on:click={() => isOutputPanelOpen = true}>
             <i class="ti ti-toilet-paper mr-2"></i> Output
          </Button>
 
-         <Button on:click={() => isEditPayloadPanelOpen = true} data-footer-message='[EditPayloadPanel]: Edits the payload.' variant="ghost">
+         <Button on:click={() => isEditPayloadPanelOpen = true} data-footer-message={footerMessages.editPayloadPanel} variant="ghost">
             <i class="ti ti-braces mr-2"></i> Payload
          </Button>
 
-         <Button on:click={() => isAddFlowPanelOpen = true} data-footer-message='[AddFlowPanel]: Adds a new flow to the payload.' variant="ghost">
+         <Button on:click={() => isAddFlowPanelOpen = true} data-footer-message={footerMessages.addFlowPanel} variant="ghost">
             <i class="ti ti-cube-plus mr-2"></i>Add flow
+         </Button>
+         
+         <Button on:click={() => isGenSchemaPanelOpen = true} data-footer-message={footerMessages.genSchemaPanel} variant="ghost">
+            <i class="ti ti-arrows-shuffle mr-2"></i>Gen Schema
          </Button>
       </div>
       

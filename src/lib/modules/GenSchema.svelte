@@ -2,14 +2,16 @@
     import * as Dialog from "$lib/components/ui/dialog";
     import * as Tabs from "$lib/components/ui/tabs";
     import * as Select from "$lib/components/ui/select";
+    import * as Tooltip from "$lib/components/ui/tooltip";
     import { Textarea } from "$lib/components/ui/textarea";
     import Button from "$lib/components/ui/button/button.svelte";
     import Input from "$lib/components/ui/input/input.svelte";
     import Label from "$lib/components/ui/label/label.svelte";
     
     export let toast;
+    export let isPanelOpen;
+    export let payload;
 
-    let isFlowBlocksListOpen = false;
     let generatedSchema;
     let generatedSchemaTextarea;
     let envPayload;
@@ -163,13 +165,13 @@ export const @@block_filename@: BlockProps = {
         
         toast.success('Schema copied!');
    }
+
+   function fetchPayload () {
+        envPayload = structuredClone(JSON.stringify(payload, null, 3));
+   }
 </script>
 
-<svelte:window on:load={() => console.log('Hello!')}/>
-
-<Button variant="secondary" on:click={() => isFlowBlocksListOpen = true}>Generate Flow Block</Button>
-
-<Dialog.Root bind:open={isFlowBlocksListOpen}>
+<Dialog.Root bind:open={isPanelOpen}>
     <Dialog.Content class="min-w-[60rem] max-h-[80vh]">
         <Dialog.Header>
             <Dialog.Title>Generate Flow Block</Dialog.Title>
@@ -182,7 +184,19 @@ export const @@block_filename@: BlockProps = {
             </Tabs.List>
 
             <Tabs.Content value="env_payload">
-                <h3 class="text-lg my-3">Env payload</h3>
+                <div class="flex flex-row items-center justify-between my-2">
+                    <h3 class="text-lg my-3">Env payload</h3>
+                    <Tooltip.Root>
+                        <Tooltip.Trigger tabindex={-1}>
+                            <Button on:click={fetchPayload} size="icon" variant="ghost">
+                                <i class="ti ti-refresh"></i>
+                            </Button>
+                        </Tooltip.Trigger>
+                        <Tooltip.Content align="start" side="left">
+                            <p class="text-base whitespace-nowrap">Fetches de current payload</p>
+                        </Tooltip.Content>
+                    </Tooltip.Root>
+                </div>
                 <Textarea class="h-[100rem] max-h-[50vh] text-base font-code resize-none" bind:value={envPayload} placeholder="Original payload"/>
                 
                 <div class="flex flex-row flex-wrap space-y-4">
