@@ -172,16 +172,19 @@ export async function POST ({ request }) {
 
                         if (flags.query) {
                             if (flags.scoped) {
-                                fillUndefinedQueryMembers(`${key}`, _env);
-                                eval(`_env.${key} = value`);
+                                let bracketKey = fillUndefinedQueryMembers(key, _env);
+                                console.log('[ENV]', _env, `_env${bracketKey} = value`);
+                                eval(`_env${bracketKey} = value`);
                             } else {
-                                fillUndefinedQueryMembers(`${key}`, payload.env);
-                                eval(`payload.env.${key} = value`);
+                                let bracketKey = fillUndefinedQueryMembers(key, payload.env);
+                                console.log('[PAYLOAD]', payload.env, `payload.env${bracketKey} = value`);
+                                eval(`payload.env${bracketKey} = value`);
                             }
             
                             if (!flags.private) {
-                                fillUndefinedQueryMembers(`${key}`, responsePayload);
-                                eval(`responsePayload.${key} = value`);
+                                let bracketKey = fillUndefinedQueryMembers(key, responsePayload);
+                                console.log('[RESPONSE]', responsePayload, `responsePayload${bracketKey} = value`);
+                                eval(`responsePayload${bracketKey} = value`);
                             }
                         } else {
                             console.log('ENV VALUE', value);

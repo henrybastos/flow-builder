@@ -22,18 +22,17 @@ export function replaceEnvPlaceholders (_operation, _env) {
 }
 
 export function fillUndefinedQueryMembers (query, obj) {
-    query.split('.').reduce((a,b) => {
+    let newQuery = query.split('.').reduce((a,b) => {
         console.log(`Checking ${a} ...`);
-        if (eval(`!obj.${a}`)) { 
-            eval(`obj.${a} = {}`) 
+        if (eval(`Object.keys(obj['${a}'] || {}).length == 0`)) { 
+            eval(`obj['${a}'] = {}`) 
         }
 
         console.log(`Checking ${a}.${b} ...`);
-        if (eval(`!obj.${a}.${b}`)) { 
-            eval(`obj.${a}.${b} = {}`) 
+        if (eval(`Object.keys(obj['${a}']['${b}'] || {}).length == 0`)) { 
+            eval(`obj['${a}']['${b}'] = {}`) 
         }
-        console.log(eval(`obj.${a}.${b}\n`)); 
-        return `${a}.${b}`; 
+        return `['${a}']['${b}']`; 
     })
-    return obj;
+    return newQuery;
 }

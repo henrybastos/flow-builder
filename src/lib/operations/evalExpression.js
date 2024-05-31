@@ -32,7 +32,7 @@ async function eval_expression ({ expression }) {
                 if (query) {
                     const fb = await this.curr_page.evaluate('_$fb');
                     fillUndefinedQueryMembers(key, fb);
-                    eval(`fb.${key} = value`);
+                    eval(`fb${key} = value`);
                     await this.curr_page.evaluate((fb) => {_$fb = fb}, fb);
                 } else {
                     await this.curr_page.evaluate((result) => {_$fb = { ..._$fb, ...(result)}}, { [key]: value });
