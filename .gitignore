@@ -12,7 +12,7 @@ src/lib/flow-blocks
 public
 static/screenshots
 static/last_error.png
-src/database/data.db
+src/database/*.db
 .sh
 .jpg
 .jpeg
